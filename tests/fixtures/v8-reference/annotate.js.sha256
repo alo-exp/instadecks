@@ -1,2 +1,2 @@
-# PRE-PATCH SHA — Phase 2 replaces with post-patch SHA after applying require-path patch and committing skills/annotate/scripts/annotate.js.
-c21aa66dc7e6563d425cd4739a31a68693e6d4a386e9605a7b91f1bde99d239e  annotate.js
+# POST-PATCH SHA — recorded after applying require-path patch (line 6) and SAMPLES-extraction substitution (lines 107-150). See ANNO-02/03/04.
+186d881bbc200d695266ca5588a49c1a1a1dfc4ce70cc19563c1cfaf1050d545  annotate.js
