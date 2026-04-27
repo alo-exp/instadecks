@@ -6,13 +6,15 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** A user can hand Claude Code arbitrary input material and end up with a polished, design-reviewed, annotated PPTX + PDF — without having to know about pptxgenjs, custom-geometry arrows, or our deck-design-review skill — and the output quality matches what we ship by hand today.
 **Current focus:** Phase 1 — Plugin Foundation, Contract & CI Gates
+**Current milestone:** v0.1.0 — Plugin v0.1.0 Public Release
 
 ## Current Position
 
+Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 7 phases, 67 requirements
 Phase: 1 of 7 (Plugin Foundation, Contract & CI Gates)
 Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-04-27 — Roadmap created (7 phases, 67 v1 requirements mapped, 100% coverage)
+Status: Ready to plan — milestone formalized, awaiting `/gsd-discuss-phase 1` or `/gsd-plan-phase 1`
+Last activity: 2026-04-27 — Milestone v0.1.0 formalized (existing 7-phase roadmap from /gsd-new-project labeled as v0.1.0)
 
 Progress: [░░░░░░░░░░] 0%
 

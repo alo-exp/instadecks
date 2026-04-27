@@ -1,8 +1,23 @@
 # Instadecks
 
+## Current Milestone: v0.1.0 Plugin v0.1.0 Public Release
+
+**Goal:** Ship Instadecks v0.1.0 as a publicly installable Claude Code plugin via the alo-labs marketplace, with the four user-invocable slash skills end-to-end (`/create`, `/review`, `/content-review`, `/annotate`) producing v8-pixel-parity output and full Apache-2.0 license compliance.
+
+**Target features:**
+- Plugin Foundation, Contract & CI Gates (Phase 1)
+- `/instadecks:annotate` verbatim wired to locked contract (Phase 2)
+- `/instadecks:review` with DECK-VDA + R18 AI-tell detection (Phase 3)
+- `/instadecks:create` scaffold + render cookbook + 8 slide types (Phase 4)
+- `/instadecks:create` auto-refine loop with convergence rule (Phase 5)
+- `/instadecks:content-review` with Pyramid Principle / MECE / narrative-arc (Phase 6)
+- Marketplace publication, license compliance, v0.1.0 release tag (Phase 7)
+
+**Phase numbering / scope:** The existing 7-phase ROADMAP.md created during `/gsd-new-project` IS the v0.1.0 milestone roadmap. 67 requirements (FOUND/ANNO/RVW/CRT/CRV/DIST) map 1:1 to the 7 phases. Development uses Silver Bullet's `full-dev-cycle` composable workflow per phase.
+
 ## What This Is
 
-A Claude Code plugin that productizes a refined deck-building workflow into three slash skills — `/instadecks:create`, `/instadecks:review`, and `/instadecks:annotate` — so anyone using Claude Code can generate, critique, and visually mark up PowerPoint decks with the same approach we developed across the *Agentic Disruption v8 BluePrestige* iterations. Distributed publicly via the alo-labs marketplace; aimed at any Claude Code user who builds presentations.
+A Claude Code plugin that productizes a refined deck-building workflow into four slash skills — `/instadecks:create`, `/instadecks:review`, `/instadecks:content-review`, and `/instadecks:annotate` — so anyone using Claude Code can generate, critique, and visually mark up PowerPoint decks with the same approach we developed across the *Agentic Disruption v8 BluePrestige* iterations. Distributed publicly via the alo-labs marketplace; aimed at any Claude Code user who builds presentations.
 
 ## Core Value
 
@@ -98,4 +113,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-27 after initialization*
+*Last updated: 2026-04-27 after milestone v0.1.0 formalization*
