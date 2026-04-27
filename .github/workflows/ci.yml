@@ -15,7 +15,4 @@ jobs:
       - name: Run tests
         run: npm test --if-present
       - name: Hardcoded path lint
-        run: |
-          ! grep -rE "/Users/|~/.claude|/home/|C:\\\\\\\\" \
-              --include="*.js" --include="*.cjs" --include="*.json" --include="*.md" \
-              --exclude-dir=node_modules --exclude-dir=.git --exclude-dir=.planning .
+        run: bash tools/lint-paths.sh
