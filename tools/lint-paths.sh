@@ -13,6 +13,10 @@
 #   - .silver-bullet.json       — third-party tool config (silver-bullet state
 #                                  paths under ~/.claude); JSON cannot host the
 #                                  inline `# lint-allow:hardcoded-path` token
+#   - .planning/HANDOFF.json    — pause-work state file; legitimately references
+#                                  source-of-truth paths from CLAUDE.md (e.g.,
+#                                  v8 BluePrestige source); JSON can't host the
+#                                  inline allowlist comment
 #   - README.md, HANDOFF.md, CLAUDE.md, silver-bullet.md, NOTICE, LICENSE
 #                                — top-level narrative docs
 #   - docs/**/*.md              — narrative discussion of the patterns
@@ -33,7 +37,7 @@ cd "$(git rev-parse --show-toplevel)"
 # Trailing `|| true` keeps the pipeline alive when grep finds zero matches.
 HITS=$(git ls-files -z \
   | xargs -0 grep -HInE '/Users/|~/\.claude|/home/|C:\\\\' 2>/dev/null \
-  | grep -vE '^(tests/fixtures/|tests/path-lint\.test\.js:|tools/lint-paths\.sh:|\.silver-bullet\.json:|(^|/)README\.md:|(^|/)HANDOFF\.md:|(^|/)CLAUDE\.md:|(^|/)silver-bullet\.md:|(^|/)NOTICE:|(^|/)LICENSE:|docs/.+\.md:|\.planning/.+\.md:)' \
+  | grep -vE '^(tests/fixtures/|tests/path-lint\.test\.js:|tools/lint-paths\.sh:|\.silver-bullet\.json:|\.planning/HANDOFF\.json:|(^|/)README\.md:|(^|/)HANDOFF\.md:|(^|/)CLAUDE\.md:|(^|/)silver-bullet\.md:|(^|/)NOTICE:|(^|/)LICENSE:|docs/.+\.md:|\.planning/.+\.md:)' \
   | grep -v '# lint-allow:hardcoded-path' \
   || true)
 
