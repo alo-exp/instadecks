@@ -1,0 +1,23 @@
+{
+  "name": "instadecks",
+  "version": "0.1.0",
+  "description": "Generate, review, content-review, and annotate polished presentation decks.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint:paths": "bash tools/lint-paths.sh",
+    "validate:manifest": "node tools/validate-manifest.js",
+    "assert:pin": "node tools/assert-pptxgenjs-pin.js"
+  },
+  "dependencies": {
+    "pptxgenjs": "4.0.1"
+  },
+  "devDependencies": {
+    "license-checker": "^25.0.1",
+    "pixelmatch": "^5.3.0",
+    "pngjs": "^7.0.0"
+  }
+}
