@@ -171,4 +171,57 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   };
 }
 
-module.exports = { runAnnotate, generateRunId, resolveSiblingOutputs };
+/**
+ * Test-only entry point: runs the same pipeline as runAnnotate but accepts a
+ * pre-computed SAMPLES array (skipping the adapter). Required by the visual-
+ * regression test (tests/annotate-visual-regression.test.js) to inject v8
+ * author-curated SAMPLES verbatim per RESEARCH §A1 so byte-identical SHA
+ * comparison against the Phase 1 baseline is possible.
+ *
+ * NOT part of the public D-06 contract — do not call from /review or /create.
+ * The leading `_` prefix signals non-public; threat T-02-08 (validation
+ * bypass) is accepted because no public CLI surfaces this export.
+ */
+async function _runAnnotateWithRawSamples({ deckPath, samples, outDir, runId } = {}) {
+  if (!deckPath) throw new Error('_runAnnotateWithRawSamples: deckPath required');
+  if (!Array.isArray(samples)) throw new Error('_runAnnotateWithRawSamples: samples must be array');
+
+  runId = runId || generateRunId();
+  outDir = outDir || path.join(process.cwd(), '.planning', 'instadecks', runId);
+  await fsp.mkdir(outDir, { recursive: true });
+
+  setSamples(samples);
+  const work = await prepareWork({ outDir, samples });
+  ensurePptxgenjsPath();
+
+  const pptxRun = path.join(work.cwd, 'Annotations_Sample.pptx');
+  let baselineMtimeMs = 0;
+  try { baselineMtimeMs = fs.statSync(pptxRun).mtimeMs; } catch (_) { /* missing — fine */ }
+
+  const annotateEntry = path.join(work.cwd, 'annotate.js');
+  delete require.cache[require.resolve(annotateEntry)];
+  const origLog = console.log;
+  console.log = (...args) => console.error(...args);
+  try {
+    require(annotateEntry);
+    await awaitPptxOnDisk(pptxRun, baselineMtimeMs);
+  } finally {
+    console.log = origLog;
+  }
+  const pdfRun = await convertToPdf(pptxRun, outDir);
+
+  const sibling = resolveSiblingOutputs(deckPath);
+  await fsp.copyFile(pptxRun, sibling.pptxPath);
+  await fsp.copyFile(pdfRun, sibling.pdfPath);
+
+  return {
+    pptxPath: sibling.pptxPath,
+    pdfPath: sibling.pdfPath,
+    runDir: outDir,
+    runId,
+    pptxRun,
+    pdfRun,
+  };
+}
+
+module.exports = { runAnnotate, generateRunId, resolveSiblingOutputs, _runAnnotateWithRawSamples };
