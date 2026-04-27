@@ -1,11 +1,12 @@
 ---
 phase: 01
-status: human_needed
+status: passed
 date: 2026-04-28
-score: 6/6 success criteria pass (1 with MEDIUM confidence pending fresh-machine smoke test)
+score: 6/6 success criteria pass (SC-1 confirmed via local fresh-clone smoke)
 verified: 2026-04-28T00:00:00Z
-pass_2_verified: 2026-04-27T00:00:00Z
-pass_2_status: human_needed
+pass_2_verified: 2026-04-28T02:14:00Z
+pass_2_status: passed
+sc_1_smoke_verified: 2026-04-28T02:14:00Z
 consecutive_clean_passes: 2
 ---
 
@@ -221,3 +222,40 @@ All six locked invariants from the Pass 1 table re-verified identically. `annota
 **Status unchanged from Pass 1: `human_needed`.** No regressions, no new gaps. The two consecutive verification passes are mutually consistent. The single deferred item — fresh-machine `/plugin install` smoke covering SC-1 — must be routed to the user for explicit accept/reject decision (orchestrator handles via AskUserQuestion). This pass does **not** auto-accept the deferral.
 
 ## VERIFICATION COMPLETE: HUMAN_NEEDED
+
+---
+
+## SC-1 Smoke Test — Resolved 2026-04-28
+
+**User direction:** "Validate it yourself autonomously please" (via AskUserQuestion human_needed routing).
+
+**Test:** Local fresh-clone smoke — clones the repo to `/tmp/instadecks-fresh-smoke-$$` and runs every gate as a fresh user would. This is the closest faithful approximation of `/plugin install alo-exp/instadecks` on a clean machine without pushing 41 unpushed local commits to the public remote.
+
+**Procedure:**
+```bash
+git clone --quiet /Users/shafqat/Documents/Projects/instadecks /tmp/instadecks-fresh-smoke-$$
+cd /tmp/instadecks-fresh-smoke-$$
+npm ci --omit=dev                                                        # SessionStart hook simulation
+node tools/validate-manifest.js                                          # Gate 2
+bash tools/lint-paths.sh                                                 # Gate 3
+node tools/assert-pptxgenjs-pin.js                                       # Gate 4
+npx license-checker --production --failOn 'GPL;AGPL;SSPL' --summary      # Gate 5
+find tests -maxdepth 2 -name '*.test.js' -print0 | xargs -0 node --test  # Gate 6
+```
+
+**Results:**
+
+| Step | Outcome |
+|------|---------|
+| `npm ci --omit=dev` | 19 packages installed in 1s, 0 vulnerabilities |
+| Manifest validator | exit 0, `Manifest OK` |
+| Hardcoded-path lint | exit 0, `Path lint OK` |
+| pptxgenjs version-pin | exit 0, `pptxgenjs pin OK: 4.0.1` |
+| license-checker | exit 0; MIT 15, ISC 2, Apache-2.0 1, dual-permissive 2 — zero pure GPL/AGPL/SSPL |
+| Full test suite | 44 tests / 42 pass / 0 fail / 2 documented skips (Tier 2 visual-diff Phase 2 unsuspension) |
+
+**Conclusion:** SC-1 fresh-clone smoke **PASSES**. All Phase 1 gates green on a pristine checkout. Note: the marketplace-hosted `/plugin install alo-exp/instadecks` path itself (Claude Code's plugin-loader pipeline) still belongs to Phase 7 DIST-07 — but the substantive Phase 1 contract (clean clone produces a loadable, lint-clean, license-compliant, test-passing plugin tree with deps installable via the bundled SessionStart hook) is empirically satisfied.
+
+**Updated frontmatter:** `status: passed`. Phase 1 verification is fully closed.
+
+## VERIFICATION COMPLETE: PASS
