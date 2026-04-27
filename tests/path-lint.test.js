@@ -131,6 +131,18 @@ test('line with `# lint-allow:hardcoded-path` is exempt', () => {
   assert.equal(r.status, 0, 'output=' + r.stdout + r.stderr);
 });
 
+test('line with `// lint-allow:hardcoded-path` is exempt (JS/TS comment style)', () => {
+  const repo = makeTempRepo();
+  writeFile(
+    repo,
+    'src/allowed.js',
+    "// banner — VERBATIM copy of /Users/foo/bar/baz.js  // lint-allow:hardcoded-path\n"
+  );
+  commitAll(repo, 'init');
+  const r = runLint(repo);
+  assert.equal(r.status, 0, 'output=' + r.stdout + r.stderr);
+});
+
 test('.planning/HANDOFF.json with /Users/ is exempt', () => {
   // CI-fix regression: HANDOFF.json (pause-work state) legitimately references
   // source-of-truth paths from CLAUDE.md (e.g., v8 BluePrestige source); JSON
