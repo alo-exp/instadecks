@@ -145,9 +145,16 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   // Bust require cache so re-runs in the same process re-execute annotate.js's main().
   const annotateEntry = path.join(work.cwd, 'annotate.js');
   delete require.cache[require.resolve(annotateEntry)];
-  require(annotateEntry);
-
-  await awaitPptxOnDisk(pptxRun, baselineMtimeMs);
+  // Redirect annotate.js's `✓ Written: ...` console.log to stderr so CLI stdout stays
+  // pure JSON for pipelined consumers (ANNO-09 contract). Restored after main() resolves.
+  const origLog = console.log;
+  console.log = (...args) => console.error(...args);
+  try {
+    require(annotateEntry);
+    await awaitPptxOnDisk(pptxRun, baselineMtimeMs);
+  } finally {
+    console.log = origLog;
+  }
   const pdfRun = await convertToPdf(pptxRun, outDir);
 
   const sibling = resolveSiblingOutputs(deckPath);
