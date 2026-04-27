@@ -51,10 +51,26 @@ if [ -n "$LOCK_SHA" ] && [ "$LOCK_SHA" != "$PREV_SHA" ]; then
   fi
 fi
 
-# ── Font detect (install in Plan 07 once fonts bundled) ───────────
+# ── Font detection + install (D-01) ───────────────────────────────
+case "$(uname -s)" in
+  Darwin)               FONT_DIR="$HOME/Library/Fonts" ;;
+  Linux)                FONT_DIR="$HOME/.local/share/fonts" ;;
+  MINGW*|CYGWIN*|MSYS*) FONT_DIR="" ;;
+  *)                    FONT_DIR="" ;;
+esac
 if command -v fc-list >/dev/null 2>&1; then
   if ! fc-list 2>/dev/null | grep -qi "IBM Plex Sans"; then
-    WARN+=("install IBM Plex Sans manually: see assets/fonts/IBM_Plex_Sans/")
+    if [ -n "$FONT_DIR" ]; then
+      if mkdir -p "$FONT_DIR" 2>/dev/null \
+         && cp "$PLUGIN_ROOT/assets/fonts/IBM_Plex_Sans/"*.ttf "$FONT_DIR/" 2>/dev/null \
+         && fc-cache -f >/dev/null 2>&1; then
+        INFO+=("fonts installed")
+      else
+        WARN+=("font install failed; see assets/fonts/IBM_Plex_Sans/README.md")
+      fi
+    else
+      WARN+=("install IBM Plex Sans manually: see \${CLAUDE_PLUGIN_ROOT}/assets/fonts/IBM_Plex_Sans/README.md")
+    fi
   fi
 fi
 
