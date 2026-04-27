@@ -4,6 +4,9 @@ status: human_needed
 date: 2026-04-28
 score: 6/6 success criteria pass (1 with MEDIUM confidence pending fresh-machine smoke test)
 verified: 2026-04-28T00:00:00Z
+pass_2_verified: 2026-04-27T00:00:00Z
+pass_2_status: human_needed
+consecutive_clean_passes: 2
 ---
 
 # Phase 1: Plugin Foundation, Contract & CI Gates — Verification Report
@@ -174,5 +177,47 @@ Then start a Claude Code session.
 All six success criteria are programmatically satisfied with strong evidence. All locked invariants hold. CI gates fail loud on the documented violation patterns. The findings-schema 1:1 mapping to SAMPLES is verified field-by-field. Visual-regression Tier 1 (SHA) passes; Tier 2 is correctly suspended for Phase 2 with an explicit unsuspension recipe.
 
 The single open item — fresh-machine `/plugin install` validation for SC-1 — is intentionally deferred to UAT/Phase 7 per the project's release-gate strategy.
+
+## VERIFICATION COMPLETE: HUMAN_NEEDED
+
+---
+
+## Pass 2 Re-Verification
+
+**Pass:** 2 of 2 (silver-bullet §3a EXRV-03 — 2 consecutive clean passes required)
+**Verified:** 2026-04-27
+**Code state:** Unchanged since Pass 1 (no commits in between).
+
+### Re-run results (live commands, identical to Pass 1)
+
+| Check | Pass 1 result | Pass 2 result | Consistent |
+|-------|---------------|---------------|------------|
+| `node tools/validate-manifest.js` | exit 0, `Manifest OK` | exit 0, `Manifest OK` | ✓ |
+| `bash tools/lint-paths.sh` | exit 0, `Path lint OK` | exit 0, `Path lint OK` | ✓ |
+| `node tools/assert-pptxgenjs-pin.js` | exit 0, `pptxgenjs pin OK: 4.0.1` | exit 0, `pptxgenjs pin OK: 4.0.1` | ✓ |
+| Full test suite | 44 tests / 42 pass / 0 fail / 2 skipped | 44 tests / 42 pass / 0 fail / 2 skipped | ✓ |
+| `package.json` pptxgenjs pin | `"pptxgenjs": "4.0.1"` (exact) | `"pptxgenjs": "4.0.1"` (exact) | ✓ |
+| `licenses/` per-dep dirs | `IBM_Plex_Sans`, `image-size`, `jszip`, `pptxgenjs` | identical | ✓ |
+| `assets/fonts/IBM_Plex_Sans/` | 4 TTFs + OFL.txt + README.md | identical | ✓ |
+| `tests/fixtures/v8-reference/` | samples.js, .pptx, 2× .sha256, 3× slide PNGs | identical | ✓ |
+| `skills/annotate/scripts/` | not present (Phase 2 owns) | not present (Phase 2 owns) | ✓ |
+| `LICENSE`, `NOTICE`, `package-lock.json` | all present | all present | ✓ |
+
+### Per-SC re-confirmation
+
+- **SC-1** ▸ PARTIAL (PASS proxy, MEDIUM confidence) — unchanged. Fresh-machine `/plugin install` smoke still pending UAT.
+- **SC-2** ▸ PASS — all four CI gates re-invoked, exit 0 each.
+- **SC-3** ▸ PASS — schema/SAMPLES mapping intact; 10/10 schema-validator subtests pass.
+- **SC-4** ▸ PASS — fonts present; check-deps font-install branch test passes.
+- **SC-5** ▸ PASS — Tier 1 SHA assertion passes; Tier 2 correctly skipped (Phase 2 unsuspension).
+- **SC-6** ▸ PASS — LICENSE/NOTICE/per-dep licenses present; license-checker clean.
+
+### Locked invariants re-confirmation
+
+All six locked invariants from the Pass 1 table re-verified identically. `annotate.js` is still NOT copied to `skills/annotate/scripts/` (correct — Phase 2 owns), PRE-PATCH SHA still recorded in `tests/fixtures/v8-reference/annotate.js.sha256`, severity 4-tier still preserved at producer side per findings-schema.md §4.
+
+### Pass 2 verdict
+
+**Status unchanged from Pass 1: `human_needed`.** No regressions, no new gaps. The two consecutive verification passes are mutually consistent. The single deferred item — fresh-machine `/plugin install` smoke covering SC-1 — must be routed to the user for explicit accept/reject decision (orchestrator handles via AskUserQuestion). This pass does **not** auto-accept the deferral.
 
 ## VERIFICATION COMPLETE: HUMAN_NEEDED
