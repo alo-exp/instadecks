@@ -1,11 +1,22 @@
 #!/usr/bin/env bash
 # tools/lint-paths.sh — Hardcoded-path lint (Phase 1 D-02 / FOUND-02).
 #
-# Fails CI if any tracked file (excluding tests/fixtures/**, *.md docs,
-# .silver-bullet.json (third-party tool config; JSON cannot host inline
-# comments for the allowlist token), and lines bearing the trailing comment
-# `# lint-allow:hardcoded-path`) reaches outside the plugin tree via
-# /Users/, ~/.claude, /home/, or escaped C:\\.
+# Fails CI if any tracked file reaches outside the plugin tree via
+# /Users/, ~/.claude, /home/, or escaped C:\\ (four-backslash JS-string form).
+#
+# Excluded paths (by-purpose contents that legitimately hold the patterns):
+#   - tests/fixtures/**         — frozen baseline data
+#   - tests/path-lint.test.js   — exercises the lint itself; its strings ARE
+#                                  the negative test cases
+#   - tools/lint-paths.sh       — this script's own grep regex literally names
+#                                  the patterns it searches for
+#   - .silver-bullet.json       — third-party tool config (silver-bullet state
+#                                  paths under ~/.claude); JSON cannot host the
+#                                  inline `# lint-allow:hardcoded-path` token
+#   - *.md docs                 — narrative discussion of the patterns
+#
+# All other files: a line opts in via the trailing comment
+# `# lint-allow:hardcoded-path`.
 #
 # This is a CI tool (not a SessionStart hook), so we use `set -euo pipefail`
 # and let errors bubble up. No `trap exit 0`.
@@ -17,7 +28,7 @@ cd "$(git rev-parse --show-toplevel)"
 # Trailing `|| true` keeps the pipeline alive when grep finds zero matches.
 HITS=$(git ls-files -z \
   | xargs -0 grep -HInE '/Users/|~/\.claude|/home/|C:\\\\' 2>/dev/null \
-  | grep -vE '^(tests/fixtures/|\.silver-bullet\.json:|.+\.md:)' \
+  | grep -vE '^(tests/fixtures/|tests/path-lint\.test\.js:|tools/lint-paths\.sh:|\.silver-bullet\.json:|.+\.md:)' \
   | grep -v '# lint-allow:hardcoded-path' \
   || true)
 
