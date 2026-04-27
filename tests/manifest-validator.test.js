@@ -143,6 +143,25 @@ test('rejects missing component path when explicitly set', () => {
   }
 });
 
+test('rejects implicit folded continuation (next line indented) (CR-02)', () => {
+  const root = mkTempRoot();
+  try {
+    writeManifest(root, { name: 'demo', version: '0.1.0', skills: './skills/' });
+    const fm = [
+      'name: demo',
+      'description: First line.',
+      '  continuation line.',
+      'user-invocable: true',
+    ].join('\n');
+    writeSkill(root, 'demo', fm);
+    const r = runValidator(root);
+    assert.equal(r.status, 1, `expected fail; stdout=${r.stdout} stderr=${r.stderr}`);
+    assert.match(r.stderr, /single-line|continuation/i);
+  } finally {
+    cleanup(root);
+  }
+});
+
 test('rejects multi-line description block scalar (PC-05)', () => {
   // Pipe `|` form
   {
