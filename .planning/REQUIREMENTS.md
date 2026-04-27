@@ -40,14 +40,14 @@
 
 ### `/instadecks:review` skill — Design Review (RVW)
 
-- [ ] **RVW-01**: `/instadecks:review` is invocable as a slash skill with imperative-keyword description (≥ 8/10 prompt activation)
-- [ ] **RVW-02**: Bundles deck-design-review skill content verbatim: DECK-VDA 4-pass methodology, finding grammar `[Severity] | [Category] — [Location] — [Defect] — [Standard violated] — [Fix]`, 4-tier severity (Critical/Major/Minor/Nitpick), exhaustive per-slide §3 findings, deck-level §1 systemic findings, §4 maturity scoreboard, §5 top-10 fixes
-- [ ] **RVW-03**: Adds R18 AI-tell detection: flags accent lines under titles, default blue, identical layouts repeated, and other AI-generator hallmarks specific to LLM-authored decks
-- [ ] **RVW-04**: Each finding includes `genuine` flag, `category` (defect/improvement/style), `nx`/`ny` annotation positioning, and `rationale` for the determination
-- [ ] **RVW-05**: Output is a JSON sidecar in the locked schema (FOUND-06) AND a human-readable Markdown report; both written to the run directory
-- [ ] **RVW-06**: Pipeline-by-default into `/instadecks:annotate` so a single invocation produces deck + JSON + Markdown report + annotated PPTX + annotated PDF
-- [ ] **RVW-07**: Standalone mode: accepts a deck file path (PPTX or PDF) and produces JSON + Markdown without invoking `/annotate`
-- [ ] **RVW-08**: Structured-handoff mode: accepts a pre-rendered deck-spec object (when pipelined from `/create`) to skip the file-read roundtrip
+- [x] **RVW-01**: `/instadecks:review` is invocable as a slash skill with imperative-keyword description (≥ 8/10 prompt activation) *(Phase 3 Plan 05 — 5fe5210; pattern landed; Phase 7 DIST-02 finalizes ≥8/10 tuning)*
+- [x] **RVW-02**: Bundles deck-design-review skill content verbatim: DECK-VDA 4-pass methodology, finding grammar `[Severity] | [Category] — [Location] — [Defect] — [Standard violated] — [Fix]`, 4-tier severity (Critical/Major/Minor/Nitpick), exhaustive per-slide §3 findings, deck-level §1 systemic findings, §4 maturity scoreboard, §5 top-10 fixes *(Phase 3 Plan 04 — 9bf101b; Plan 05 — 5fe5210; canonicalized as re-expressed Apache-2.0 content per D-01, NOT verbatim vendor — see NOTICE attribution)*
+- [x] **RVW-03**: Adds R18 AI-tell detection: flags accent lines under titles, default blue, identical layouts repeated, and other AI-generator hallmarks specific to LLM-authored decks *(Phase 3 Plan 03 — 3e07e4f)*
+- [x] **RVW-04**: Each finding includes `genuine` flag, `category` (defect/improvement/style), `nx`/`ny` annotation positioning, and `rationale` for the determination *(Phase 3 Plan 02 — d5e40a9; schema-validator enforces)*
+- [x] **RVW-05**: Output is a JSON sidecar in the locked schema (FOUND-06) AND a human-readable Markdown report; both written to the run directory *(Phase 3 Plan 02 — d5e40a9; Plan 04 — 9bf101b real renderer; Plan 05 — 33b1a33 integration test)*
+- [x] **RVW-06**: Pipeline-by-default into `/instadecks:annotate` so a single invocation produces deck + JSON + Markdown report + annotated PPTX + annotated PDF *(Phase 3 Plan 02 — d5e40a9 lazy require + gating; documented in SKILL.md per Plan 05 — 5fe5210)*
+- [x] **RVW-07**: Standalone mode: accepts a deck file path (PPTX or PDF) and produces JSON + Markdown without invoking `/annotate` *(Phase 3 Plan 02 — a00b1a3 CLI; Plan 05 — 33b1a33 integration test)*
+- [x] **RVW-08**: Structured-handoff mode: accepts a pre-rendered deck-spec object (when pipelined from `/create`) to skip the file-read roundtrip *(Phase 3 Plan 02 — d5e40a9 mode parameter; Plan 05 — 33b1a33 integration test)*
 - [x] **RVW-09**: `scripts/pptx-to-images.sh` uses `-env:UserInstallation=file:///tmp/lo-${SESSION_ID}-${PID}` per call to prevent soffice race conditions *(Phase 3 Plan 01 — df5a4bb)*
 - [x] **RVW-10**: After every `soffice` and `pdftoppm` invocation, file-existence + size check verifies success (don't trust exit codes — both have known silent-failure modes); 60s timeout with one retry *(Phase 3 Plan 01 — df5a4bb)*
 - [x] **RVW-11**: Cleanup trap removes `/tmp/lo-${SESSION_ID}-${PID}` on exit (success or failure) *(Phase 3 Plan 01 — df5a4bb)*
@@ -140,7 +140,7 @@ Phase ↔ requirement mapping (filled by roadmap, updated as phases ship):
 |-------|-----------|--------------|--------|
 | 1 | Plugin Foundation, Contract & CI Gates | FOUND-01, FOUND-02, FOUND-03, FOUND-04, FOUND-05, FOUND-06, FOUND-07, FOUND-08, FOUND-09, FOUND-10, FOUND-11 | Pending |
 | 2 | `/instadecks:annotate` | ANNO-01, ANNO-02, ANNO-03, ANNO-04, ANNO-05, ANNO-06, ANNO-07, ANNO-08, ANNO-09, ANNO-10, ANNO-11 | In Progress (9/11 — ANNO-01, ANNO-11 deferred to plan 02-04) |
-| 3 | `/instadecks:review` (Design Review) | RVW-01, RVW-02, RVW-03, RVW-04, RVW-05, RVW-06, RVW-07, RVW-08, RVW-09, RVW-10, RVW-11 | Pending |
+| 3 | `/instadecks:review` (Design Review) | RVW-01, RVW-02, RVW-03, RVW-04, RVW-05, RVW-06, RVW-07, RVW-08, RVW-09, RVW-10, RVW-11 | Complete (11/11; Phase 7 DIST-02 finalizes RVW-01 ≥8/10 activation) |
 | 4 | `/instadecks:create` Scaffold + Render Cookbook | CRT-01, CRT-02, CRT-03, CRT-04, CRT-05, CRT-06, CRT-15 | Pending |
 | 5 | `/instadecks:create` Auto-Refine Loop | CRT-07, CRT-08, CRT-09, CRT-10, CRT-11, CRT-12, CRT-13, CRT-14 | Pending |
 | 6 | `/instadecks:content-review` | CRV-01, CRV-02, CRV-03, CRV-04, CRV-05, CRV-06, CRV-07, CRV-08, CRV-09, CRV-10, CRV-11 | Pending |

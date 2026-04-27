@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Plugin Foundation, Contract & CI Gates** - Loadable plugin skeleton with locked JSON contract, CI gates, fonts, and visual-regression baselines
 - [x] **Phase 2: `/instadecks:annotate`** - Verbatim `annotate.js` wired to the locked contract; produces annotated PPTX + PDF overlays *(complete 2026-04-28 — 4/4 plans, ANNO-01..ANNO-11)*
-- [ ] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate` *(in progress — Plan 03-01 complete: `scripts/pptx-to-images.sh` hardened, RVW-09/10/11 closed)*
+- [x] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate` *(complete 2026-04-28 — 5/5 plans, RVW-01..RVW-11)*
 - [ ] **Phase 4: `/instadecks:create` Scaffold + Render Cookbook** - Deck generator with 8 slide types, design-rationale doc, PowerPoint compatibility gate (no loop yet)
 - [ ] **Phase 5: `/instadecks:create` Auto-Refine Loop** - Convergence rule, oscillation detection, issue ledger, soft cap, user interrupt — the project's central differentiator
 - [ ] **Phase 6: `/instadecks:content-review`** - Pyramid Principle / MECE / narrative-arc / claim-evidence content critique with hard content-vs-design boundary
@@ -62,7 +62,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. R18 AI-tell detection flags accent lines under titles, default blue, and identical-layouts-repeated patterns specific to LLM-authored decks; each finding includes `genuine`, `category` (defect/improvement/style), `nx`/`ny` positioning, and `rationale` per the Phase 1 schema
   3. `scripts/pptx-to-images.sh` runs without race conditions across concurrent invocations: `-env:UserInstallation=file:///tmp/lo-${SESSION_ID}-${PID}` per call, file-existence + size checks after every soffice and pdftoppm invocation, 60s timeout with one retry, cleanup trap on exit
   4. Default pipeline-into-`/annotate` mode produces deck + JSON + Markdown + annotated PPTX + annotated PDF in a single invocation; standalone mode produces JSON + Markdown only; structured-handoff mode (called from `/create`) skips the file-read roundtrip
-**Plans**: TBD
+**Plans**: 5 plans
+- [x] 03-01-PLAN.md — `scripts/pptx-to-images.sh` hardened (RVW-09/10/11) + tiny-deck smoke fixture
+- [x] 03-02-PLAN.md — runReview orchestrator + schema validator + render-fixed stub + standalone CLI (RVW-04/05/06/07/08)
+- [x] 03-03-PLAN.md — ai-tells.js with 3 R18 heuristics + jszip devDep + read-deck-xml lib + fixtures (RVW-03)
+- [x] 03-04-PLAN.md — render-fixed.js DECK-VDA renderer (pure, deterministic) + locked snapshot + property tests (RVW-02/05)
+- [x] 03-05-PLAN.md — SKILL.md DECK-VDA canonicalization + NOTICE attribution + end-to-end integration test (RVW-01/02/03/05/06/07/08)
 **UI hint**: yes
 
 ### Phase 4: `/instadecks:create` Scaffold + Render Cookbook
