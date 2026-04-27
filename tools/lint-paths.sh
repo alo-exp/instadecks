@@ -13,7 +13,12 @@
 #   - .silver-bullet.json       — third-party tool config (silver-bullet state
 #                                  paths under ~/.claude); JSON cannot host the
 #                                  inline `# lint-allow:hardcoded-path` token
-#   - *.md docs                 — narrative discussion of the patterns
+#   - README.md, HANDOFF.md, CLAUDE.md, silver-bullet.md, NOTICE, LICENSE
+#                                — top-level narrative docs
+#   - docs/**/*.md              — narrative discussion of the patterns
+#   - .planning/**/*.md         — planning narrative
+# NOTE: skills/**/*.md (incl. SKILL.md) and tests/**/*.md DO get linted —
+# they are operational/agent-facing artifacts.
 #
 # All other files: a line opts in via the trailing comment
 # `# lint-allow:hardcoded-path`.
@@ -28,7 +33,7 @@ cd "$(git rev-parse --show-toplevel)"
 # Trailing `|| true` keeps the pipeline alive when grep finds zero matches.
 HITS=$(git ls-files -z \
   | xargs -0 grep -HInE '/Users/|~/\.claude|/home/|C:\\\\' 2>/dev/null \
-  | grep -vE '^(tests/fixtures/|tests/path-lint\.test\.js:|tools/lint-paths\.sh:|\.silver-bullet\.json:|.+\.md:)' \
+  | grep -vE '^(tests/fixtures/|tests/path-lint\.test\.js:|tools/lint-paths\.sh:|\.silver-bullet\.json:|(^|/)README\.md:|(^|/)HANDOFF\.md:|(^|/)CLAUDE\.md:|(^|/)silver-bullet\.md:|(^|/)NOTICE:|(^|/)LICENSE:|docs/.+\.md:|\.planning/.+\.md:)' \
   | grep -v '# lint-allow:hardcoded-path' \
   || true)
 

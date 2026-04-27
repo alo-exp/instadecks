@@ -108,6 +108,17 @@ test('*.md with /Users/ is exempt', () => {
   assert.equal(r.status, 0);
 });
 
+test('lints SKILL.md - /Users/x in skills/foo/SKILL.md fails lint', () => {
+  // CR-01 regression: skills/**/*.md must NOT be exempt — SKILL.md files are
+  // agent-facing operational artifacts, not narrative docs.
+  const repo = makeTempRepo();
+  writeFile(repo, 'skills/foo/SKILL.md', "const path = '/Users/foo';\n");
+  commitAll(repo, 'init');
+  const r = runLint(repo);
+  assert.equal(r.status, 1, 'expected exit 1; output=' + r.stdout + r.stderr);
+  assert.match(r.stdout + r.stderr, /skills\/foo\/SKILL\.md/);
+});
+
 test('line with `# lint-allow:hardcoded-path` is exempt', () => {
   const repo = makeTempRepo();
   writeFile(
