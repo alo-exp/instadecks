@@ -121,7 +121,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Plugin Foundation, Contract & CI Gates | 0/TBD | Not started | - |
-| 2. `/instadecks:annotate` | 0/TBD | Not started | - |
+| 2. `/instadecks:annotate` | 3/4 | In Progress | - |
 | 3. `/instadecks:review` (Design Review) | 0/TBD | Not started | - |
 | 4. `/instadecks:create` Scaffold + Render Cookbook | 0/TBD | Not started | - |
 | 5. `/instadecks:create` Auto-Refine Loop | 0/TBD | Not started | - |
