@@ -59,14 +59,17 @@ if command -v fc-list >/dev/null 2>&1; then
 fi
 
 # ── Summary ───────────────────────────────────────────────────────
+# Single line, always Instadecks:-prefixed. INFO is appended in parens so the
+# install-complete signal is visible even when WARN is non-empty (e.g. fonts).
 if [ ${#WARN[@]} -eq 0 ]; then
-  if [ ${#INFO[@]} -eq 0 ]; then
-    echo "Instadecks: deps OK"
-  else
-    echo "Instadecks: deps OK (${INFO[*]})"
-  fi
+  HEAD="deps OK"
 else
-  echo "Instadecks: ${WARN[*]}"
+  HEAD="${WARN[*]}"
+fi
+if [ ${#INFO[@]} -eq 0 ]; then
+  echo "Instadecks: ${HEAD}"
+else
+  echo "Instadecks: ${HEAD} (${INFO[*]})"
 fi
 
 exit 0
