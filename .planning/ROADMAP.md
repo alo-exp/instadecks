@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Plugin Foundation, Contract & CI Gates** - Loadable plugin skeleton with locked JSON contract, CI gates, fonts, and visual-regression baselines
 - [x] **Phase 2: `/instadecks:annotate`** - Verbatim `annotate.js` wired to the locked contract; produces annotated PPTX + PDF overlays *(complete 2026-04-28 — 4/4 plans, ANNO-01..ANNO-11)*
-- [ ] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate`
+- [ ] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate` *(in progress — Plan 03-01 complete: `scripts/pptx-to-images.sh` hardened, RVW-09/10/11 closed)*
 - [ ] **Phase 4: `/instadecks:create` Scaffold + Render Cookbook** - Deck generator with 8 slide types, design-rationale doc, PowerPoint compatibility gate (no loop yet)
 - [ ] **Phase 5: `/instadecks:create` Auto-Refine Loop** - Convergence rule, oscillation detection, issue ledger, soft cap, user interrupt — the project's central differentiator
 - [ ] **Phase 6: `/instadecks:content-review`** - Pyramid Principle / MECE / narrative-arc / claim-evidence content critique with hard content-vs-design boundary

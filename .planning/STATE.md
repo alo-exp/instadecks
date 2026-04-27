@@ -5,35 +5,36 @@
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** A user can hand Claude Code arbitrary input material and end up with a polished, design-reviewed, annotated PPTX + PDF — without having to know about pptxgenjs, custom-geometry arrows, or our deck-design-review skill — and the output quality matches what we ship by hand today.
-**Current focus:** Phase 2 complete; next is Phase 3 — `/instadecks:review` (DECK-VDA design review)
+**Current focus:** Phase 3 in progress — Wave 1 (Plan 03-01) complete; Wave 2 (03-02..03-04) ready
 **Current milestone:** v0.1.0 — Plugin v0.1.0 Public Release
 
 ## Current Position
 
 Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 7 phases, 67 requirements
-Phase: 3 of 7 (`/instadecks:review`) — pending start
-Plan: 0 of TBD in current phase
-Status: Phase 2 complete — all 4 plans landed, ANNO-01..ANNO-11 closed, full test suite 73 pass / 2 skip / 0 fail
-Last activity: 2026-04-28 — Plan 02-04 completed (visual-regression normalized-SHA + final SKILL.md body)
+Phase: 3 of 7 (`/instadecks:review`) — in progress (Wave 1 complete)
+Plan: 1 of TBD in current phase (03-01 complete)
+Status: Plan 03-01 complete — `scripts/pptx-to-images.sh` hardened (RVW-09/10/11), tiny-deck fixture committed, full test suite 84 pass / 2 skip / 0 fail
+Last activity: 2026-04-28 — Plan 03-01 completed (Wave 1 serial — unblocks 03-02..03-04 + Phases 4-6)
 
-Progress: [███░░░░░░░] 27%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~24 min
-- Total execution time: ~1.6 hours
+- Total plans completed: 5
+- Average duration: ~22 min
+- Total execution time: ~1.8 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 2 | 4 | ~95 min | ~24 min |
+| 3 | 1 | ~12 min | ~12 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (~10 min), 02-02 (~10 min), 02-03 (~25 min), 02-04 (~50 min, incl. Rule 4 checkpoint)
-- Trend: 02-04 spike driven by mandatory escalation runbook (byte-SHA → normalized-SHA architectural redefinition under user adjudication)
+- Last 5 plans: 02-02 (~10 min), 02-03 (~25 min), 02-04 (~50 min, incl. Rule 4 checkpoint), 03-01 (~12 min)
+- Trend: 03-01 fast — research-locked verbatim script body + 2 small Rule 1/3 deviations (macOS timeout shim, parallel-test leak filter)
 
 *Updated after each plan completion*
 
@@ -50,6 +51,7 @@ Recent decisions affecting current work:
 - Pre-Phase 1 (research synthesis 2026-04-27): repo at alo-exp/instadecks; marketplace listing under alo-labs/claude-plugins references it
 - Pre-Phase 1 (granularity = "fine"): split /create into Phase 4 (scaffold + 8 slide types + PowerPoint gate) and Phase 5 (auto-refine loop) to isolate the highest-risk subsystem
 - Plan 02-04 (2026-04-28, Rule 4 user-approved Option A): Tier 1 visual regression redefined as structural-XML normalized SHA (not byte-identical) — pptxgenjs 4.0.1 timestamps + absolute-path `descr` attributes preclude byte-equivalence. New baseline `Annotations_Sample.pptx.normalized.sha256` pinned. Original `Annotations_Sample.pptx.sha256` retained as committed-binary self-check.
+- Plan 03-01 (2026-04-28, Rule 3 auto-fix): macOS dev hosts lack `timeout`/`gtimeout`; added a probe in `scripts/pptx-to-images.sh` that defines a no-op `timeout` shim function ONLY if neither binary is present. Preserves verbatim `timeout 60 soffice` invocation form (static assertions still match) and keeps script runnable without coreutils. Production CI must provide GNU coreutils for real wall-clock cap.
 
 ### Pending Todos
 
@@ -83,5 +85,5 @@ Items acknowledged and carried forward:
 ## Session Continuity
 
 Last session: 2026-04-28
-Stopped at: Phase 2 complete (4/4 plans, ANNO-01..11). Phase gate green: 73 pass / 2 skip / 0 fail; manifest validator OK; pptxgenjs pin OK.
-Resume file: None (next step: plan Phase 3 — `/instadecks:review` DECK-VDA + R18 + soffice hardening RVW-09..11)
+Stopped at: Plan 03-01 complete (Wave 1 serial). Test suite 84 pass / 2 skip / 0 fail; lint green; pptxgenjs pin OK.
+Resume file: None (next step: Wave 2 — Plans 03-02, 03-03, 03-04 can now execute in parallel against the now-locked `scripts/pptx-to-images.sh` contract)

@@ -48,9 +48,9 @@
 - [ ] **RVW-06**: Pipeline-by-default into `/instadecks:annotate` so a single invocation produces deck + JSON + Markdown report + annotated PPTX + annotated PDF
 - [ ] **RVW-07**: Standalone mode: accepts a deck file path (PPTX or PDF) and produces JSON + Markdown without invoking `/annotate`
 - [ ] **RVW-08**: Structured-handoff mode: accepts a pre-rendered deck-spec object (when pipelined from `/create`) to skip the file-read roundtrip
-- [ ] **RVW-09**: `scripts/pptx-to-images.sh` uses `-env:UserInstallation=file:///tmp/lo-${SESSION_ID}-${PID}` per call to prevent soffice race conditions
-- [ ] **RVW-10**: After every `soffice` and `pdftoppm` invocation, file-existence + size check verifies success (don't trust exit codes — both have known silent-failure modes); 60s timeout with one retry
-- [ ] **RVW-11**: Cleanup trap removes `/tmp/lo-${SESSION_ID}-${PID}` on exit (success or failure)
+- [x] **RVW-09**: `scripts/pptx-to-images.sh` uses `-env:UserInstallation=file:///tmp/lo-${SESSION_ID}-${PID}` per call to prevent soffice race conditions *(Phase 3 Plan 01 — df5a4bb)*
+- [x] **RVW-10**: After every `soffice` and `pdftoppm` invocation, file-existence + size check verifies success (don't trust exit codes — both have known silent-failure modes); 60s timeout with one retry *(Phase 3 Plan 01 — df5a4bb)*
+- [x] **RVW-11**: Cleanup trap removes `/tmp/lo-${SESSION_ID}-${PID}` on exit (success or failure) *(Phase 3 Plan 01 — df5a4bb)*
 
 ### `/instadecks:create` skill — Auto-Refine Orchestrator (CRT)
 
