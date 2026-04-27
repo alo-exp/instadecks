@@ -48,15 +48,25 @@ fi
 PREV_SHA=$(cat "$SENTINEL" 2>/dev/null || echo "")
 if [ -n "$LOCK_SHA" ] && [ "$LOCK_SHA" != "$PREV_SHA" ]; then
   if command -v npm >/dev/null 2>&1; then
-    # Copy package manifests into PLUGIN_DATA so node_modules lands there
-    # (not in PLUGIN_ROOT). npm ci requires package-lock.json adjacent to cwd.
-    if cp "$PLUGIN_ROOT/package.json" "$PLUGIN_DATA/package.json" 2>/dev/null \
-       && cp "$PLUGIN_ROOT/package-lock.json" "$PLUGIN_DATA/package-lock.json" 2>/dev/null \
-       && ( cd "$PLUGIN_DATA" && npm ci --omit=dev ) >/dev/null 2>&1; then
-      echo "$LOCK_SHA" > "$SENTINEL" 2>/dev/null || true
-      INFO+=("install complete")
+    # CR-04: concurrent-session race guard via atomic mkdir. If a sibling
+    # session is already inside this block, mkdir fails and we skip cleanly.
+    LOCK_DIR="$PLUGIN_DATA/.npm-install.lock"
+    if mkdir "$LOCK_DIR" 2>/dev/null; then
+      # Layered cleanup — preserve the original ERR-suppression contract while
+      # ensuring the lock dir is removed on any exit path.
+      trap 'rmdir "$LOCK_DIR" 2>/dev/null || true' EXIT
+      # Copy package manifests into PLUGIN_DATA so node_modules lands there
+      # (not in PLUGIN_ROOT). npm ci requires package-lock.json adjacent to cwd.
+      if cp "$PLUGIN_ROOT/package.json" "$PLUGIN_DATA/package.json" 2>/dev/null \
+         && cp "$PLUGIN_ROOT/package-lock.json" "$PLUGIN_DATA/package-lock.json" 2>/dev/null \
+         && ( cd "$PLUGIN_DATA" && npm ci --omit=dev ) >/dev/null 2>&1; then
+        echo "$LOCK_SHA" > "$SENTINEL" 2>/dev/null || true
+        INFO+=("install complete")
+      else
+        WARN+=("npm ci failed")
+      fi
     else
-      WARN+=("npm ci failed")
+      INFO+=("install in progress in another session; skipping")
     fi
   else
     WARN+=("missing npm")
