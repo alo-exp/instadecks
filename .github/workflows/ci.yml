@@ -1,18 +1,121 @@
 name: CI
-on: [push, pull_request]
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
 jobs:
-  ci:
+  validate:
+    name: Validate (Phase 1 day-1 gates)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '20' }
-      - name: Install LibreOffice and Poppler
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # NOTE: No `--omit=dev` here — license-checker, pixelmatch, and pngjs are
+      # devDependencies (PC-13). `npm ci` populates them once into root node_modules
+      # so subsequent `npx license-checker` resolves locally without re-fetching.
+      - name: Install dependencies (npm ci)
+        run: npm ci
+
+      # ------------------------------------------------------------------
+      # Phase 1 day-1 gates — each must fail loud (non-zero exit) on
+      # violation. Order matches PLAN.md task list. Tools that don't already
+      # emit ::error:: annotations are wrapped to surface a GitHub error.
+      # ------------------------------------------------------------------
+
+      - name: Gate 1 — Manifest validator
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libreoffice poppler-utils fontconfig
-      - run: npm ci
-      - name: Run tests
-        run: npm test --if-present
-      - name: Hardcoded path lint
-        run: bash tools/lint-paths.sh
+          node tools/validate-manifest.js || {
+            echo "::error file=.claude-plugin/plugin.json::Manifest validation failed"
+            exit 1
+          }
+
+      - name: Gate 2 — Hardcoded-path lint
+        run: |
+          bash tools/lint-paths.sh || {
+            echo "::error::Hardcoded path detected (use \${CLAUDE_PLUGIN_ROOT} or \${CLAUDE_PLUGIN_DATA})"
+            exit 1
+          }
+
+      - name: Gate 3 — pptxgenjs version-pin assertion
+        run: |
+          node tools/assert-pptxgenjs-pin.js || {
+            echo "::error file=package.json::pptxgenjs must be pinned to exactly 4.0.1"
+            exit 1
+          }
+
+      # license-checker resolves from the local devDep installed in `npm ci`
+      # above (PC-13). No `npx --yes` flag needed. jszip's
+      # `(MIT OR GPL-3.0-or-later)` SPDX expression does NOT trip the
+      # `--failOn 'GPL'` substring filter (verified in Plan 08); if a future
+      # license-checker version regresses this, narrow with
+      #   --exclude '(MIT OR GPL-3.0-or-later)'
+      - name: Gate 4 — License checker (production tree)
+        run: |
+          npx license-checker --production --failOn 'GPL;AGPL;SSPL' --summary || {
+            echo "::error::Forbidden license (GPL/AGPL/SSPL) found in production dependency tree"
+            exit 1
+          }
+
+      - name: Gate 5 — Hook executability
+        run: |
+          test -x hooks/check-deps.sh || {
+            echo "::error file=hooks/check-deps.sh::hooks/check-deps.sh must be executable (chmod +x)"
+            exit 1
+          }
+
+      # Plan 05's path-lint.test.js commits with `git -c user.email=... -c user.name=...`
+      # flags per-test (PC-12 option (a), hermetic) — no global `git config --global`
+      # prelude required in this workflow.
+      - name: Gate 6 — Node test suite (full)
+        run: |
+          node --test \
+            tests/findings-schema.test.js \
+            tests/manifest-validator.test.js \
+            tests/path-lint.test.js \
+            tests/assert-pin.test.js \
+            tests/check-deps.test.js \
+            tests/annotate-integrity.test.js \
+            tests/visual-regression.test.js || {
+            echo "::error::Node test suite failed"
+            exit 1
+          }
+
+      # Optional gate — soft-fail if `claude` CLI is not on PATH (it usually
+      # isn't in stock GitHub runners). Wired so that when a future runner
+      # image ships the CLI, validation runs automatically.
+      - name: Gate 7 (optional) — claude plugin validate
+        run: |
+          if command -v claude >/dev/null 2>&1; then
+            claude plugin validate || {
+              echo "::error::claude plugin validate failed"
+              exit 1
+            }
+          else
+            echo "claude CLI not on PATH — skipping plugin validate (soft fail)"
+          fi
+
+      # ------------------------------------------------------------------
+      # RESERVED for Phase 2/3 — Tier 2 visual regression requires
+      # LibreOffice (`soffice`) + Poppler (`pdftoppm`) in the runner image.
+      # Plan 06 currently keeps the Tier 2 visual-regression.test.js cases
+      # under `test.skip` until that runtime lands. When unskipped, add:
+      #
+      #   - name: Install LibreOffice + Poppler
+      #     run: |
+      #       sudo apt-get update
+      #       sudo apt-get install -y libreoffice poppler-utils fontconfig
+      #
+      # immediately before "Gate 6 — Node test suite (full)".
+      # ------------------------------------------------------------------
