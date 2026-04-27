@@ -136,16 +136,20 @@ These are valuable but out of v1 scope to prevent feature creep:
 
 Phase ↔ requirement mapping (filled by roadmap, updated as phases ship):
 
-| Phase | Phase Name | Requirements |
-|-------|-----------|--------------|
-| 1 | Plugin Foundation, Contract, and CI Gates | FOUND-01..11 |
-| 2 | `/instadecks:annotate` | ANNO-01..11 |
-| 3 | `/instadecks:review` (Design Review) | RVW-01..11 |
-| 4 | `/instadecks:create` (Auto-Refine Orchestrator) | CRT-01..15 |
-| 5 | `/instadecks:content-review` | CRV-01..11 |
-| 6 | Marketplace Publication & Release Polish | DIST-01..08 |
-| 7 (optional) | Post-Launch Hardening | (v1.x deferred items) |
+| Phase | Phase Name | Requirements | Status |
+|-------|-----------|--------------|--------|
+| 1 | Plugin Foundation, Contract & CI Gates | FOUND-01, FOUND-02, FOUND-03, FOUND-04, FOUND-05, FOUND-06, FOUND-07, FOUND-08, FOUND-09, FOUND-10, FOUND-11 | Pending |
+| 2 | `/instadecks:annotate` | ANNO-01, ANNO-02, ANNO-03, ANNO-04, ANNO-05, ANNO-06, ANNO-07, ANNO-08, ANNO-09, ANNO-10, ANNO-11 | Pending |
+| 3 | `/instadecks:review` (Design Review) | RVW-01, RVW-02, RVW-03, RVW-04, RVW-05, RVW-06, RVW-07, RVW-08, RVW-09, RVW-10, RVW-11 | Pending |
+| 4 | `/instadecks:create` Scaffold + Render Cookbook | CRT-01, CRT-02, CRT-03, CRT-04, CRT-05, CRT-06, CRT-15 | Pending |
+| 5 | `/instadecks:create` Auto-Refine Loop | CRT-07, CRT-08, CRT-09, CRT-10, CRT-11, CRT-12, CRT-13, CRT-14 | Pending |
+| 6 | `/instadecks:content-review` | CRV-01, CRV-02, CRV-03, CRV-04, CRV-05, CRV-06, CRV-07, CRV-08, CRV-09, CRV-10, CRV-11 | Pending |
+| 7 | Marketplace Publication & Release Polish | DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07, DIST-08 | Pending |
+
+**Coverage:** 67/67 v1 requirements mapped (FOUND × 11 + ANNO × 11 + RVW × 11 + CRT × 15 + CRV × 11 + DIST × 8). No orphans, no duplicates.
+
+**Note on /create split:** The original research synthesis placed all of CRT-01..15 in a single Phase 4. Per granularity = "fine" (and per `/gsd-roadmap` instructions to isolate the highest-risk subsystem), `/create` is split into Phase 4 (scaffold + render cookbook + 8 slide types + PowerPoint compatibility gate — CRT-01..06, CRT-15) and Phase 5 (auto-refine loop, convergence rule, oscillation detection, issue ledger, soft cap, user interrupt — CRT-07..14). Content-review moves to Phase 6; marketplace to Phase 7. The original "Phase 7 — Post-Launch Hardening" is dropped from v1; its items are tracked in v2 / v1.x deferred.
 
 ---
 
-*Last updated: 2026-04-27 after research synthesis.*
+*Last updated: 2026-04-27 after roadmap creation (7 phases, 100% coverage).*
