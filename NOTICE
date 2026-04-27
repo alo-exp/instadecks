@@ -32,3 +32,13 @@ provided under the licenses/ directory at the project root.
 - image-size (MIT) — https://github.com/image-size/image-size
   Transitive dependency of pptxgenjs.
   Copyright (c) 2017 Aditya Yadav.
+
+--------------------------------------------------------------------
+
+## DECK-VDA methodology attribution
+
+The DECK-VDA methodology embedded in /instadecks:review (4-pass scan, 4-tier
+severity grammar, finding grammar, §1–§5 reporting structure, maturity rubric)
+was developed by Shafqat Ullah / Sourcevo as the standalone deck-design-review
+skill. Instadecks re-expresses the methodology as first-class authored content
+under Apache-2.0; no upstream files are vendored.
