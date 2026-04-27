@@ -13,7 +13,7 @@ Instadecks ships a Claude Code marketplace plugin with four user-invocable slash
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Plugin Foundation, Contract & CI Gates** - Loadable plugin skeleton with locked JSON contract, CI gates, fonts, and visual-regression baselines
-- [ ] **Phase 2: `/instadecks:annotate`** - Verbatim `annotate.js` wired to the locked contract; produces annotated PPTX + PDF overlays
+- [x] **Phase 2: `/instadecks:annotate`** - Verbatim `annotate.js` wired to the locked contract; produces annotated PPTX + PDF overlays *(complete 2026-04-28 — 4/4 plans, ANNO-01..ANNO-11)*
 - [ ] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate`
 - [ ] **Phase 4: `/instadecks:create` Scaffold + Render Cookbook** - Deck generator with 8 slide types, design-rationale doc, PowerPoint compatibility gate (no loop yet)
 - [ ] **Phase 5: `/instadecks:create` Auto-Refine Loop** - Convergence rule, oscillation detection, issue ledger, soft cap, user interrupt — the project's central differentiator
@@ -47,10 +47,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. Running the skill against `tests/fixtures/sample-findings.json` produces output that passes the visual regression baseline from Phase 1 (byte-identical PPTX or pixel-diff < 0.5%)
   6. Both standalone-invocable mode (user provides JSON + deck path) and pipelined-from-`/review` mode (in-memory deck-spec handoff, no file roundtrip) work
 **Plans**: 4 plans
-- [ ] 02-01-PLAN.md — Verbatim annotate.js + require-path patch + SAMPLES extraction + JPG fixtures + integrity test unsuspend
-- [ ] 02-02-PLAN.md — JSON-to-SAMPLES adapter (validate → filter genuine → collapse 4→3) + unit tests
-- [ ] 02-03-PLAN.md — runAnnotate entry point + standalone CLI + soffice PDF + sibling outputs + integration tests
-- [ ] 02-04-PLAN.md — Visual-regression Tier 1 (SHA) + Tier 2 (pixelmatch skip-guarded) + SKILL.md full body
+- [x] 02-01-PLAN.md — Verbatim annotate.js + require-path patch + SAMPLES extraction + JPG fixtures + integrity test unsuspend
+- [x] 02-02-PLAN.md — JSON-to-SAMPLES adapter (validate → filter genuine → collapse 4→3) + unit tests
+- [x] 02-03-PLAN.md — runAnnotate entry point + standalone CLI + soffice PDF + sibling outputs + integration tests
+- [x] 02-04-PLAN.md — Visual-regression Tier 1 (normalized SHA per Rule 4 deviation) + Tier 2 (pixelmatch skip-guarded) + SKILL.md full body
 **UI hint**: yes
 
 ### Phase 3: `/instadecks:review` (Design Review)

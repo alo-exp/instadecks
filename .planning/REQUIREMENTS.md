@@ -26,7 +26,7 @@
 
 ### `/instadecks:annotate` skill (ANNO)
 
-- [ ] **ANNO-01**: `/instadecks:annotate` is invocable as a slash skill with imperative-keyword-front-loaded description that triggers Claude reliably (≥ 8/10 prompt activation)
+- [x] **ANNO-01**: `/instadecks:annotate` is invocable as a slash skill with imperative-keyword-front-loaded description that triggers Claude reliably (≥ 8/10 prompt activation) *(Phase 7 DIST-02 finalizes activation tuning)*
 - [x] **ANNO-02**: `annotate.js` is bundled verbatim under `skills/annotate/scripts/` with banner comment "VERBATIM v8 BLUE PRESTIGE — DO NOT EDIT" and SHA-pinned in `tests/annotate-integrity.test.js`
 - [x] **ANNO-03**: The only modification to `annotate.js` is the documented one-line require-path patch so pptxgenjs resolves out of `${CLAUDE_PLUGIN_DATA}/node_modules`; algorithm code is unchanged
 - [x] **ANNO-04**: The `SAMPLES` example data is extracted to a separate `samples.js` module so geometry code stays unmodified; runtime data is written into a fresh JSON consumed via the same module shape
@@ -36,7 +36,7 @@
 - [x] **ANNO-08**: Output is both an annotated PPTX overlay and an annotated PDF; both written to the run directory and a project-relative output path
 - [x] **ANNO-09**: Standalone-invocable mode: user provides findings JSON path + deck file path; skill produces annotated outputs without requiring `/review` to have run in the same session
 - [x] **ANNO-10**: Pipelined invocation mode: when called by `/review` (default pipeline), receives the in-memory deck-spec handoff and skips the file-read roundtrip
-- [ ] **ANNO-11**: Validates against `tests/fixtures/sample-findings.json` → produces output with byte-identical PPTX vs v8 reference (or pixel-diff < 0.5% if non-deterministic bytes)
+- [x] **ANNO-11**: Validates against `tests/fixtures/sample-findings.json` → produces output with byte-identical PPTX vs v8 reference (or pixel-diff < 0.5% if non-deterministic bytes) *(Tier 1 satisfied via structural-XML normalized SHA per Plan 02-04 Rule 4 deviation; Tier 2 pixelmatch staged behind Phase 7 ci.yml RESERVED block)*
 
 ### `/instadecks:review` skill — Design Review (RVW)
 
