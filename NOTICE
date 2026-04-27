@@ -1,0 +1,34 @@
+Instadecks
+Copyright 2026 Alo Labs
+
+This product is licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License. A copy of the
+License is provided in the LICENSE file at the root of this project, and is
+also available at http://www.apache.org/licenses/LICENSE-2.0.
+
+--------------------------------------------------------------------
+RELICENSING NOTE
+
+annotate.js originally developed for internal Sourcevo use; relicensed under
+Apache-2.0 by the author for inclusion in this plugin.
+
+--------------------------------------------------------------------
+BUNDLED SOFTWARE ATTRIBUTION
+
+This product includes software developed by third parties. License texts are
+provided under the licenses/ directory at the project root.
+
+- pptxgenjs (MIT) — https://github.com/gitbrent/PptxGenJS
+  Copyright (c) Brent Ely and contributors.
+
+- IBM Plex Sans (SIL Open Font License 1.1) — https://github.com/IBM/plex
+  Copyright © 2017 IBM Corp. with Reserved Font Name "Plex".
+
+- jszip (MIT or GPL-3.0; used under MIT) — https://github.com/Stuk/jszip
+  Transitive dependency of pptxgenjs.
+  Copyright (c) 2009-2016 Stuart Knightley, David Duponchel, Franz Buchinger,
+  António Afonso.
+
+- image-size (MIT) — https://github.com/image-size/image-size
+  Transitive dependency of pptxgenjs.
+  Copyright (c) 2017 Aditya Yadav.
