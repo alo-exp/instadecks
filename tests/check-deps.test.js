@@ -78,6 +78,47 @@ test('check-deps.sh', async (t) => {
     );
   });
 
+  await t.test('font install branch fires when fc-list reports IBM Plex Sans missing (D-01)', (t2) => {
+    if (process.platform !== 'darwin' && process.platform !== 'linux') {
+      t2.skip('font auto-install path is macOS/Linux only');
+      return;
+    }
+    // Stub fc-list (returns empty: no IBM Plex Sans) and fc-cache (no-op success)
+    // by prepending a temp dir to PATH. Use a sandboxed HOME so the test does
+    // not touch the user's real font directory.
+    const stubDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cd-stub-'));
+    fs.writeFileSync(path.join(stubDir, 'fc-list'), '#!/usr/bin/env bash\nexit 0\n', { mode: 0o755 });
+    fs.writeFileSync(path.join(stubDir, 'fc-cache'), '#!/usr/bin/env bash\nexit 0\n', { mode: 0o755 });
+    const sandboxHome = fs.mkdtempSync(path.join(os.tmpdir(), 'cd-home-'));
+    const dataDir = freshDataDir();
+    const result = spawnSync('bash', [HOOK], {
+      env: {
+        ...process.env,
+        CLAUDE_PLUGIN_ROOT: ROOT,
+        CLAUDE_PLUGIN_DATA: dataDir,
+        HOME: sandboxHome,
+        PATH: `${stubDir}:${process.env.PATH}`,
+      },
+      encoding: 'utf8',
+    });
+    assert.equal(result.status, 0, `expected exit 0, got ${result.status}\nstderr: ${result.stderr}`);
+    const targetDir = process.platform === 'darwin'
+      ? path.join(sandboxHome, 'Library', 'Fonts')
+      : path.join(sandboxHome, '.local', 'share', 'fonts');
+    assert.ok(
+      fs.existsSync(path.join(targetDir, 'IBMPlexSans-Regular.ttf')),
+      `expected Regular TTF copied to ${targetDir}`,
+    );
+    assert.ok(
+      fs.existsSync(path.join(targetDir, 'IBMPlexSans-Bold.ttf')),
+      `expected Bold TTF copied to ${targetDir}`,
+    );
+    assert.ok(
+      result.stdout.includes('fonts installed'),
+      `expected "fonts installed" INFO marker, got: ${result.stdout}`,
+    );
+  });
+
   await t.test('npm ci installs into CLAUDE_PLUGIN_DATA, not CLAUDE_PLUGIN_ROOT (PC-04)', (t2) => {
     if (!npmAvailable) {
       t2.skip('npm not available');
