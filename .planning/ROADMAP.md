@@ -46,7 +46,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. The slide-image symlink approach (`slide-NN.jpg` → `v8s-NN.jpg` in a temp working dir) lets `annotate.js` run without code changes
   5. Running the skill against `tests/fixtures/sample-findings.json` produces output that passes the visual regression baseline from Phase 1 (byte-identical PPTX or pixel-diff < 0.5%)
   6. Both standalone-invocable mode (user provides JSON + deck path) and pipelined-from-`/review` mode (in-memory deck-spec handoff, no file roundtrip) work
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 02-01-PLAN.md — Verbatim annotate.js + require-path patch + SAMPLES extraction + JPG fixtures + integrity test unsuspend
+- [ ] 02-02-PLAN.md — JSON-to-SAMPLES adapter (validate → filter genuine → collapse 4→3) + unit tests
+- [ ] 02-03-PLAN.md — runAnnotate entry point + standalone CLI + soffice PDF + sibling outputs + integration tests
+- [ ] 02-04-PLAN.md — Visual-regression Tier 1 (SHA) + Tier 2 (pixelmatch skip-guarded) + SKILL.md full body
 **UI hint**: yes
 
 ### Phase 3: `/instadecks:review` (Design Review)
