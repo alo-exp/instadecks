@@ -79,15 +79,13 @@ jobs:
       # flags per-test (PC-12 option (a), hermetic) — no global `git config --global`
       # prelude required in this workflow.
       - name: Gate 6 — Node test suite (full)
+        # Glob captures all *.test.js files automatically — new tests in later
+        # phases run without ci.yml updates. `find` form is portable across
+        # Node versions; -maxdepth 2 keeps the scan cheap and confined to the
+        # tests/ tree (excluding tests/fixtures subtrees that contain no test
+        # files at depth >2).
         run: |
-          node --test \
-            tests/findings-schema.test.js \
-            tests/manifest-validator.test.js \
-            tests/path-lint.test.js \
-            tests/assert-pin.test.js \
-            tests/check-deps.test.js \
-            tests/annotate-integrity.test.js \
-            tests/visual-regression.test.js || {
+          find tests -maxdepth 2 -name '*.test.js' -print0 | xargs -0 node --test || {
             echo "::error::Node test suite failed"
             exit 1
           }
