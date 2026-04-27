@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** A user can hand Claude Code arbitrary input material and end up with a polished, design-reviewed, annotated PPTX + PDF — without having to know about pptxgenjs, custom-geometry arrows, or our deck-design-review skill — and the output quality matches what we ship by hand today.
-**Current focus:** Phase 3 in progress — Wave 1 (Plan 03-01) complete; Wave 2 (03-02..03-04) ready
+**Current focus:** Phase 3 COMPLETE — all 5 plans landed; ready for Phase 4 (`/instadecks:create` scaffold + render cookbook)
 **Current milestone:** v0.1.0 — Plugin v0.1.0 Public Release
 
 ## Current Position
 
 Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 7 phases, 67 requirements
-Phase: 3 of 7 (`/instadecks:review`) — in progress (Wave 1 complete)
-Plan: 1 of TBD in current phase (03-01 complete)
-Status: Plan 03-01 complete — `scripts/pptx-to-images.sh` hardened (RVW-09/10/11), tiny-deck fixture committed, full test suite 84 pass / 2 skip / 0 fail
-Last activity: 2026-04-28 — Plan 03-01 completed (Wave 1 serial — unblocks 03-02..03-04 + Phases 4-6)
+Phase: 3 of 7 (`/instadecks:review`) — COMPLETE (5/5 plans)
+Plan: 5 of 5 in Phase 3 (03-05 complete)
+Status: Phase 3 complete — DECK-VDA canonicalized in SKILL.md, NOTICE attribution landed, end-to-end integration test green; full repo suite 129 pass / 2 skip / 0 fail; RVW-01..RVW-11 all closed. SUMMARYs for 03-02/03-03/03-04 backfilled in this session (executors hit SB hook before SUMMARY emission; commits durable).
+Last activity: 2026-04-28 — Plan 03-05 completed (Wave 3 closer)
 
-Progress: [████░░░░░░] 33%
+Progress: [██████░░░░] 43%
 
 ## Performance Metrics
 
