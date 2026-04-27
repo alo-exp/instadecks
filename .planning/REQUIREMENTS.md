@@ -27,15 +27,15 @@
 ### `/instadecks:annotate` skill (ANNO)
 
 - [ ] **ANNO-01**: `/instadecks:annotate` is invocable as a slash skill with imperative-keyword-front-loaded description that triggers Claude reliably (≥ 8/10 prompt activation)
-- [ ] **ANNO-02**: `annotate.js` is bundled verbatim under `skills/annotate/scripts/` with banner comment "VERBATIM v8 BLUE PRESTIGE — DO NOT EDIT" and SHA-pinned in `tests/annotate-integrity.test.js`
-- [ ] **ANNO-03**: The only modification to `annotate.js` is the documented one-line require-path patch so pptxgenjs resolves out of `${CLAUDE_PLUGIN_DATA}/node_modules`; algorithm code is unchanged
-- [ ] **ANNO-04**: The `SAMPLES` example data is extracted to a separate `samples.js` module so geometry code stays unmodified; runtime data is written into a fresh JSON consumed via the same module shape
-- [ ] **ANNO-05**: JSON-to-SAMPLES adapter implements 4-tier→3-tier severity collapse (Critical→MAJOR, Major→MAJOR, Minor→MINOR, Nitpick→POLISH) at the adapter only; `annotate.js` continues to see only `'major' | 'minor' | 'polish'`
-- [ ] **ANNO-06**: Adapter filters `genuine == true` findings before passing to annotate.js; non-genuine findings are recorded in the design-rationale doc but do not appear in the overlay
-- [ ] **ANNO-07**: Slide-image symlink approach: skill creates a temp working dir, symlinks `slide-NN.jpg` → `v8s-NN.jpg` names so annotate.js's hardcoded image-name expectation is satisfied without code changes
-- [ ] **ANNO-08**: Output is both an annotated PPTX overlay and an annotated PDF; both written to the run directory and a project-relative output path
-- [ ] **ANNO-09**: Standalone-invocable mode: user provides findings JSON path + deck file path; skill produces annotated outputs without requiring `/review` to have run in the same session
-- [ ] **ANNO-10**: Pipelined invocation mode: when called by `/review` (default pipeline), receives the in-memory deck-spec handoff and skips the file-read roundtrip
+- [x] **ANNO-02**: `annotate.js` is bundled verbatim under `skills/annotate/scripts/` with banner comment "VERBATIM v8 BLUE PRESTIGE — DO NOT EDIT" and SHA-pinned in `tests/annotate-integrity.test.js`
+- [x] **ANNO-03**: The only modification to `annotate.js` is the documented one-line require-path patch so pptxgenjs resolves out of `${CLAUDE_PLUGIN_DATA}/node_modules`; algorithm code is unchanged
+- [x] **ANNO-04**: The `SAMPLES` example data is extracted to a separate `samples.js` module so geometry code stays unmodified; runtime data is written into a fresh JSON consumed via the same module shape
+- [x] **ANNO-05**: JSON-to-SAMPLES adapter implements 4-tier→3-tier severity collapse (Critical→MAJOR, Major→MAJOR, Minor→MINOR, Nitpick→POLISH) at the adapter only; `annotate.js` continues to see only `'major' | 'minor' | 'polish'`
+- [x] **ANNO-06**: Adapter filters `genuine == true` findings before passing to annotate.js; non-genuine findings are recorded in the design-rationale doc but do not appear in the overlay
+- [x] **ANNO-07**: Slide-image symlink approach: skill creates a temp working dir, symlinks `slide-NN.jpg` → `v8s-NN.jpg` names so annotate.js's hardcoded image-name expectation is satisfied without code changes
+- [x] **ANNO-08**: Output is both an annotated PPTX overlay and an annotated PDF; both written to the run directory and a project-relative output path
+- [x] **ANNO-09**: Standalone-invocable mode: user provides findings JSON path + deck file path; skill produces annotated outputs without requiring `/review` to have run in the same session
+- [x] **ANNO-10**: Pipelined invocation mode: when called by `/review` (default pipeline), receives the in-memory deck-spec handoff and skips the file-read roundtrip
 - [ ] **ANNO-11**: Validates against `tests/fixtures/sample-findings.json` → produces output with byte-identical PPTX vs v8 reference (or pixel-diff < 0.5% if non-deterministic bytes)
 
 ### `/instadecks:review` skill — Design Review (RVW)
@@ -139,7 +139,7 @@ Phase ↔ requirement mapping (filled by roadmap, updated as phases ship):
 | Phase | Phase Name | Requirements | Status |
 |-------|-----------|--------------|--------|
 | 1 | Plugin Foundation, Contract & CI Gates | FOUND-01, FOUND-02, FOUND-03, FOUND-04, FOUND-05, FOUND-06, FOUND-07, FOUND-08, FOUND-09, FOUND-10, FOUND-11 | Pending |
-| 2 | `/instadecks:annotate` | ANNO-01, ANNO-02, ANNO-03, ANNO-04, ANNO-05, ANNO-06, ANNO-07, ANNO-08, ANNO-09, ANNO-10, ANNO-11 | Pending |
+| 2 | `/instadecks:annotate` | ANNO-01, ANNO-02, ANNO-03, ANNO-04, ANNO-05, ANNO-06, ANNO-07, ANNO-08, ANNO-09, ANNO-10, ANNO-11 | In Progress (9/11 — ANNO-01, ANNO-11 deferred to plan 02-04) |
 | 3 | `/instadecks:review` (Design Review) | RVW-01, RVW-02, RVW-03, RVW-04, RVW-05, RVW-06, RVW-07, RVW-08, RVW-09, RVW-10, RVW-11 | Pending |
 | 4 | `/instadecks:create` Scaffold + Render Cookbook | CRT-01, CRT-02, CRT-03, CRT-04, CRT-05, CRT-06, CRT-15 | Pending |
 | 5 | `/instadecks:create` Auto-Refine Loop | CRT-07, CRT-08, CRT-09, CRT-10, CRT-11, CRT-12, CRT-13, CRT-14 | Pending |

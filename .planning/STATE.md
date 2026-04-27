@@ -5,35 +5,35 @@
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** A user can hand Claude Code arbitrary input material and end up with a polished, design-reviewed, annotated PPTX + PDF — without having to know about pptxgenjs, custom-geometry arrows, or our deck-design-review skill — and the output quality matches what we ship by hand today.
-**Current focus:** Phase 1 — Plugin Foundation, Contract & CI Gates
+**Current focus:** Phase 2 — `/instadecks:annotate` (Wave 2 complete; plan 02-04 remaining)
 **Current milestone:** v0.1.0 — Plugin v0.1.0 Public Release
 
 ## Current Position
 
 Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 7 phases, 67 requirements
-Phase: 1 of 7 (Plugin Foundation, Contract & CI Gates)
-Plan: 0 of TBD in current phase
-Status: Ready to plan — milestone formalized, awaiting `/gsd-discuss-phase 1` or `/gsd-plan-phase 1`
-Last activity: 2026-04-27 — Milestone v0.1.0 formalized (existing 7-phase roadmap from /gsd-new-project labeled as v0.1.0)
+Phase: 2 of 7 (`/instadecks:annotate`)
+Plan: 3 of 4 complete in current phase
+Status: In Progress — Wave 1 (02-01, 02-02) and Wave 2 (02-03) landed; 02-04 (SKILL.md + visual regression) remaining
+Last activity: 2026-04-28 — Plan 02-03 completed (runAnnotate orchestrator + CLI + 12 integration subtests)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0.0 hours
+- Total plans completed: 3
+- Average duration: ~15 min
+- Total execution time: ~0.75 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 2 | 3 | ~45 min | ~15 min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 02-01 (~10 min), 02-02 (~10 min), 02-03 (~25 min)
+- Trend: steady; Wave 2 longer due to live-pipeline integration tests
 
 *Updated after each plan completion*
 
@@ -81,6 +81,6 @@ Items acknowledged and carried forward:
 
 ## Session Continuity
 
-Last session: 2026-04-27 22:55
-Stopped at: Roadmap created — ROADMAP.md and STATE.md written; REQUIREMENTS.md traceability updated
-Resume file: None (next step: `/gsd-plan-phase 1`)
+Last session: 2026-04-28
+Stopped at: Phase 2 plans 02-01, 02-02, 02-03 complete; runAnnotate + CLI + integration tests live
+Resume file: None (next step: execute plan 02-04 — SKILL.md + Tier-2 visual regression)
