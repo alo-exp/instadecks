@@ -1,0 +1,97 @@
+{
+  "schema_version": "1.0",
+  "deck": "tests/fixtures/v8-reference/Annotations_Sample.pptx",
+  "generated_at": "2026-04-27T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 7,
+      "title": "Slide 07  ·  Freelance Baseline",
+      "findings": [
+        {
+          "severity_reviewer": "Critical",
+          "category": "defect",
+          "genuine": true,
+          "nx": 0.46,
+          "ny": 0.16,
+          "text": "Headline claim unsupported by cited source",
+          "rationale": "Linked source does not contain the 42% figure asserted in the headline; risks credibility loss with stakeholder review.",
+          "location": "title text centre",
+          "standard": "Factual integrity (Tufte 2001)",
+          "fix": "Replace with verifiable figure from primary source or remove claim"
+        },
+        {
+          "severity_reviewer": "Major",
+          "category": "improvement",
+          "genuine": true,
+          "nx": 0.58,
+          "ny": 0.27,
+          "text": "Body copy exceeds 7-line cognitive threshold",
+          "rationale": "Nine lines of body copy on a single slide forces reader context-switch and reduces retention.",
+          "location": "body text region, right column",
+          "standard": "Cognitive load (Norman 1988)",
+          "fix": "Split into two slides or compress to 5 bullet points"
+        }
+      ]
+    },
+    {
+      "slideNum": 8,
+      "title": "Slide 08  ·  Pricing Tier Comparison",
+      "findings": [
+        {
+          "severity_reviewer": "Minor",
+          "category": "style",
+          "genuine": true,
+          "nx": 0.11,
+          "ny": 0.32,
+          "text": "Inconsistent currency formatting across pricing tiers",
+          "rationale": "Tier A uses '$1,200' while Tier B uses 'USD 1200' — violates table consistency.",
+          "location": "left pricing column",
+          "standard": "Consistency heuristic (Nielsen 1994)",
+          "fix": "Normalize all currency cells to '$X,XXX' format"
+        },
+        {
+          "severity_reviewer": "Nitpick",
+          "category": "style",
+          "genuine": false,
+          "nx": 0.72,
+          "ny": 0.85,
+          "text": "Footer page number font weight differs from body",
+          "rationale": "Reviewer flagged on cycle 1; on inspection the footer uses the brand template's intentional weight contrast — not a defect.",
+          "location": "footer, lower right",
+          "standard": "Typographic hierarchy",
+          "fix": "No action — intentional brand-template choice"
+        }
+      ]
+    },
+    {
+      "slideNum": 9,
+      "title": "Slide 09  ·  Roadmap Timeline",
+      "findings": [
+        {
+          "severity_reviewer": "Major",
+          "category": "defect",
+          "genuine": true,
+          "nx": 0.40,
+          "ny": 0.55,
+          "text": "Q3 milestone date conflicts with Q2 end date",
+          "rationale": "Timeline shows Q2 ending 2026-09-30 and Q3 starting 2026-09-15 — overlap renders sequencing incoherent.",
+          "location": "centre timeline band",
+          "standard": "Logical consistency",
+          "fix": "Align quarter boundaries; Q3 should start 2026-10-01"
+        },
+        {
+          "severity_reviewer": "Minor",
+          "category": "improvement",
+          "genuine": true,
+          "nx": 0.85,
+          "ny": 0.42,
+          "text": "Missing legend for milestone color coding",
+          "rationale": "Three colors used for milestone markers without legend; viewer must infer meaning.",
+          "location": "right margin, mid-slide",
+          "standard": "Self-explanatory visualization (Few 2012)",
+          "fix": "Add inline legend mapping color to milestone status"
+        }
+      ]
+    }
+  ]
+}
