@@ -123,6 +123,25 @@ function validateSkillFile(file, errors) {
     return;
   }
 
+  // CR-02: Also reject IMPLICIT folded-style continuations — a description
+  // followed by a whitespace-indented non-empty next line. Real YAML parsers
+  // fold those into the description value. Valid next-line forms:
+  //   - column-0 new key (e.g. `user-invocable:`)
+  //   - closing `---`
+  //   - end of frontmatter (no more lines)
+  const nextLine = lines[descLineIdx + 1];
+  if (
+    nextLine !== undefined &&
+    nextLine !== '---' &&
+    /^\s/.test(nextLine) &&
+    nextLine.trim() !== ''
+  ) {
+    errors.push(
+      `${file}: description must be single-line; indented continuation detected on line ${descLineIdx + 2}`
+    );
+    return;
+  }
+
   // user-invocable check
   let userInvocable = false;
   for (const l of lines) {
