@@ -29,9 +29,21 @@ fi
 
 # ── npm ci sentinel ───────────────────────────────────────────────
 SENTINEL="$PLUGIN_DATA/.npm-installed-sentinel"
+LOCK="$PLUGIN_ROOT/package-lock.json"
 LOCK_SHA=""
-if [ -f "$PLUGIN_ROOT/package-lock.json" ]; then
-  LOCK_SHA=$(shasum -a 256 "$PLUGIN_ROOT/package-lock.json" 2>/dev/null | awk '{print $1}' || echo "")
+
+# CR-03: detect-or-fallback for SHA hasher (some Linux distros lack `shasum`).
+HASHER=""
+if command -v shasum >/dev/null 2>&1; then
+  HASHER="shasum -a 256"
+elif command -v sha256sum >/dev/null 2>&1; then
+  HASHER="sha256sum"
+else
+  WARN+=("missing shasum/sha256sum; cannot verify lockfile — npm install not run")
+fi
+
+if [ -n "$HASHER" ] && [ -f "$LOCK" ]; then
+  LOCK_SHA=$($HASHER "$LOCK" 2>/dev/null | awk '{print $1}' || echo "")
 fi
 PREV_SHA=$(cat "$SENTINEL" 2>/dev/null || echo "")
 if [ -n "$LOCK_SHA" ] && [ "$LOCK_SHA" != "$PREV_SHA" ]; then
