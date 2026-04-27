@@ -25,7 +25,8 @@
 # they are operational/agent-facing artifacts.
 #
 # All other files: a line opts in via the trailing comment
-# `# lint-allow:hardcoded-path`.
+# `# lint-allow:hardcoded-path` (or `// lint-allow:hardcoded-path` for JS/TS).
+# The marker token is matched regardless of comment-prefix style.
 #
 # This is a CI tool (not a SessionStart hook), so we use `set -euo pipefail`
 # and let errors bubble up. No `trap exit 0`.
@@ -38,7 +39,7 @@ cd "$(git rev-parse --show-toplevel)"
 HITS=$(git ls-files -z \
   | xargs -0 grep -HInE '/Users/|~/\.claude|/home/|C:\\\\' 2>/dev/null \
   | grep -vE '^(tests/fixtures/|tests/path-lint\.test\.js:|tools/lint-paths\.sh:|\.silver-bullet\.json:|\.planning/HANDOFF\.json:|(^|/)README\.md:|(^|/)HANDOFF\.md:|(^|/)CLAUDE\.md:|(^|/)silver-bullet\.md:|(^|/)NOTICE:|(^|/)LICENSE:|docs/.+\.md:|\.planning/.+\.md:)' \
-  | grep -v '# lint-allow:hardcoded-path' \
+  | grep -v 'lint-allow:hardcoded-path' \
   || true)
 
 if [ -n "$HITS" ]; then
