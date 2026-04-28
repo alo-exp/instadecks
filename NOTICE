@@ -42,3 +42,16 @@ severity grammar, finding grammar, §1–§5 reporting structure, maturity rubri
 was developed by Shafqat Ullah / Sourcevo as the standalone deck-design-review
 skill. Instadecks re-expresses the methodology as first-class authored content
 under Apache-2.0; no upstream files are vendored.
+
+--------------------------------------------------------------------
+
+## Author-original design-ideas attribution
+
+Design-ideas guidance (skills/create/references/design-ideas.md and design-ideas.json)
+is original to this project. The structural pattern (curated palettes + curated
+typography pairings + anti-patterns list) is inspired by public design-systems
+literature; no content is copied or derived from any proprietary source.
+
+R18 AI-tell detection patterns in skills/review/scripts/ai-tells.js are original
+pattern-matchers; the underlying design heuristics (e.g. "horizontal accent line
+under titles" as an LLM-authored signature) are unprotectable observations.
