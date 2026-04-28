@@ -191,6 +191,34 @@ If cycle 2 also returns 0 genuine, convergence achieved. If cycle 2 returns N>0,
 - `findings-schema.md` (Phase 1 contract) — clarifies `genuine` is set during triage, not during review. Add note; no breaking change.
 - SKILL.md Auto-Refine Loop step 4 (per cycle): "Read each finding + slide image, decide genuine/non-genuine, write `findings.triaged.json`. Only `genuine && severity ∈ {Critical, Major}` flow into fix list."
 
+
+---
+
+### D-09 — Oscillation Detection Semantics Refinement
+
+**Decision:** **Strict equality of `issue_set_hash` across cycle N and cycle N-2, AND `findings_genuine > 0` on cycle N.** Supersedes the subset semantics described in earlier text of this document, ROADMAP SC#2, and CRT-09.
+
+Concretely:
+```
+detectOscillation(ledger) === true  iff
+    ledger.length >= 3
+    AND ledger[N].issue_set_hash === ledger[N-2].issue_set_hash
+    AND ledger[N].findings_genuine > 0
+```
+
+**Rationale (from RESEARCH Pitfall 2):** The original `cycle N ⊆ cycle N-2` subset rule generates a false-positive on the steady-improvement path. When a loop is genuinely converging, cycle N`s issue set is a strict subset of N-2`s — and `⊆` is satisfied trivially. The detector would flag the converging run as oscillating and halt prematurely. Strict hash equality on the unfixed-genuine set captures the "agent fixed a different subset each round but the leftovers are identical" pattern that IS oscillation, without false-flagging shrinkage. The `findings_genuine > 0` guard prevents two consecutive zero-genuine cycles (the convergence path under D-07) from registering as oscillation.
+
+**Reconciliation with prior text:**
+- ROADMAP SC#2 / CRT-09 prose ("cycle N`s issue set ⊆ cycle N-2`s issue set") describes the SPIRIT of oscillation but is imprecise. D-09 is the precise CRT-09 implementation contract.
+- D-02 ledger `issue_set_hash` field is the canonical signal — set semantics are encoded into the hash via sort+join+SHA-1 (Plan 05-01 `hashIssueSet`).
+- PATTERNS.md analog block at lines 117-130 (subset code sketch) is SUPERSEDED by D-09; planner consumes D-09, not the PATTERNS sketch, for the production `oscillation.js` body.
+
+**How to apply:**
+- Plan 05-01 `lib/oscillation.js` implements D-09 verbatim (already does — see <interfaces>).
+- Plan 05-01 `tests/oscillation.test.js` Test 6 (shrinking-but-hash-matches) explicitly verifies the D-09 refinement.
+- Plan 05-04 Scenario 3 (oscillation) scripts findings producing equal hashes on cycle 1 and cycle 3 — verifies D-09 end-to-end.
+- Plan 05-03 SKILL.md `Locked invariants` block cites the D-09 rule verbatim ("Oscillation = `issue_set_hash_N == issue_set_hash_{N-2} AND genuine_count_N > 0`").
+- PATTERNS.md analog block at lines 117-130 is annotated as superseded (planner cross-reference; not an executable artifact).
 ---
 
 ## Canonical References (read in research)
