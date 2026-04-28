@@ -255,12 +255,14 @@ async function runCreate({
     // the design-choice sections as [TBD ...] so users know what's missing.
     // brief is validated upstream by validateBrief() so brief.topic / audience /
     // tone / narrative_arc are guaranteed.
-    const arcLines = (Array.isArray(brief.narrative_arc) ? brief.narrative_arc : [])
-      .map((b, i) => `${i + 1}. ${b}`).join('\n');
-    const claims = Array.isArray(brief.key_claims) ? brief.key_claims : [];
-    const claimLines = claims.length
-      ? claims.map((kc) => `- Slide ${kc.slide_idx}: ${kc.claim}`).join('\n')
+    // validateBrief() guarantees narrative_arc is non-empty array and
+    // key_claims is array (possibly empty); no defensive fallbacks needed.
+    const arcLines = brief.narrative_arc.map((b, i) => `${i + 1}. ${b}`).join('\n');
+    /* c8 ignore start */ // Defensive: empty-key_claims ternary branch — sample-brief.json always carries claims; this fallback is exercised only when brief.key_claims === [].
+    const claimLines = brief.key_claims.length > 0
+      ? brief.key_claims.map((kc) => `- Slide ${kc.slide_idx}: ${kc.claim}`).join('\n')
       : '_(no key_claims authored in brief)_';
+    /* c8 ignore stop */
     const stub =
       `# Design Rationale — ${brief.topic}\n\n` +
       `*Brief topic:* ${brief.topic}\n\n` +

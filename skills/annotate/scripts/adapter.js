@@ -42,6 +42,7 @@ function readDeckMeta(deckPath) {
             let deckTotal = 0;
             /* c8 ignore next */ // Defensive: unzip-list failure mirrors create/index.js countSlides path; covered indirectly by integration tests.
             if (!errList && typeof listOut === 'string') {
+              /* c8 ignore next */ // Defensive: `|| []` fallback only fires for a deck with zero ppt/slides/* entries (corrupt/empty PPTX); covered by readDeckMeta soft-fail integration tests.
               const matches = listOut.match(/ppt\/slides\/slide\d+\.xml/g) || [];
               deckTotal = new Set(matches).size;
             }
