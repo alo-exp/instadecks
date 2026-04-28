@@ -4,7 +4,7 @@
 // Severity collapse table sourced from skills/review/references/findings-schema.md §5.
 
 const SEV_MAP = { Critical: 'major', Major: 'major', Minor: 'minor', Nitpick: 'polish' };
-const VALID_CATEGORY = new Set(['defect', 'improvement', 'style']);
+const VALID_CATEGORY = new Set(['defect', 'improvement', 'style', 'content']);
 const REQUIRED_FINDING_FIELDS = [
   'severity_reviewer', 'category', 'genuine',
   'nx', 'ny', 'text', 'rationale', 'location', 'standard', 'fix',
@@ -55,7 +55,7 @@ function adaptFindings(doc) {
         throw new Error(`${where}.severity_reviewer: ${f.severity_reviewer} not in {Critical,Major,Minor,Nitpick}`);
       }
       if (typeof f.category !== 'string' || !VALID_CATEGORY.has(f.category)) {
-        throw new Error(`${where}.category: ${f.category} not in {defect,improvement,style}`);
+        throw new Error(`${where}.category: ${f.category} not in {defect,improvement,style,content}`);
       }
       if (typeof f.genuine !== 'boolean') {
         throw new Error(`${where}.genuine: must be boolean`);

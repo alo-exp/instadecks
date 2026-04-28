@@ -1,6 +1,6 @@
 # Findings Schema
 
-**Schema version:** 1.0
+**Schema version:** 1.1
 **Required top-level field:** `schema_version`
 
 This file is THE canonical JSON contract for design/content findings produced by `/instadecks:review` and `/instadecks:content-review`, and consumed by `/instadecks:annotate` and `/instadecks:create`. All four skills read this file directly via `Read` — **do not duplicate this schema in code**. The schema is the single source of truth for the entire plugin.
@@ -52,7 +52,8 @@ This file is THE canonical JSON contract for design/content findings produced by
 | Field                | Type    | Required | Purpose                                                                                      |
 | -------------------- | ------- | -------- | -------------------------------------------------------------------------------------------- |
 | `severity_reviewer`  | string  | yes      | One of `"Critical"`, `"Major"`, `"Minor"`, `"Nitpick"` (full 4-tier producer vocabulary).    |
-| `category`           | string  | yes      | One of `"defect"`, `"improvement"`, `"style"`.                                                |
+| `category`           | string  | yes      | One of `"defect"`, `"improvement"`, `"style"`, `"content"`. (`"content"` added in v1.1.)     |
+| `check_id`           | string  | conditional | Required iff `category === "content"`. One of `"action-title"`, `"redundancy"`, `"jargon"`, `"length"`, `"pyramid-mece"`, `"narrative-arc"`, `"claim-evidence"`, `"standalone-readability"`. (Added in v1.1.) |
 | `genuine`            | boolean | yes      | Auto-refine filter — only `true` findings flow into `/annotate` SAMPLES.                     |
 | `nx`                 | number  | yes      | Normalized x in `[0, 1]`; mapped directly to `annotate.js` `nx`.                             |
 | `ny`                 | number  | yes      | Normalized y in `[0, 1]`; mapped directly to `annotate.js` `ny`.                             |
@@ -62,7 +63,7 @@ This file is THE canonical JSON contract for design/content findings produced by
 | `standard`           | string  | yes      | Design / content standard cited (e.g., `"Cognitive load (Norman 1988)"`).                    |
 | `fix`                | string  | yes      | Concrete remediation instruction.                                                            |
 
-All finding fields are required in v1.0. Future minor versions (`1.x`) MAY add optional fields; consumers MUST ignore unknown fields.
+All required finding fields from v1.0 remain required in v1.1. v1.1 adds the optional `check_id` field (required iff `category === "content"`) and extends the `category` enum with `"content"`. Future minor versions (`1.x`) MAY add optional fields; consumers MUST ignore unknown fields. `1.x` validators tolerate optional new fields; required-iff rules are expressed inline in §3.
 
 ## 4. Severity vocabulary (producer side)
 

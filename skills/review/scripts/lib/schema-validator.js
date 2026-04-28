@@ -5,7 +5,11 @@
 // Phase 1/Phase 2 invariant: severity_reviewer keeps the full 4-tier vocabulary (P-01 guard).
 
 const SEVERITIES = new Set(['Critical', 'Major', 'Minor', 'Nitpick']);
-const CATEGORIES = new Set(['defect', 'improvement', 'style']);
+const CATEGORIES = new Set(['defect', 'improvement', 'style', 'content']);
+const VALID_CHECK_IDS = new Set([
+  'action-title', 'redundancy', 'jargon', 'length',
+  'pyramid-mece', 'narrative-arc', 'claim-evidence', 'standalone-readability',
+]);
 const REQUIRED_FINDING_FIELDS = [
   'severity_reviewer', 'category', 'genuine',
   'nx', 'ny', 'text', 'rationale', 'location', 'standard', 'fix',
@@ -62,7 +66,16 @@ function validate(doc) {
         throw new Error(`${where}.severity_reviewer: must be one of {Critical,Major,Minor,Nitpick} (got ${JSON.stringify(f.severity_reviewer)})`);
       }
       if (typeof f.category !== 'string' || !CATEGORIES.has(f.category)) {
-        throw new Error(`${where}.category: must be one of {defect,improvement,style} (got ${JSON.stringify(f.category)})`);
+        throw new Error(`${where}.category: must be one of {defect,improvement,style,content} (got ${JSON.stringify(f.category)})`);
+      }
+      if (f.category === 'content') {
+        if (typeof f.check_id !== 'string' || !VALID_CHECK_IDS.has(f.check_id)) {
+          throw new Error(`${where}.check_id: required for category="content", must be one of {action-title,redundancy,jargon,length,pyramid-mece,narrative-arc,claim-evidence,standalone-readability} (got ${JSON.stringify(f.check_id)})`);
+        }
+      } else if (Object.prototype.hasOwnProperty.call(f, 'check_id')) {
+        if (typeof f.check_id !== 'string' || !VALID_CHECK_IDS.has(f.check_id)) {
+          throw new Error(`${where}.check_id: must be one of {action-title,redundancy,jargon,length,pyramid-mece,narrative-arc,claim-evidence,standalone-readability} (got ${JSON.stringify(f.check_id)})`);
+        }
       }
       if (typeof f.genuine !== 'boolean') {
         throw new Error(`${where}.genuine: must be boolean (got ${JSON.stringify(f.genuine)})`);
@@ -85,5 +98,5 @@ function validate(doc) {
 
 module.exports = {
   validate,
-  _internal: { SEVERITIES, CATEGORIES, REQUIRED_FINDING_FIELDS },
+  _internal: { SEVERITIES, CATEGORIES, VALID_CHECK_IDS, REQUIRED_FINDING_FIELDS },
 };
