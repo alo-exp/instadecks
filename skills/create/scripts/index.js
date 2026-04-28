@@ -248,13 +248,37 @@ async function runCreate({
     const md = renderRationale({ brief, designChoices });
     await fsp.writeFile(rationalePath, md);
   } else {
-    // brief is validated upstream by validateBrief() so brief.topic is guaranteed.
+    // Live-E2E MINOR #2: when designChoices is absent we used to write a
+    // ~190-byte sparse stub. The output contract still requires the 6 locked
+    // sections (Palette / Typography / Motif / Narrative Arc / Key Tradeoffs /
+    // Reviewer Notes) — derive what we can from the brief and explicitly flag
+    // the design-choice sections as [TBD ...] so users know what's missing.
+    // brief is validated upstream by validateBrief() so brief.topic / audience /
+    // tone / narrative_arc are guaranteed.
+    const arcLines = (Array.isArray(brief.narrative_arc) ? brief.narrative_arc : [])
+      .map((b, i) => `${i + 1}. ${b}`).join('\n');
+    const claims = Array.isArray(brief.key_claims) ? brief.key_claims : [];
+    const claimLines = claims.length
+      ? claims.map((kc) => `- Slide ${kc.slide_idx}: ${kc.claim}`).join('\n')
+      : '_(no key_claims authored in brief)_';
     const stub =
-      `# Design Rationale\n\n` +
-      `*Brief:* ${brief.topic}\n\n` +
+      `# Design Rationale — ${brief.topic}\n\n` +
+      `*Brief topic:* ${brief.topic}\n\n` +
       `*Author mode:* ${mode}\n\n` +
       `*Render path:* render-deck.cjs (agent-authored)\n\n` +
-      `[No structured design choices captured in this run.]\n`;
+      `## Audience\n\n${brief.audience}\n\n` +
+      `## Tone\n\n${brief.tone}\n\n` +
+      `## Palette\n\n[TBD — agent did not capture structured design choices in this run; ` +
+      `palette tokens were inlined directly into render-deck.cjs without being surfaced ` +
+      `via the structured-handoff contract.]\n\n` +
+      `## Typography\n\n[TBD — agent did not capture structured design choices in this run; ` +
+      `font choices were inlined directly into render-deck.cjs.]\n\n` +
+      `## Motif\n\n[TBD — agent did not capture a structured motif description in this run.]\n\n` +
+      `## Narrative Arc\n\n${arcLines}\n\n` +
+      `### Key claims by slide\n\n${claimLines}\n\n` +
+      `## Key Tradeoffs\n\n[Not authored in standalone mode without structured design choices.]\n\n` +
+      `## Reviewer Notes\n\n[Not authored in standalone mode without structured design choices. ` +
+      `Run /instadecks:review on deck.pptx to populate this section in a follow-up artifact.]\n`;
     await fsp.writeFile(rationalePath, stub);
   }
 
