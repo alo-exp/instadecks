@@ -1,6 +1,6 @@
 # Fresh-Machine Install Validation — v0.1.0
 
-End-to-end install validation per Phase 7 D-06 / SC#4. The tester runs the 6 numbered steps below on a fresh machine (or `rm -rf ~/.claude/data/plugins/instadecks` + restart) on Mac AND Windows. Linux is deferred per CONTEXT.md "Out of Scope" for v0.1.0.
+End-to-end install validation per Phase 7 D-06 / SC#4. The tester runs the 6 numbered steps below on a fresh machine (or remove the installed plugin directory under the Claude Code data dir + restart) <!-- lint-allow:hardcoded-path --> on Mac AND Windows. Linux is deferred per CONTEXT.md "Out of Scope" for v0.1.0.
 
 **Status:** human_needed — to be filled by the tester for v0.1.0 sign-off.
 
