@@ -1,0 +1,87 @@
+'use strict';
+// render-rationale.js — D-07 fixed-template design-rationale renderer.
+// Pure deterministic function: no fs, no async, no clock, no random.
+// Given identical inputs, render() returns byte-identical Markdown.
+// Mirrors skills/review/scripts/render-fixed.js style.
+//
+// Section ordering (locked, D-07): Palette / Typography / Motif /
+// Narrative Arc / Key Tradeoffs / Reviewer Notes.
+
+const REVIEWER_NOTES_PLACEHOLDER =
+  '_(empty in Phase 4 — auto-refine loop ships in Phase 5.)_';
+
+function renderPalette(designChoices) {
+  const p = (designChoices && designChoices.palette) || {};
+  const triple = [p.primary, p.secondary, p.accent].filter(Boolean).join(', ');
+  const lines = ['## Palette'];
+  lines.push(`- Chosen: ${p.name || '(unnamed)'} (${triple})`);
+  lines.push(`- Rationale: ${p.rationale || ''}`);
+  return lines.join('\n');
+}
+
+function renderTypography(designChoices) {
+  const t = (designChoices && designChoices.typography) || {};
+  const lines = ['## Typography'];
+  lines.push(`- Headings: ${t.heading || ''}`);
+  lines.push(`- Body: ${t.body || ''}`);
+  lines.push(`- Pair rationale: ${t.rationale || ''}`);
+  return lines.join('\n');
+}
+
+function renderMotif(designChoices) {
+  const motif = (designChoices && designChoices.motif) || '';
+  return ['## Motif', motif].join('\n');
+}
+
+function renderNarrativeArc(brief) {
+  const lines = ['## Narrative Arc'];
+  const arc = (brief && Array.isArray(brief.narrative_arc)) ? brief.narrative_arc : [];
+  arc.forEach((beat, i) => {
+    lines.push(`${i + 1}. ${beat}`);
+  });
+  return lines.join('\n');
+}
+
+function renderKeyTradeoffs(designChoices) {
+  const lines = ['## Key Tradeoffs'];
+  const tradeoffs = (designChoices && Array.isArray(designChoices.tradeoffs))
+    ? designChoices.tradeoffs : [];
+  if (tradeoffs.length === 0) {
+    lines.push('- _(none recorded)_');
+  } else {
+    for (const t of tradeoffs) lines.push(`- ${t}`);
+  }
+  return lines.join('\n');
+}
+
+function renderReviewerNotes(reviewerNotes) {
+  const body = (reviewerNotes && String(reviewerNotes).trim().length > 0)
+    ? String(reviewerNotes)
+    : REVIEWER_NOTES_PLACEHOLDER;
+  return ['## Reviewer Notes', body].join('\n');
+}
+
+function render({ brief, designChoices, reviewerNotes } = {}) {
+  if (!brief || typeof brief !== 'object') {
+    throw new Error('render: brief must be an object');
+  }
+  const header = `# Design Rationale — ${brief.topic || ''}`;
+  return [
+    header,
+    renderPalette(designChoices),
+    renderTypography(designChoices),
+    renderMotif(designChoices),
+    renderNarrativeArc(brief),
+    renderKeyTradeoffs(designChoices),
+    renderReviewerNotes(reviewerNotes),
+  ].join('\n\n') + '\n';
+}
+
+module.exports = {
+  render,
+  _internal: {
+    renderPalette, renderTypography, renderMotif,
+    renderNarrativeArc, renderKeyTradeoffs, renderReviewerNotes,
+    REVIEWER_NOTES_PLACEHOLDER,
+  },
+};
