@@ -11,6 +11,8 @@
     "coverage": "c8 --reporter html --reporter text node --test 'tests/**/*.test.js'",
     "test:smoke": "node --test 'tests/smoke/**/*.test.js'",
     "test:e2e": "node --test 'tests/e2e/**/*.test.js'",
+    "test:bats": "bats tests/bats/",
+    "test:bats:if-installed": "command -v bats >/dev/null 2>&1 && bats tests/bats/ || echo 'bats not installed; skipping'",
     "lint:paths": "bash tools/lint-paths.sh",
     "validate:manifest": "node tools/validate-manifest.js",
     "assert:pin": "node tools/assert-pptxgenjs-pin.js",
