@@ -8,7 +8,7 @@
 const path = require('node:path');
 const fsp = require('node:fs/promises');
 const fs = require('node:fs');
-const { execFile } = require('node:child_process');
+const { execFile, spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
 const { adaptFindings } = require('./adapter');
 const { setSamples } = require('./samples');
@@ -42,7 +42,55 @@ function ensurePptxgenjsPath() {
   }
 }
 
-async function prepareWork({ outDir, samples }) {
+// Returns true iff deckPath has the same SHA-256 as the bundled v8-reference fixture deck.
+// The v8 fixture is the visual-regression baseline — its slide JPGs are bundled
+// in tests/fixtures/v8-reference/ and we must use those bundled JPGs so the Tier-1
+// normalized SHA continues to match. For ALL other decks, we render fresh per-slide
+// JPGs from the user's actual deckPath via scripts/pptx-to-images.sh.
+//
+// Detection by SHA (not by path) — existing tests copy the reference deck into tmp
+// dirs before invoking runAnnotate, so a path-prefix check would mis-classify them.
+function isV8ReferenceDeck(deckPath) {
+  const root = repoRoot();
+  const shaFile = path.join(root, 'tests', 'fixtures', 'v8-reference', 'Annotations_Sample.pptx.sha256');
+  try {
+    const expected = fs.readFileSync(shaFile, 'utf8').split(/\s+/)[0].trim();
+    if (!expected) return false;
+    const actual = crypto.createHash('sha256').update(fs.readFileSync(deckPath)).digest('hex');
+    return actual === expected;
+  } catch (_) {
+    return false;
+  }
+}
+
+// Render user's deckPath → per-slide JPGs in <workDir>/rendered/, then return
+// a map { slideNum → absolute jpg path } for prepareWork to symlink.
+function renderUserDeckToJpegs(deckPath, workDir) {
+  const renderedDir = path.join(workDir, 'rendered');
+  fs.mkdirSync(renderedDir, { recursive: true });
+  const root = repoRoot();
+  const baseDir = process.env.CLAUDE_PLUGIN_ROOT || root;
+  const script = path.join(baseDir, 'scripts', 'pptx-to-images.sh');
+  const r = spawnSync('bash', [script, deckPath, renderedDir], {
+    encoding: 'utf8', timeout: 180_000,
+  });
+  /* c8 ignore next 4 */ // Defensive: shell-script failure path requires real soffice/pdftoppm; covered indirectly by e2e suite.
+  if (r.status !== 0) {
+    throw new Error(
+      `runAnnotate: pptx-to-images.sh failed (status ${r.status}) for deck ${deckPath}\nstderr: ${r.stderr}`,
+    );
+  }
+  // pdftoppm produces slide-<N>.jpg with auto-padded N (width = digits in last slide).
+  // Walk renderedDir, parse slide-<digits>.jpg, build numeric map.
+  const map = new Map();
+  for (const f of fs.readdirSync(renderedDir)) {
+    const m = f.match(/^slide-(\d+)\.jpg$/);
+    if (m) map.set(Number(m[1]), path.join(renderedDir, f));
+  }
+  return map;
+}
+
+async function prepareWork({ outDir, samples, deckPath }) {
   const workDir = path.join(outDir, 'work');
   await fsp.mkdir(workDir, { recursive: true });
 
@@ -66,20 +114,40 @@ async function prepareWork({ outDir, samples }) {
   await fsp.symlink(path.join(skillScripts, 'samples.js'), samplesLink);
 
   // Slide image symlinks. P-06: lowercase, zero-padded basenames.
+  // FIX BLOCKER #1: For the v8 reference fixture (visual-regression path), use the
+  // bundled author-curated JPGs to preserve the Tier-1 normalized SHA baseline.
+  // For ALL other decks (real user input), render the user's deckPath fresh and
+  // symlink THOSE rendered JPGs so annotations overlay on the user's actual slides.
   const slideNums = [...new Set(samples.map(s => s.slideNum))];
   const fixturesDir = path.join(root, 'tests', 'fixtures', 'v8-reference');
+  const useV8Fixture = deckPath ? isV8ReferenceDeck(deckPath) : true;
+  let renderedMap = null;
+  if (!useV8Fixture) {
+    renderedMap = renderUserDeckToJpegs(deckPath, workDir);
+  }
   for (const n of slideNums) {
     const padded = String(n).padStart(2, '0');
-    const target = path.join(fixturesDir, `v8s-${padded}.jpg`);
-    /* c8 ignore next 3 */ // Defensive: target basename is always v8s-NN.jpg by construction (line 72) — guard against future refactors.
-    if (!/^v8s-\d{2}\.jpg$/.test(path.basename(target))) {
-      throw new Error(`prepareWork: refusing to symlink unexpected target ${target}`);
+    let target;
+    if (useV8Fixture) {
+      target = path.join(fixturesDir, `v8s-${padded}.jpg`);
+    } else {
+      target = renderedMap.get(n);
+      /* c8 ignore next 5 */ // Defensive: missing-slide path fires only when findings reference a slide not present in the user's deck — caught upstream by review pass in normal flow.
+      if (!target) {
+        throw new Error(
+          `runAnnotate: findings reference slide ${n} but rendered deck has no such slide (deck: ${deckPath})`,
+        );
+      }
     }
     // NOTE: annotate.js (line 417) references `v8s-NN.jpg` directly via path.join(__dirname, ...).
     // Symlink basename MUST match what verbatim annotate.js loads — using `slide-NN.jpg` would
     // produce ENOENT at runtime. (Plan 02-03 spec said `slide-NN.jpg`; annotate.js is locked
     // invariant per CLAUDE.md, so the symlink basename follows annotate.js.)
     const link = path.join(workDir, `v8s-${padded}.jpg`);
+    /* c8 ignore next 3 */ // Defensive: link basename is always v8s-NN.jpg by construction — guard against future refactors.
+    if (!/^v8s-\d{2}\.jpg$/.test(path.basename(link))) {
+      throw new Error(`prepareWork: refusing to create unexpected link ${link}`);
+    }
     /* c8 ignore next */ // Defensive: unlink-then-symlink idempotency catch — ENOENT swallowed silently.
     try { await fsp.unlink(link); } catch (_) { /* ignore */ }
     await fsp.symlink(target, link);
@@ -138,7 +206,7 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   await fsp.writeFile(path.join(outDir, 'findings.json'), JSON.stringify(findings, null, 2));
 
   setSamples(samples);
-  const work = await prepareWork({ outDir, samples });
+  const work = await prepareWork({ outDir, samples, deckPath });
   ensurePptxgenjsPath();
 
   const pptxRun = path.join(work.cwd, 'Annotations_Sample.pptx');
@@ -199,7 +267,7 @@ async function _runAnnotateWithRawSamples({ deckPath, samples, outDir, runId } =
   await fsp.mkdir(outDir, { recursive: true });
 
   setSamples(samples);
-  const work = await prepareWork({ outDir, samples });
+  const work = await prepareWork({ outDir, samples, deckPath });
   ensurePptxgenjsPath();
 
   const pptxRun = path.join(work.cwd, 'Annotations_Sample.pptx');
