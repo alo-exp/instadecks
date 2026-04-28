@@ -52,6 +52,9 @@ node skills/review/scripts/cli.js <deckPath> --findings <doc.json> [--out-dir <d
 ```
 Prints the run summary as JSON to stdout.
 
+> **Important — the CLI is a findings post-processor / annotator dispatcher, NOT a reviewer.**
+> Producing findings from a deck (the LLM reading slide images and emitting the v1.x findings JSON via the DECK-VDA 4-pass methodology described below) is an **agent-mode** step. The CLI requires `--findings <doc.json>` and will exit non-zero without it; it then renders the fixed-template MD, optionally pipes into `/instadecks:annotate`, and archives outputs. To produce findings end-to-end from a `.pptx`, invoke `/instadecks:review` in agent mode and let Claude execute the 4-pass scan before calling the CLI.
+
 **Structured handoff** (D-04) — for skills/scripts importing in-process:
 ```js
 const { runReview } = require('skills/review/scripts/index');

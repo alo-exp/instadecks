@@ -64,6 +64,9 @@ node skills/content-review/scripts/cli.js <deckPath> --findings <doc.json> [--ou
 
 Prints the run summary as JSON to stdout.
 
+> **Important — the CLI is a findings post-processor / annotator dispatcher, NOT a reviewer.**
+> Producing findings from a deck (the LLM reading slide text + speaker notes and applying the 8 content checks described below) is an **agent-mode** step. The CLI accepts pre-authored findings JSON (`--findings`) and exits non-zero without it; it then renders the fixed-template MD, optionally pipes into `/instadecks:annotate`, and archives outputs. To produce findings end-to-end from a `.pptx`, invoke `/instadecks:content-review` in agent mode.
+
 **Structured handoff** — for skills/scripts importing in-process:
 
 ```js
