@@ -1,6 +1,6 @@
 ---
 name: create
-description: Generate a polished slide deck (PPTX + PDF + design-rationale doc) from any input (markdown, PDF, PPTX, URL, image, transcript, brief). Composes a per-run render-deck.cjs from a curated pptxgenjs cookbook, picks palette and typography from author-original design guidance (10 palettes / 8 typography pairs / 10 anti-patterns), and emits 8 slide types at 16:9 with action titles, page numbers, source lines, and speaker notes. Single-cycle in v0.1.0; Phase 5 ships auto-refine.
+description: Generate a polished slide deck (PPTX + PDF + design-rationale) from any input. This skill should be used when the user supplies markdown / PDF / PPTX / URL / image / transcript / brief and asks for a deck, slides, presentation, or pitch. Composes a per-run render-deck.cjs from a curated pptxgenjs cookbook, picks palette and typography from author-original design guidance, and emits 8 slide types at 16:9 with action titles, page numbers, source lines, and speaker notes.
 allowed-tools:
   - Bash(node:*)
   - Bash(soffice:*)
