@@ -1,0 +1,27 @@
+{
+  "topic": "Q3 enterprise expansion",
+  "audience": "board",
+  "tone": "executive",
+  "narrative_arc": [
+    "Open with the headline: revenue grew 23% on enterprise wins",
+    "Frame the prior quarter's plateau and the hypothesis driving the pivot",
+    "Walk through the three deals that anchored the upside",
+    "Quantify pipeline coverage going into Q4",
+    "Show the comparison vs. plan and vs. last year",
+    "Surface the two risks (concentration, ramp time) and mitigations",
+    "Lay out the Q4 commitments by segment",
+    "Close with the ask: hire 6 AEs, approve EU expansion budget"
+  ],
+  "key_claims": [
+    { "slide_idx": 1, "claim": "Q3 revenue grew 23% YoY on enterprise wins", "evidence": "Salesforce Q3 close report 2026-10-02", "source": "internal/q3-close.md" },
+    { "slide_idx": 4, "claim": "Q4 pipeline coverage is 3.1x quota at $42M weighted", "evidence": "Pipeline snapshot 2026-10-15", "source": "internal/pipeline.md" },
+    { "slide_idx": 6, "claim": "Top-3 customer concentration is 38% — flagged as risk", "evidence": "Finance review deck", "source": "internal/finance-review.md" }
+  ],
+  "asset_hints": {
+    "has_data": true,
+    "has_quotes": false,
+    "has_comparison": true,
+    "has_stats": true
+  },
+  "source_files": ["internal/q3-close.md", "internal/pipeline.md", "internal/finance-review.md"]
+}
