@@ -1,0 +1,109 @@
+{
+  "schema_version": "1.0",
+  "deck": "tests/fixtures/v8-reference/Annotations_Sample.pptx",
+  "generated_at": "2026-04-27T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 7,
+      "title": "Slide 07  ·  Freelance Baseline",
+      "findings": [
+        {
+          "id": "7-e3e9b7f2",
+          "severity_reviewer": "Critical",
+          "category": "defect",
+          "genuine": true,
+          "triage_rationale": "Genuine — cited source 404s and the 42% claim is not present in any primary source linked from the deck; blocking factual integrity defect.",
+          "nx": 0.46,
+          "ny": 0.16,
+          "text": "Headline claim unsupported by cited source",
+          "rationale": "Linked source does not contain the 42% figure asserted in the headline; risks credibility loss with stakeholder review.",
+          "location": "title text centre",
+          "standard": "Factual integrity (Tufte 2001)",
+          "fix": "Replace with verifiable figure from primary source or remove claim"
+        },
+        {
+          "id": "7-0dff2c87",
+          "severity_reviewer": "Major",
+          "category": "improvement",
+          "genuine": false,
+          "triage_rationale": "Non-genuine — brief tone='dense-analytical' explicitly justifies high text density on baseline slides; reviewer applied generic 7-line heuristic without context.",
+          "nx": 0.58,
+          "ny": 0.27,
+          "text": "Body copy exceeds 7-line cognitive threshold",
+          "rationale": "Nine lines of body copy on a single slide forces reader context-switch and reduces retention.",
+          "location": "body text region, right column",
+          "standard": "Cognitive load (Norman 1988)",
+          "fix": "Split into two slides or compress to 5 bullet points"
+        }
+      ]
+    },
+    {
+      "slideNum": 8,
+      "title": "Slide 08  ·  Pricing Tier Comparison",
+      "findings": [
+        {
+          "id": "8-34d89de1",
+          "severity_reviewer": "Minor",
+          "category": "style",
+          "genuine": true,
+          "triage_rationale": "Genuine — '$1,200' vs 'USD 1200' inconsistency confirmed on inspection of the rendered slide; cheap fix.",
+          "nx": 0.11,
+          "ny": 0.32,
+          "text": "Inconsistent currency formatting across pricing tiers",
+          "rationale": "Tier A uses '$1,200' while Tier B uses 'USD 1200' — violates table consistency.",
+          "location": "left pricing column",
+          "standard": "Consistency heuristic (Nielsen 1994)",
+          "fix": "Normalize all currency cells to '$X,XXX' format"
+        },
+        {
+          "id": "8-e6908a69",
+          "severity_reviewer": "Nitpick",
+          "category": "style",
+          "genuine": false,
+          "triage_rationale": "Non-genuine — footer weight contrast is intentional brand-template choice; reviewer flagged on cycle 1 but inspection confirms it matches the Sourcevo deck spec.",
+          "nx": 0.72,
+          "ny": 0.85,
+          "text": "Footer page number font weight differs from body",
+          "rationale": "Reviewer flagged on cycle 1; on inspection the footer uses the brand template's intentional weight contrast — not a defect.",
+          "location": "footer, lower right",
+          "standard": "Typographic hierarchy",
+          "fix": "No action — intentional brand-template choice"
+        }
+      ]
+    },
+    {
+      "slideNum": 9,
+      "title": "Slide 09  ·  Roadmap Timeline",
+      "findings": [
+        {
+          "id": "9-b3a55b94",
+          "severity_reviewer": "Major",
+          "category": "defect",
+          "genuine": true,
+          "triage_rationale": "Genuine — Q2 end (2026-09-30) and Q3 start (2026-09-15) overlap is a logical inconsistency; must be fixed before stakeholder review.",
+          "nx": 0.40,
+          "ny": 0.55,
+          "text": "Q3 milestone date conflicts with Q2 end date",
+          "rationale": "Timeline shows Q2 ending 2026-09-30 and Q3 starting 2026-09-15 — overlap renders sequencing incoherent.",
+          "location": "centre timeline band",
+          "standard": "Logical consistency",
+          "fix": "Align quarter boundaries; Q3 should start 2026-10-01"
+        },
+        {
+          "id": "9-27c621bc",
+          "severity_reviewer": "Minor",
+          "category": "improvement",
+          "genuine": true,
+          "triage_rationale": "Genuine — three milestone colors used without legend; viewer cannot infer status mapping. Cheap inline-legend fix.",
+          "nx": 0.85,
+          "ny": 0.42,
+          "text": "Missing legend for milestone color coding",
+          "rationale": "Three colors used for milestone markers without legend; viewer must infer meaning.",
+          "location": "right margin, mid-slide",
+          "standard": "Self-explanatory visualization (Few 2012)",
+          "fix": "Add inline legend mapping color to milestone status"
+        }
+      ]
+    }
+  ]
+}

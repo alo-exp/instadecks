@@ -188,6 +188,29 @@ Triggers:
 
 When triggered, the agent passes `annotate: true` to `runReview`, which lazy-loads `runAnnotate` from `/instadecks:annotate` and produces the two extra outputs.
 
+### Scoped Review Mode (cycle 2+ in `/instadecks:create` auto-refine loop)
+
+When the caller passes `slidesToReview: [3, 7, 9]`, scope the review to those
+slide indices only. Skip the per-slide §3 entries for any slideNum not in the
+list. The §1 systemic findings, §4 maturity scoreboard, and §5 top-10 fixes
+sections still produce, but they reference only the in-scope slides.
+
+Cycle 1 of the auto-refine loop ALWAYS passes null (full review). Cycle 2,
+when forced as the confirmation cycle (D-07), ALSO passes null. Cycle 2+
+diff-only review passes the int[] of slides whose JPG SHA changed since the
+prior cycle.
+
+Empty list `[]` is valid — produces an empty `findings.slides` array (no
+findings emitted); useful when no slides changed but the loop still wants a
+sentinel review pass.
+
+Invalid inputs (non-array values other than `null`/`'all'`, floats, negative
+integers) throw a pinpoint `Error` from `runReview` — fail fast so the caller
+fixes the diff computation rather than silently reviewing the wrong scope.
+
+See also: `references/findings-triaged-schema.md` for the agent-augmented
+output the auto-refine loop writes per cycle (`findings.triaged.json`).
+
 ## Severity-collapse boundary (P-01 — locked invariant)
 
 **Producers (this skill, `/content-review`) emit FULL 4-tier severity (`Critical`, `Major`, `Minor`, `Nitpick`). The 4→3 collapse to `MAJOR` / `MINOR` / `POLISH` happens ONLY at the `/instadecks:annotate` adapter (Phase 2). Pre-collapsing here breaks `/content-review` and the future r18-only filter.**
