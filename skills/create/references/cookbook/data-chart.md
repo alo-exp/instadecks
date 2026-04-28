@@ -38,6 +38,7 @@ function renderDataChart(slide, { title, chartType, series, source, pageNum, tot
 | `pres.charts[chartType]` (ENUM key, e.g. `'BAR'`) | `slide.addChart('bar', …)` (raw lowercase string) |
 | `chartColors: [PALETTE.primary, …]` | Default palette (PowerPoint blues — R18 anti-tell) |
 | `showLegend: series.length > 1` | Always show legend (clutters single-series) |
+| `legendPos: 'b'` for horizontal data, `'r'` for vertical (allowed: `'b' \| 'r' \| 'l' \| 't'`; pptxgenjs default `'r'`) | Omit `legendPos` for multi-series charts and accept whatever PowerPoint picks |
 
 ## When to use
 
