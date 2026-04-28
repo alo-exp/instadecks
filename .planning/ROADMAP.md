@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate` *(complete 2026-04-28 — 5/5 plans, RVW-01..RVW-11)*
 - [ ] **Phase 4: `/instadecks:create` Scaffold + Render Cookbook** - Deck generator with 8 slide types, design-rationale doc, PowerPoint compatibility gate (no loop yet)
 - [x] **Phase 5: `/instadecks:create` Auto-Refine Loop** - Convergence rule, oscillation detection, issue ledger, soft cap, user interrupt — the project's central differentiator
-- [ ] **Phase 6: `/instadecks:content-review`** - Pyramid Principle / MECE / narrative-arc / claim-evidence content critique with hard content-vs-design boundary
+- [x] **Phase 6: `/instadecks:content-review`** - Pyramid Principle / MECE / narrative-arc / claim-evidence content critique with hard content-vs-design boundary
 - [ ] **Phase 7: Marketplace Publication & Release Polish** - Skill activation tuning, license compliance, marketplace PR to `alo-labs/claude-plugins`, v0.1.0 tag
 
 ## Phase Details
