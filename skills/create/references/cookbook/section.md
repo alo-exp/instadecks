@@ -32,7 +32,7 @@ function renderSection(slide, { sectionNum, sectionTitle, pageNum, total }) {
 
 | ✅ DO | ❌ DON'T |
 |---|---|
-| `slide.addShape(pres.shapes.LINE, …)` | `slide.addShape('line', …)` |
+| `slide.addShape(pres.shapes.LINE, …)` | `slide.addShape('line', …)` | <!-- enum-lint-allow: anti-pattern doc -->
 | Place the rail line under the section number | Place a divider directly under the slide title (R18 AI-tell) |
 | Zero-pad: `String(n).padStart(2, '0')` | Manual `'01'` literal (breaks for 10+) |
 

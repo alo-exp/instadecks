@@ -3,7 +3,7 @@
 This cookbook is the reference Claude reads at runtime to compose a per-run `render-deck.cjs` for `/instadecks:create`. Each recipe is a copy-pasteable building block — never a template. Per CRT-03, `render-deck.cjs` is authored fresh per run, content-tuned to the `DeckBrief`.
 
 > **Locked invariants (CRT-15 / D-05):**
-> - **ENUM-only shapes:** `slide.addShape(pres.shapes.OVAL, …)` ✅ — never `addShape('oval', …)` ❌. Same for charts: `pres.charts.BAR`.
+> - **ENUM-only shapes:** `slide.addShape(pres.shapes.OVAL, …)` ✅ — never `addShape('oval', …)` ❌. Same for charts: `pres.charts.BAR`. <!-- enum-lint-allow: anti-pattern doc -->
 > - **No `#` prefix on hex:** `color: 'FF0000'` ✅ — not `'#FF0000'` and not 8-char `'FF000040'`.
 > - **Fresh option objects per call** — never reuse one options bag across multiple `addShape`/`addText` invocations.
 > - **Action titles only** (D-06) — every slide title is a claim (subject-verb-object), not a topic. `lib/title-check.js` blocks the laziest violations.
@@ -64,7 +64,7 @@ function addFooter(slide, { pageNum, total, source }) {
 
 | ✅ DO | ❌ DON'T |
 |---|---|
-| `slide.addShape(pres.shapes.OVAL, …)` | `slide.addShape('oval', …)` |
+| `slide.addShape(pres.shapes.OVAL, …)` | `slide.addShape('oval', …)` | <!-- enum-lint-allow: anti-pattern doc -->
 | `color: 'FF0000'` | `color: '#FF0000'` or `color: 'FF000040'` |
 | `bullet: true` | `'• item'` (unicode) |
 | `paraSpaceAfter: 6` | `lineSpacing: 1.4` (with bullets) |

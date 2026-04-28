@@ -33,7 +33,7 @@ function renderQuote(slide, { quote, attribution, role, pageNum, total }) {
 
 | ✅ DO | ❌ DON'T |
 |---|---|
-| `slide.addShape(pres.shapes.LEFT_BRACE, …)` | `slide.addShape('leftBrace', …)` |
+| `slide.addShape(pres.shapes.LEFT_BRACE, …)` | `slide.addShape('leftBrace', …)` | <!-- enum-lint-allow: anti-pattern doc -->
 | Italicize the quote body | Bold the quote (reads like shouting) |
 | Always include attribution + role | Anonymous quotes (loses authority) |
 
