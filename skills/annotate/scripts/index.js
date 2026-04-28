@@ -224,4 +224,30 @@ async function _runAnnotateWithRawSamples({ deckPath, samples, outDir, runId } =
   };
 }
 
-module.exports = { runAnnotate, generateRunId, resolveSiblingOutputs, _runAnnotateWithRawSamples };
+// Plan 8-02 / CONTEXT D-05 — single LLM-DI carve-out (BLOCKER B-3 single source of truth).
+// runAnnotate doesn't call an LLM directly (adapter is deterministic), but the hook is exposed
+// uniformly across all 4 orchestrators so Plans 8-05/8-06 have one consistent contract.
+let _llmStub = null;
+function _test_setLlm(fn) { _llmStub = fn; }
+let _renderImagesStub = null;
+function _test_setRenderImages(fn) { _renderImagesStub = fn; }
+
+if (process.env.INSTADECKS_LLM_STUB) {
+  try {
+    const { stubLlmResponse } = require('../../../tests/helpers/llm-mock');
+    const fixture = require('node:path').basename(process.env.INSTADECKS_LLM_STUB, '.json');
+    _test_setLlm(stubLlmResponse(fixture));
+  } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
+}
+if (process.env.INSTADECKS_RENDER_STUB === '1') {
+  _test_setRenderImages(async () => 'stubbed-render');
+}
+
+module.exports = {
+  runAnnotate,
+  generateRunId,
+  resolveSiblingOutputs,
+  _runAnnotateWithRawSamples,
+  _test_setLlm,
+  _test_setRenderImages,
+};

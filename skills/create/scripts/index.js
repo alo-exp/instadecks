@@ -127,6 +127,27 @@ let _runCreateOverride = null;
 function _test_setRunReview(fn) { _runReviewOverride = fn; }
 function _test_setRunCreate(fn) { _runCreateOverride = fn; }
 
+// Plan 8-02 / CONTEXT D-05 — single LLM-DI carve-out (BLOCKER B-3 single source of truth).
+// Plans 8-05 and 8-06 CONSUME these; they do NOT add new DI hooks. Default behavior
+// unchanged: when no stub set, runCreate spawns the real render-deck.cjs.
+let _llmStub = null;
+function _test_setLlm(fn) { _llmStub = fn; }
+let _renderImagesStub = null;
+function _test_setRenderImages(fn) { _renderImagesStub = fn; }
+
+// Env-var bridge — Plan 8-05 Task 1 will author tests/helpers/llm-mock.js. Wrapping the
+// require keeps Plan 8-02 verification green even when 8-05 has not yet landed.
+if (process.env.INSTADECKS_LLM_STUB) {
+  try {
+    const { stubLlmResponse } = require('../../../tests/helpers/llm-mock');
+    const fixture = require('node:path').basename(process.env.INSTADECKS_LLM_STUB, '.json');
+    _test_setLlm(stubLlmResponse(fixture));
+  } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
+}
+if (process.env.INSTADECKS_RENDER_STUB === '1') {
+  _test_setRenderImages(async () => 'stubbed-render');
+}
+
 async function runCreate({
   brief,
   runId,
@@ -236,4 +257,6 @@ module.exports = {
   _test_setSpawn,
   _test_setRunReview,
   _test_setRunCreate,
+  _test_setLlm,
+  _test_setRenderImages,
 };
