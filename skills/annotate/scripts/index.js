@@ -250,10 +250,12 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
 
   // Live E2E Round 3 MINOR N3: surface annotated-vs-source slide counts so
   // users see the delta-only contract directly in the CLI output JSON.
-  const annotatedSlideCount = new Set(
-    /* c8 ignore next */ // Defensive: findings.slides is validated as array upstream by adaptFindings (P-09); the empty-array fallback is unreachable in practice.
-    (findings && Array.isArray(findings.slides)) ? findings.slides.map(s => s.slideNum) : [],
-  ).size;
+  // Live-E2E R4 MINOR R4-2: count must reflect what was ACTUALLY annotated in
+  // the produced PPTX — i.e. unique slideNums in the post-adapter samples
+  // (after genuine:true filter). Computing from raw findings.slides over-counts
+  // when a slide-group's findings are all genuine:false (adapter drops them,
+  // so they don't appear in the output deck).
+  const annotatedSlideCount = new Set(samples.map(s => s.slideNum)).size;
   /* c8 ignore next */ // Defensive: readDeckMeta always returns deckTotal as a number (soft-fail returns 0); the typeof-not-number fallback is unreachable.
   const sourceSlideCount = (deckMeta && typeof deckMeta.deckTotal === 'number') ? deckMeta.deckTotal : 0;
 
