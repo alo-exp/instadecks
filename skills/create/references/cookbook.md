@@ -16,6 +16,11 @@ const pptxgen = require('pptxgenjs');
 const fs = require('node:fs');
 const path = require('node:path');
 
+// Load the brief that the agent staged at <runDir>/brief.json before invoking
+// runCreate. Without this load, `brief.topic` (and other brief.* references in
+// recipes below) would throw `ReferenceError: brief is not defined`.
+const brief = JSON.parse(fs.readFileSync(path.join(__dirname, 'brief.json'), 'utf8'));
+
 const pres = new pptxgen();
 pres.layout = 'LAYOUT_16x9';            // 10" × 5.625"
 pres.author = 'Instadecks';

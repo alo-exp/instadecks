@@ -104,3 +104,35 @@ test('palette names in design-ideas.md match design-ideas.json', () => {
     assert.match(md, new RegExp(`\\*\\*${p.name}\\*\\*`), `design-ideas.md missing palette name "${p.name}"`);
   }
 });
+
+// FIX MINOR #4: cookbook.md "Setup boilerplate" snippet declares all symbols it
+// references — including `brief`. Previously the snippet did `pres.title = brief.topic`
+// without a `brief` declaration, so a copy-paste into render-deck.cjs would throw
+// `ReferenceError: brief is not defined` before any slide could be rendered.
+test('cookbook.md setup boilerplate declares all referenced top-level symbols', () => {
+  const cookbookPath = path.join(__dirname, '..', 'skills', 'create', 'references', 'cookbook.md');
+  const md = fs.readFileSync(cookbookPath, 'utf8');
+  // Extract the FIRST javascript code-fence (the setup boilerplate).
+  const m = md.match(/```javascript\n([\s\S]*?)\n```/);
+  assert.ok(m, 'cookbook.md missing setup boilerplate code-fence');
+  const code = m[1];
+  // The boilerplate must declare `brief` before referencing it.
+  assert.match(code, /(?:const|let|var)\s+brief\s*=/,
+    'cookbook.md setup boilerplate references `brief` without declaring it (BLOCKER for copy-paste use)');
+  // Smoke-parse: the snippet must be syntactically valid JS (Function ctor will throw on parse error).
+  // We supply the brief.json read as a stub so __dirname/fs are mockable.
+  const stubFs = {
+    readFileSync: () => JSON.stringify({ topic: 'Test', title: 'Test', audience: 'x', narrative: 'y' }),
+  };
+  // eslint-disable-next-line no-new-func
+  const factory = new Function('require', '__dirname', `${code}\n; return { brief, pres };`);
+  const fakeRequire = (mod) => {
+    if (mod === 'pptxgenjs') return function () { return { layout: '', author: '', title: '' }; };
+    if (mod === 'node:fs') return stubFs;
+    if (mod === 'node:path') return { join: (...args) => args.join('/') };
+    throw new Error(`unexpected require: ${mod}`);
+  };
+  const result = factory(fakeRequire, '/fake/dir');
+  assert.ok(result.brief, 'boilerplate must produce a `brief` binding');
+  assert.equal(typeof result.brief, 'object', '`brief` must be an object');
+});
