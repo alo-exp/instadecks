@@ -1,0 +1,7 @@
+{
+  "name": "instadecks",
+  "source": { "source": "github", "repo": "alo-exp/instadecks" },
+  "category": "productivity",
+  "version": "0.1.0",
+  "description": "Generate, review, and annotate polished presentation decks. Four slash skills powered by pptxgenjs + DECK-VDA design review + auto-refine convergence loop."
+}
