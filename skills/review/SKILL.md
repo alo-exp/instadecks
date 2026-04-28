@@ -1,6 +1,13 @@
 ---
 name: review
-description: Review a presentation deck for design defects using DECK-VDA 4-pass methodology. This skill should be used when the user wants a design critique with finding-grammar output and AI-tell detection, optionally pipelined into annotation.
+description: Review a presentation deck for design defects. This skill should be used when the user asks to "review my deck", "critique my slides", "find what's wrong with this deck", or "does this deck look AI-generated" — runs DECK-VDA 4-pass methodology (macro / typography / data-objects / micro) with R18 AI-tell detection, emits findings JSON + fixed-template Markdown + narrative report, and optionally pipelines into annotation.
+allowed-tools:
+  - Bash(node:*)
+  - Bash(soffice:*)
+  - Bash(pdftoppm:*)
+  - Bash(unzip:*)
+  - Read
+  - Write
 user-invocable: true
 version: 0.1.0
 ---
