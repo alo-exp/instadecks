@@ -1,0 +1,8 @@
+{
+  "_comment": "Verbatim entry to add to the alo-labs/claude-plugins marketplace.json `plugins` array. Apply manually to the upstream marketplace repo as part of the marketplace PR (see .planning/marketplace-pr.md).",
+  "name": "instadecks",
+  "source": { "source": "github", "repo": "alo-exp/instadecks" },
+  "category": "productivity",
+  "version": "0.1.0",
+  "description": "Generate, review, and annotate polished presentation decks. Four slash skills powered by pptxgenjs + DECK-VDA design review + auto-refine convergence loop."
+}
