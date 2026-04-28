@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "deck": "tests/fixtures/v8-reference/Annotations_Sample.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 7,
+      "title": "Slide 07 · Adapter Passthrough",
+      "findings": [
+        {
+          "severity_reviewer": "Critical", "category": "defect", "genuine": true,
+          "nx": 0.46, "ny": 0.16,
+          "text": "Critical defect", "rationale": "r", "location": "l", "standard": "s", "fix": "f"
+        },
+        {
+          "severity_reviewer": "Major", "category": "improvement", "genuine": true,
+          "nx": 0.5, "ny": 0.3,
+          "text": "Major improvement", "rationale": "r", "location": "l", "standard": "s", "fix": "f"
+        },
+        {
+          "severity_reviewer": "Minor", "category": "style", "genuine": true,
+          "nx": 0.2, "ny": 0.8,
+          "text": "Minor style", "rationale": "r", "location": "l", "standard": "s", "fix": "f"
+        },
+        {
+          "severity_reviewer": "Nitpick", "category": "style", "genuine": true,
+          "nx": 0.9, "ny": 0.9,
+          "text": "Nitpick style", "rationale": "r", "location": "l", "standard": "s", "fix": "f"
+        },
+        {
+          "severity_reviewer": "Major", "category": "defect", "genuine": false,
+          "nx": 0.1, "ny": 0.1,
+          "text": "Should be filtered", "rationale": "r", "location": "l", "standard": "s", "fix": "f"
+        }
+      ]
+    }
+  ]
+}

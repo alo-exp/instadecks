@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "deck": "cycle-2/deck.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "cycle": 2,
+  "deck_spec": {
+    "topic": "Test Deck",
+    "audience": "test",
+    "slides": [{ "slideNum": 1, "type": "title", "title": "Converged" }]
+  },
+  "design_rationale_partial": {
+    "palette_rationale": "executive cooler tones",
+    "typography_rationale": "IBM Plex Sans body anchor"
+  },
+  "slides": []
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.1",
+  "deck": "tests/fixtures/cross-domain-test-deck.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 2,
+      "title": "Solution Overview",
+      "findings": [
+        {
+          "severity_reviewer": "Major", "category": "content", "check_id": "pyramid-mece",
+          "genuine": true, "nx": 0.5, "ny": 0.5,
+          "text": "Major | content — slide 2 — no thesis — Pyramid Principle (Minto 1987) — Insert thesis",
+          "rationale": "First content slide labels topic, no claim.",
+          "location": "slide 2 title", "standard": "Pyramid Principle (Minto 1987)", "fix": "Insert thesis"
+        },
+        {
+          "severity_reviewer": "Major", "category": "content", "check_id": "narrative-arc",
+          "genuine": true, "nx": 0.5, "ny": 0.5,
+          "text": "Major | content — deck — setup absent — Narrative arc (Duarte 2010) — Add setup",
+          "rationale": "No status-quo setup.",
+          "location": "deck-systemic", "standard": "Narrative arc (Duarte 2010)", "fix": "Add setup"
+        },
+        {
+          "severity_reviewer": "Major", "category": "content", "check_id": "claim-evidence",
+          "genuine": true, "nx": 0.5, "ny": 0.5,
+          "text": "Major | content — slide 2 body — claim without evidence — Heath, Made to Stick 2007 — Cite source",
+          "rationale": "Hyperbolic claim with no data.",
+          "location": "slide 2 body", "standard": "Heath, Made to Stick 2007", "fix": "Cite source"
+        },
+        {
+          "severity_reviewer": "Major", "category": "content", "check_id": "standalone-readability",
+          "genuine": true, "nx": 0.5, "ny": 0.5,
+          "text": "Major | content — slide 2 — depends on presenter — Reynolds, Presentation Zen 2008 — Add caption",
+          "rationale": "Chart with no action title.",
+          "location": "slide 2", "standard": "Reynolds, Presentation Zen 2008", "fix": "Add caption"
+        },
+        {
+          "severity_reviewer": "Minor", "category": "content", "check_id": "redundancy",
+          "genuine": true, "nx": 0.5, "ny": 0.5,
+          "text": "Minor | content — slide 2 — bullet repeated — Redundancy — Deduplicate",
+          "rationale": "Identical bullet appears twice.",
+          "location": "slide 2 body", "standard": "Redundancy", "fix": "Deduplicate"
+        },
+        {
+          "severity_reviewer": "Minor", "category": "content", "check_id": "jargon",
+          "genuine": true, "nx": 0.5, "ny": 0.5,
+          "text": "Minor | content — slide 2 — jargon density >2 — Audience-fit (Knaflic 2015) — Plain English",
+          "rationale": "synergize, leverage in same bullet.",
+          "location": "slide 2 body", "standard": "Audience-fit (Knaflic 2015)", "fix": "Plain English"
+        },
+        {
+          "severity_reviewer": "Minor", "category": "content", "check_id": "action-title",
+          "genuine": true, "nx": 0.5, "ny": 0.08,
+          "text": "Minor | content — slide 2 title — topic label — Pyramid Principle (Minto 1987) — Rewrite as claim",
+          "rationale": "Title labels topic.",
+          "location": "slide 2 title", "standard": "Pyramid Principle (Minto 1987)", "fix": "Rewrite as claim"
+        }
+      ]
+    }
+  ]
+}
