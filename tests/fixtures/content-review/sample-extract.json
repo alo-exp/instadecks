@@ -1,0 +1,66 @@
+{
+  "slides": [
+    {
+      "slideNum": 1,
+      "title": "Instadecks Demo Deck",
+      "bullets": [],
+      "body": "",
+      "notes": "1",
+      "sources": [],
+      "slide_type": "title"
+    },
+    {
+      "slideNum": 2,
+      "title": "Revenue grew 40% in Q3 from enterprise renewals",
+      "bullets": [
+        "Enterprise ARR up 52% YoY driven by Fortune 500 expansion",
+        "Net retention 128%; gross retention 96%",
+        "Café experience pilots launched in EMEA region"
+      ],
+      "body": "Enterprise ARR up 52% YoY driven by Fortune 500 expansion Net retention 128%; gross retention 96% Café experience pilots launched in EMEA region",
+      "notes": "2",
+      "sources": [],
+      "slide_type": "content"
+    },
+    {
+      "slideNum": 3,
+      "title": "Q3 Revenue",
+      "bullets": [
+        "Our SaaS B2B SMB GTM motion via PLG drives ARR ACV expansion through ICP MQLs converting to SQLs at industry-leading rates per the latest BCG report"
+      ],
+      "body": "Our SaaS B2B SMB GTM motion via PLG drives ARR ACV expansion through ICP MQLs converting to SQLs at industry-leading rates per the latest BCG report",
+      "notes": "3",
+      "sources": [],
+      "slide_type": "content"
+    },
+    {
+      "slideNum": 4,
+      "title": "Section: Outlook",
+      "bullets": [],
+      "body": "",
+      "notes": "4",
+      "sources": [],
+      "slide_type": "content"
+    },
+    {
+      "slideNum": 5,
+      "title": "Revenue grew 40% in Q3 from enterprise renewals",
+      "bullets": [
+        "Enterprise ARR up 52% YoY driven by Fortune 500 expansion"
+      ],
+      "body": "Enterprise ARR up 52% YoY driven by Fortune 500 expansion",
+      "notes": "5",
+      "sources": [],
+      "slide_type": "content"
+    },
+    {
+      "slideNum": 6,
+      "title": "Thank You",
+      "bullets": [],
+      "body": "",
+      "notes": "6",
+      "sources": [],
+      "slide_type": "closing"
+    }
+  ]
+}
