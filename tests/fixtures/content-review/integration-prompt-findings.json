@@ -1,0 +1,71 @@
+{
+  "schema_version": "1.1",
+  "deck": "tests/fixtures/cross-domain-test-deck.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 2,
+      "title": "Solution Overview",
+      "findings": [
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "pyramid-mece",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.5,
+          "text": "Major | content — deck-systemic — first content slide labels a topic (\"Solution Overview\") instead of stating the deck's governing thesis — Pyramid Principle (Minto 1987) — Insert a thesis slide stating the single claim the deck argues for",
+          "rationale": "Pyramid Principle requires the top of the pyramid to state the deck's governing thesis as a single claim; the first content slide labels a topic instead, forcing the audience to derive the message themselves.",
+          "location": "deck-systemic",
+          "standard": "Pyramid Principle (Minto 1987)",
+          "fix": "Insert a thesis slide stating: 'Our hybrid solution cuts onboarding from 6 weeks to 4 days for SMB customers.'"
+        },
+        {
+          "severity_reviewer": "Critical",
+          "category": "content",
+          "check_id": "narrative-arc",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.5,
+          "text": "Critical | content — deck-systemic — deck has no resolution slide; closes on \"Strategic Direction\" without naming the answer or the ask — Narrative arc (Duarte, Resonate 2010) — Add a resolution slide that names the recommended action and the ask",
+          "rationale": "Persuasive decks follow setup → tension → resolution; this deck stops at the problem framing without delivering the answer or the ask, leaving the audience without a clear next step.",
+          "location": "deck-systemic",
+          "standard": "Narrative arc (Duarte, Resonate 2010)",
+          "fix": "Add a final resolution slide naming the specific recommendation and the explicit ask (e.g., 'Approve $2M FY26 budget for the hybrid rollout')"
+        },
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "claim-evidence",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.5,
+          "text": "Major | content — slide 2 body — claim \"innovative and disruptive\" carries no on-slide evidence (no number, source, or example) — Claim-evidence balance (Heath, Made to Stick 2007) — Replace adjectives with a quantified outcome and a source citation",
+          "rationale": "Hyperbolic adjectives without supporting data, customer story, or third-party citation give the audience no anchor to evaluate the claim.",
+          "location": "slide 2 body",
+          "standard": "Claim-evidence balance (Heath, Made to Stick 2007)",
+          "fix": "Replace with a quantified outcome and source line, e.g., \"Reduced onboarding 86% (Acme pilot, Q2 2026)\""
+        }
+      ]
+    },
+    {
+      "slideNum": 4,
+      "title": "Strategic Direction",
+      "findings": [
+        {
+          "severity_reviewer": "Minor",
+          "category": "content",
+          "check_id": "standalone-readability",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.5,
+          "text": "Minor | content — slide 4 body — bullet relies on 7 unintroduced acronyms (SaaS, B2B, SMB, GTM, PLG, ARR, ACV, ICP, MQLs, SQLs, BCG); a stranger reading the deck without a presenter cannot decode it — Standalone readability (Reynolds, Presentation Zen 2008; audience-fit per Knaflic 2015) — Spell out acronyms on first use; cap at ≤5 distinct per slide",
+          "rationale": "Standalone readability requires a slide to make sense without presenter narration; an unfiltered acronym block forces the reader into glossary lookups and breaks comprehension.",
+          "location": "slide 4 body",
+          "standard": "Standalone readability (Reynolds, Presentation Zen 2008; audience-fit per Knaflic 2015)",
+          "fix": "Spell out acronyms on first use; move definitions to speaker notes; cap at ≤5 distinct per slide"
+        }
+      ]
+    }
+  ]
+}
