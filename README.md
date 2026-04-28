@@ -2,7 +2,8 @@
 
 Generate, review, and annotate polished presentation decks from any input.
 
-![CI](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml/badge.svg)
+[![CI](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml/badge.svg)](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml)
+[![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](./tests/coverage-baseline.txt)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
@@ -73,6 +74,27 @@ Instadecks is a Claude Code marketplace plugin shipping 5 namespaced slash skill
 - Poppler (`pdftoppm` on `PATH`) — used for PDF → PNG rasterization
 
 The SessionStart hook auto-installs npm dependencies (including pinned `pptxgenjs@4.0.1`) into the plugin data directory and unpacks IBM Plex Sans from the bundled archive. System binaries (`soffice`, `pdftoppm`) must be installed via the host package manager — the hook detects them and surfaces clear install hints if missing.
+
+## Testing
+
+```bash
+# Full suite + 100% coverage gate (matches CI; per CONTEXT D-02):
+npm test
+
+# Coverage report (text + lcov; non-failing):
+npm run coverage
+
+# Smoke suite (<30s; runs in CI):
+npm run test:smoke
+
+# Bash-script suite (bats; runs in CI; install via `brew install bats-core`):
+npm run test:bats
+
+# E2E suite (local-only; requires soffice + pdftoppm; skipped silently otherwise):
+npm run test:e2e
+```
+
+For human end-to-end gating before release, see [tests/FRESH-INSTALL.md](tests/FRESH-INSTALL.md).
 
 ## License
 
