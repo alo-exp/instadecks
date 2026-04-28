@@ -13,6 +13,7 @@ Instadecks ships a Claude Code marketplace plugin with four user-invocable slash
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Plugin Foundation, Contract & CI Gates** - Loadable plugin skeleton with locked JSON contract, CI gates, fonts, and visual-regression baselines
+- [x] **Phase 8: Test Coverage to 100%** - c8 100% gate live in CI; bats wired; e2e local-only; 100% lines/branches/funcs/stmts achieved 2026-04-28 (878 tests)
 - [x] **Phase 2: `/instadecks:annotate`** - Verbatim `annotate.js` wired to the locked contract; produces annotated PPTX + PDF overlays *(complete 2026-04-28 — 4/4 plans, ANNO-01..ANNO-11)*
 - [x] **Phase 3: `/instadecks:review` (Design Review)** - DECK-VDA 4-pass design review with R18 AI-tell detection, pipelined into `/annotate` *(complete 2026-04-28 — 5/5 plans, RVW-01..RVW-11)*
 - [ ] **Phase 4: `/instadecks:create` Scaffold + Render Cookbook** - Deck generator with 8 slide types, design-rationale doc, PowerPoint compatibility gate (no loop yet)
@@ -147,4 +148,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. `/instadecks:create` Auto-Refine Loop | 0/TBD | Not started | - |
 | 6. `/instadecks:content-review` | 0/TBD | Not started | - |
 | 7. Marketplace Publication & Release Polish | 0/TBD | Not started | - |
-| 8. Test Coverage to 100% | 0/TBD | Not started | - |
+| 8. Test Coverage to 100% | 7/7 | Complete | 2026-04-28 |

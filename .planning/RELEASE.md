@@ -118,3 +118,56 @@ gh pr create --repo alo-labs/claude-plugins \
 3. Run `tests/FRESH-INSTALL.md` on Mac AND Windows. Gate 6/6 per OS.
 
 When all three are filled and pass: re-edit §1 status rows from `human_needed` → `complete`, change top-of-file Status from `pending-human-signoff` → `signed-off`, and run the §3 Tag command.
+
+---
+
+## Phase 8 — Test Coverage to 100% (signed off 2026-04-28)
+
+**Result:** 100% lines / 100% branches / 100% functions / 100% statements across all in-scope files (CONTEXT D-03). c8 hard gate is now live in CI; coverage regression below 100% fails the build.
+
+### Requirements closed
+
+| ID | Description | Closed by |
+|---|---|---|
+| TEST-01 | c8 100% gate; CI fails on regression | Plan 8-01 (wiring) + Plan 8-07 (gate) |
+| TEST-02 | Lib + cli + orchestrator + tools branch coverage | Plan 8-02 + 8-02b (gap closure) |
+| TEST-03 | Bats coverage for all 3 bash scripts | Plan 8-04 |
+| TEST-04 | SKILL.md outcome-based tests (5 skills) | Plan 8-05 |
+| TEST-05 | Smoke suite <30s | Plan 8-06 |
+| TEST-06 | Auto-refine branch coverage (6 D-07 branches in `tests/auto-refine-integration.test.js`) | Plan 8-02 (canonical) + Plan 8-05 (supporting) |
+| TEST-07 | E2E runner (local-only, skip-when-absent) | Plan 8-06 |
+| TEST-08 | Coverage gate in CI | Plan 8-07 |
+
+### TEST-06 verbatim test() description strings (BLOCKER B-4 citation)
+
+The 6 D-07 auto-refine branch tests live in `tests/auto-refine-integration.test.js` and are cited verbatim here:
+
+1. `cycle 1 zero-findings forces a confirmation cycle`
+2. `oscillation detected via strict hash equality (D-09)`
+3. `soft-cap at cycle 5 surfaces 4-option AskUserQuestion`
+4. `top-of-cycle .interrupt flag halts the loop`
+5. `schema v1.1 finding (category=content, check_id=...) routes through annotate adapter`
+6. `content-vs-design boundary BIDIRECTIONAL: review ignores content defects, content-review ignores design defects`
+
+### Decisions enacted
+
+- D-01 (annotate.js policy reversal): applied in Plan 8-01 to CLAUDE.md.
+- D-02 (c8 + 100% threshold): wired in Plan 8-01; gate live in Plan 8-07.
+- D-04 (bats for bash; not folded into c8): tests in Plan 8-04; CI install in Plan 8-07.
+- D-05 (LLM-DI carve-out): hooks added in Plan 8-02 + Plan 8-05.
+- D-08 (e2e local-only; FRESH-INSTALL.md as human gate): runner in Plan 8-06; CI never installs soffice; `npm test` prefixes `CI=true` so the e2e suite is silently skipped on dev hosts that have soffice locally (Plan 8-07).
+- D-09 (one full-suite run per plan; per W-7 the budget is per-plan, with re-runs after gap closure permitted): honored — Plan 08-07 ran `npm test` twice (initial diagnosis, final green gate).
+
+### Coverage report
+
+- Pinned text summary: `tests/coverage-baseline.txt` (final 100% / 100% / 100% / 100% across all in-scope files).
+- `coverage/lcov.info` is uploaded as a 14-day CI artifact on every push (Gate 6b in `.github/workflows/ci.yml`).
+
+### CI commit SHA
+
+The workflow change that made the coverage gate live: `0c19386` (`ci(08-07): coverage:check as hard Gate 6 + bats install/run + lcov artifact upload`). The gap-closure commit that delivered the green gate: `c90ce9a` (`test(08-02b): close all c8 100% coverage gaps for Phase 8 closer`). The Phase 8 sign-off commit will close this section.
+
+### Residual gaps
+
+None — coverage is hard 100% across all in-scope files. v0.1.0 release readiness intact; future PRs cannot regress without explicit reviewer override.
+
