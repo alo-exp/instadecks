@@ -1,0 +1,84 @@
+{
+  "schema_version": "1.1",
+  "deck": "tests/fixtures/cross-domain-test-deck.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 2,
+      "title": "Solution Overview",
+      "findings": [
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "action-title",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.08,
+          "text": "Major | content — slide 2 title — title \"Solution Overview\" labels a topic instead of stating a claim — Pyramid Principle (Minto 1987) — Rewrite title as the slide's core claim, e.g., \"Our hybrid solution cuts onboarding from 6 weeks to 4 days\"",
+          "rationale": "Action titles state the slide's claim; topic labels like \"Overview\" force the audience to derive the message themselves.",
+          "location": "slide title",
+          "standard": "Pyramid Principle (Minto 1987) — title states the answer",
+          "fix": "Rewrite as a claim that names the answer, e.g., \"Our hybrid solution cuts onboarding from 6 weeks to 4 days\""
+        },
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "claim-evidence",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.5,
+          "text": "Major | content — slide 2 body — claim \"innovative and disruptive\" carries no supporting evidence (no data, source, or example) — Heath, Made to Stick 2007 — Replace adjectives with a quantified claim and a source citation",
+          "rationale": "Hyperbolic adjectives (\"innovative\", \"disruptive\") with no data, customer story, or third-party citation are unsupported claims; the audience has no anchor to evaluate the assertion.",
+          "location": "slide 2 body",
+          "standard": "Claim-evidence balance (Heath, Made to Stick 2007)",
+          "fix": "Replace with a quantified outcome and source, e.g., \"Reduced onboarding 86% (Acme pilot, Q2 2026)\""
+        }
+      ]
+    },
+    {
+      "slideNum": 4,
+      "title": "Strategic Direction",
+      "findings": [
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "action-title",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.08,
+          "text": "Major | content — slide 4 title — title \"Strategic Direction\" labels a topic instead of stating a claim — Pyramid Principle (Minto 1987) — Rewrite as the slide's claim",
+          "rationale": "Action titles state the slide's claim; \"Strategic Direction\" is a topic label that requires the audience to read the body to find the answer.",
+          "location": "slide title",
+          "standard": "Pyramid Principle (Minto 1987) — title states the answer",
+          "fix": "Rewrite title as a claim that summarizes the recommended direction"
+        },
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "length",
+          "genuine": true,
+          "ny": 0.3,
+          "nx": 0.5,
+          "text": "Major | content — slide 4 bullet 1 — bullet is 30 words (>25 word threshold) — 6×6 rule heuristic (Reynolds, Presentation Zen 2008) — Split into shorter claims or move detail to speaker notes",
+          "rationale": "Bullets >25 words become paragraphs; audience reads instead of listening, breaking presenter-audience connection.",
+          "location": "slide 4 body, bullet 1",
+          "standard": "6×6 rule heuristic (Reynolds, Presentation Zen 2008)",
+          "fix": "Split into two bullets, OR move detail to speaker notes, OR rewrite as a single short claim"
+        },
+        {
+          "severity_reviewer": "Major",
+          "category": "content",
+          "check_id": "jargon",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.6,
+          "text": "Major | content — slide 4 body — bullet contains 7 distinct unfiltered acronyms (SaaS, B2B, SMB, GTM, PLG, ARR, ACV, ICP, MQLs, SQLs, BCG) — audience-fit (Knaflic, Storytelling with Data 2015) — Spell out acronyms on first use; cap at ≤5 distinct per slide",
+          "rationale": "Acronym density above 5/slide forces the audience into glossary lookups and erodes standalone-readability.",
+          "location": "slide 4 body",
+          "standard": "Audience-fit (Knaflic, Storytelling with Data 2015)",
+          "fix": "Spell out acronyms on first use; move definitions to speaker notes; keep ≤5 distinct acronyms per slide"
+        }
+      ]
+    }
+  ]
+}

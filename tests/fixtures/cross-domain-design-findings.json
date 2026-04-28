@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.1",
+  "deck": "tests/fixtures/cross-domain-test-deck.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 2,
+      "title": "Solution Overview",
+      "findings": [
+        {
+          "severity_reviewer": "Major",
+          "category": "style",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.6,
+          "text": "Major | style — slide 2 body — body text #CCCCCC on #FFFFFF fails WCAG AA contrast (<3:1) — WCAG 2.1 AA contrast — Increase body color to #595959 or darker",
+          "rationale": "Body text contrast ratio of approximately 1.6:1 falls below WCAG AA's 4.5:1 threshold for normal text, making the bullet illegible to standard-vision readers in projection settings.",
+          "location": "slide 2 body bullet",
+          "standard": "WCAG 2.1 AA contrast (W3C)",
+          "fix": "Darken body fill to #595959 (achieves >7:1 on white) or #767676 minimum"
+        }
+      ]
+    },
+    {
+      "slideNum": 3,
+      "title": "Revenue grew 40% in Q3 from enterprise renewals",
+      "findings": [
+        {
+          "severity_reviewer": "Minor",
+          "category": "defect",
+          "genuine": true,
+          "nx": 0.07,
+          "ny": 0.3,
+          "text": "Minor | defect — slide 3 bullet — bullet x-position offset ~12pt off the body grid — Layout grid (DECK-VDA pass 2) — Snap bullet to the body column origin x=0.8in",
+          "rationale": "Bullet x=0.97in vs. expected grid origin 0.8in (~12pt drift) creates a visible misalignment with the title and other body shapes; perceptible jitter on a slide that otherwise reads clean.",
+          "location": "slide 3 bullet, left edge",
+          "standard": "Layout grid (DECK-VDA pass 2)",
+          "fix": "Snap bullet x to the body column origin (0.8in) so the left edges align with the title shape"
+        }
+      ]
+    }
+  ]
+}
