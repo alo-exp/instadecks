@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "deck": "tests/fixtures/v8-reference/Annotations_Sample.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "slides": [
+    {
+      "slideNum": 1,
+      "title": "Slide 01 · Test",
+      "findings": [
+        {
+          "severity_reviewer": "Critical",
+          "category": "defect",
+          "genuine": true,
+          "nx": 0.5,
+          "ny": 0.5,
+          "text": "Critical | defect — title centre — illegible at 1080p — WCAG 2.1 AA contrast — Darken to #333",
+          "rationale": "Body contrast measured at 1.6:1 vs 4.5:1 threshold.",
+          "location": "title centre",
+          "standard": "WCAG 2.1 AA contrast",
+          "fix": "Darken to #333"
+        },
+        {
+          "severity_reviewer": "Major",
+          "category": "improvement",
+          "genuine": true,
+          "nx": 0.4,
+          "ny": 0.3,
+          "text": "Major | improvement — body region — 9 lines exceeds 7-line cognitive threshold — Cognitive load (Norman 1988) — Split slide",
+          "rationale": "Cognitive load test exceeded.",
+          "location": "body region",
+          "standard": "Cognitive load (Norman 1988)",
+          "fix": "Split slide"
+        },
+        {
+          "severity_reviewer": "Minor",
+          "category": "style",
+          "genuine": true,
+          "nx": 0.7,
+          "ny": 0.8,
+          "text": "Minor | style — footer — default-blue palette dominance — R18 AI-tell — Replace palette",
+          "rationale": "≥30% srgbClr values in default-blue set.",
+          "location": "footer",
+          "standard": "R18 AI-tell",
+          "fix": "Replace palette",
+          "r18_ai_tell": true
+        },
+        {
+          "severity_reviewer": "Nitpick",
+          "category": "style",
+          "genuine": false,
+          "nx": 0.9,
+          "ny": 0.95,
+          "text": "Nitpick | style — page-number — half-pixel drift — Sub-perceptual — No action",
+          "rationale": "Sub-perceptual drift; deck-rationale justifies.",
+          "location": "page-number",
+          "standard": "Sub-perceptual",
+          "fix": "No action"
+        }
+      ]
+    }
+  ]
+}

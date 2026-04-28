@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0",
+  "deck": "cycle-1/deck.pptx",
+  "generated_at": "2026-04-28T00:00:00Z",
+  "cycle": 1,
+  "deck_spec": {
+    "topic": "Test Deck",
+    "audience": "test",
+    "slides": [
+      { "slideNum": 1, "type": "title", "title": "Cycle 1 Test" }
+    ]
+  },
+  "design_rationale_partial": {
+    "palette_rationale": "executive cooler tones",
+    "typography_rationale": "IBM Plex Sans body anchor"
+  },
+  "slides": [
+    {
+      "slideNum": 1, "title": "Cycle 1 Test",
+      "findings": [
+        { "severity_reviewer": "Critical", "category": "defect", "genuine": true,
+          "nx": 0.5, "ny": 0.1, "text": "f1", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Critical", "category": "defect", "genuine": true,
+          "nx": 0.5, "ny": 0.2, "text": "f2", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Critical", "category": "defect", "genuine": true,
+          "nx": 0.5, "ny": 0.3, "text": "f3", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Major", "category": "improvement", "genuine": true,
+          "nx": 0.5, "ny": 0.4, "text": "f4", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Major", "category": "improvement", "genuine": true,
+          "nx": 0.5, "ny": 0.5, "text": "f5", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Major", "category": "improvement", "genuine": true,
+          "nx": 0.5, "ny": 0.6, "text": "f6", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Minor", "category": "style", "genuine": true,
+          "nx": 0.5, "ny": 0.7, "text": "f7", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Minor", "category": "style", "genuine": true,
+          "nx": 0.5, "ny": 0.8, "text": "f8", "rationale": "r", "location": "l", "standard": "s", "fix": "x" },
+        { "severity_reviewer": "Nitpick", "category": "style", "genuine": true,
+          "nx": 0.5, "ny": 0.9, "text": "f9", "rationale": "r", "location": "l", "standard": "s", "fix": "x" }
+      ]
+    }
+  ]
+}

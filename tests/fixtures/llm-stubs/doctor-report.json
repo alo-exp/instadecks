@@ -1,0 +1,15 @@
+{
+  "tool": "doctor",
+  "exit_code_policy": {
+    "all_ok": 0,
+    "any_missing": 1,
+    "warn_only": 0
+  },
+  "rows": [
+    { "probe": "node", "status": "OK", "detail": "v20.10.0" },
+    { "probe": "soffice", "status": "OK", "detail": "/usr/bin/soffice" },
+    { "probe": "pdftoppm", "status": "OK", "detail": "/usr/bin/pdftoppm" },
+    { "probe": "pptxgenjs", "status": "OK", "detail": "4.0.1" },
+    { "probe": "ibm-plex-sans", "status": "WARN", "detail": "fc-list missing" }
+  ]
+}
