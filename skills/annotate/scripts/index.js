@@ -248,6 +248,15 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   await fsp.copyFile(pptxRun, sibling.pptxPath);
   await fsp.copyFile(pdfRun, sibling.pdfPath);
 
+  // Live E2E Round 3 MINOR N3: surface annotated-vs-source slide counts so
+  // users see the delta-only contract directly in the CLI output JSON.
+  const annotatedSlideCount = new Set(
+    /* c8 ignore next */ // Defensive: findings.slides is validated as array upstream by adaptFindings (P-09); the empty-array fallback is unreachable in practice.
+    (findings && Array.isArray(findings.slides)) ? findings.slides.map(s => s.slideNum) : [],
+  ).size;
+  /* c8 ignore next */ // Defensive: readDeckMeta always returns deckTotal as a number (soft-fail returns 0); the typeof-not-number fallback is unreachable.
+  const sourceSlideCount = (deckMeta && typeof deckMeta.deckTotal === 'number') ? deckMeta.deckTotal : 0;
+
   return {
     pptxPath: sibling.pptxPath,
     pdfPath: sibling.pdfPath,
@@ -255,6 +264,8 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
     runId,
     pptxRun,
     pdfRun,
+    annotatedSlideCount,
+    sourceSlideCount,
   };
 }
 

@@ -47,6 +47,12 @@ node ${CLAUDE_PLUGIN_ROOT}/skills/annotate/scripts/cli.js path/to/deck.pptx path
 ```js
 const { runAnnotate } = require(`${process.env.CLAUDE_PLUGIN_ROOT}/skills/annotate/scripts/index`);
 const result = await runAnnotate({ deckPath, findings /* in-memory object */ });
+// result includes:
+//   pptxPath, pdfPath          — sibling-of-input annotated artifacts
+//   runDir, runId               — archive location
+//   pptxRun, pdfRun             — work-dir copies (audit trail)
+//   annotatedSlideCount         — unique slide indexes referenced by findings
+//   sourceSlideCount            — total slides in the source deck (delta-only contract surface)
 ```
 
 ## Adapter behaviour (locked)
