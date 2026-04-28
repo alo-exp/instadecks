@@ -37,7 +37,7 @@ function renderClosing(slide, { headline, callToAction, contact, pageNum, total 
 
 | ✅ DO | ❌ DON'T |
 |---|---|
-| `slide.addShape(pres.shapes.RIGHT_ARROW, …)` | `slide.addShape('rightArrow', …)` |
+| `slide.addShape(pres.shapes.RIGHT_ARROW, …)` | `slide.addShape('rightArrow', …)` | <!-- enum-lint-allow: anti-pattern doc -->
 | Concrete CTA: `'Approve EU expansion budget by 2026-11-15'` | Vague CTA: `'Thank You / Q&A'` (use override flag if needed) |
 | Closing variant of title — same primary-bg motif | Match a content-slide background (kills the wrap signal) |
 

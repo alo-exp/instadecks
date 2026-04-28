@@ -1,6 +1,6 @@
 'use strict';
 // enum-lint.js — Phase 4 D-05 Layer 2 / CRT-15 generation-time guard.
-// Throws on first occurrence of `addShape('foo', …)` / `addShape("foo", …)`
+// Throws on first occurrence of `addShape('foo', …)` / `addShape("foo", …)`  // enum-lint-allow: regex-doc
 // (string-literal shape name). Qualified-method form `pres.addShape(pres.shapes.X, …)`
 // is allowed. Pure function: no fs, no clock.
 

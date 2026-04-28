@@ -46,7 +46,7 @@ function renderComparison(slide, { title, optionA, optionB, source, pageNum, tot
 
 | ✅ DO | ❌ DON'T |
 |---|---|
-| `slide.addShape(pres.shapes.RECTANGLE, …)` | `slide.addShape('rect', …)` |
+| `slide.addShape(pres.shapes.RECTANGLE, …)` | `slide.addShape('rect', …)` | <!-- enum-lint-allow: anti-pattern doc -->
 | Fresh option object per `addShape` call | Reuse one options bag across both cards |
 | Thin colored top bar overlay (height 0.08) | Full-card colored fill (loses neutrality) |
 

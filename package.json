@@ -10,7 +10,8 @@
     "test": "node --test",
     "lint:paths": "bash tools/lint-paths.sh",
     "validate:manifest": "node tools/validate-manifest.js",
-    "assert:pin": "node tools/assert-pptxgenjs-pin.js"
+    "assert:pin": "node tools/assert-pptxgenjs-pin.js",
+    "lint:enums": "node tools/lint-pptxgenjs-enums.js"
   },
   "dependencies": {
     "pptxgenjs": "4.0.1"
