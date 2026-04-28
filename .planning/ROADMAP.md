@@ -134,10 +134,27 @@ Decimal phases appear between their surrounding integers in numeric order.
   8. Coverage gate added to CI workflow: `c8 --100 npm test` (or equivalent) fails the build on any regression
 **Plans**: TBD (waves: 8-01 c8 wiring + baseline, 8-02 lib/orchestrator gap-fill, 8-03 annotate.js geometry, 8-04 bats for bash scripts, 8-05 outcome-based SKILL.md tests, 8-06 smoke suite + E2E runner, 8-07 CI gate + sign-off)
 
+### Phase 9: Design Variety & Modern Aesthetics + Brief-Shape Polymorphism
+**Goal**: Eliminate the "every deck looks the same" defect surfaced by 5 live E2E rounds. Two root causes: (a) cookbook offers ONE template per slide type → uniform layouts; (b) brief intake assumes a single rigid JSON shape (title/audience/purpose/key_messages/data_points/tone) → uniform content structure even across domains. Real users hand Claude raw input (meeting transcripts, pasted strategy docs, research papers, Slack threads, one-line asks). Phase 9 makes the plugin's input surface polymorphic AND its design surface deeply varied.
+**Depends on**: Phase 8 (relaxes the CLAUDE.md "match v8 BluePrestige output" invariant — recorded as Key Decision in PROJECT.md before execution)
+**Requirements**: DV-01..DV-12 (to be defined in CONTEXT.md)
+**Success Criteria** (what must be TRUE):
+  1. Cookbook offers ≥3 documented variants per slide type (title, section, stat-callout, 2col, comparison, data-chart, data-table, quote, closing) with distinct VARIANT_IDs, working pptxgenjs 4.0.1 code, and use-case guidance
+  2. New `references/palettes.md` library with ≥14 named modern palettes (Editorial Mono, Magazine Bold, Tech Noir, Pastel Tech, Silicon Valley, Editorial Serif, Monochrome+Accent, Carbon Neon, Cobalt Edge, Terracotta Editorial, plus the 4 existing earth-tone palettes) — NOT just muted greens
+  3. New `references/typography.md` with ≥8 type pairings (sans-only modern, mono-headings, display-hero, italic-led, mixed-weight, type-as-image, etc.)
+  4. New `references/motifs.md` with ≥8 motifs (underline, geometric-block, asymmetric-grid, number-as-design, diagonal-split, editorial-rule, minimalist-void, photo-led, gradient-overlay)
+  5. SKILL.md instructs the agent to ROTATE design DNA per deck — never default to verdant-steel + serif + underline; explicit "diversity check" against prior runs
+  6. Brief intake polymorphism: `runCreate` accepts brief in 4+ shapes — (a) structured JSON (current), (b) free-form Markdown narrative, (c) raw text (paste-from-anywhere), (d) attached files list (pdf/docx/transcript paths). A new `lib/brief-normalizer.js` extracts narrative-arc/audience/tone from any of these into the internal canonical shape
+  7. Updated `design-validator.js` recognizes all 14+ palettes as legitimate; doesn't false-positive on saturated primaries, electric accents, asymmetric layouts; still catches the actual AI tells (default Calibri, Office-blue, generic stock-photo)
+  8. New live E2E test set: 6 rounds with structurally-different inputs (JSON brief, raw transcript, pasted strategy doc, one-line ask, research-paper paragraph, photo-with-caption) — visual diff between rounds shows ≥80% layout/palette variation; 2 consecutive clean rounds required
+  9. PROJECT.md Key Decisions log captures the v8-spec relaxation; CLAUDE.md updated to remove "match v8 BluePrestige output" as a hard invariant (replaced with "v8 is one valid design DNA among many")
+  10. 100% c8 coverage gate stays green; all existing tests pass; new tests for variant coverage, palette library, typography library, motif library, brief normalizer
+**Plans**: TBD (estimated waves: 9-01 palettes + typography + motifs libraries; 9-02 cookbook variant additions; 9-03 SKILL.md design-DNA picker + cookbook.md restructure; 9-04 brief-normalizer + polymorphic intake; 9-05 design-validator updates + invariant reversal; 9-06 live E2E with varied input shapes + 2-clean-rounds verification)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -149,3 +166,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 6. `/instadecks:content-review` | 0/TBD | Not started | - |
 | 7. Marketplace Publication & Release Polish | 0/TBD | Not started | - |
 | 8. Test Coverage to 100% | 7/7 | Complete | 2026-04-28 |
+| 9. Design Variety & Modern Aesthetics + Brief-Shape Polymorphism | 0/TBD | Not started | - |
