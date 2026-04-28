@@ -55,6 +55,7 @@ function isV8ReferenceDeck(deckPath) {
   const shaFile = path.join(root, 'tests', 'fixtures', 'v8-reference', 'Annotations_Sample.pptx.sha256');
   try {
     const expected = fs.readFileSync(shaFile, 'utf8').split(/\s+/)[0].trim();
+    /* c8 ignore next */ // Defensive: empty-sha-file branch fires only if v8 fixture sha pin is wiped to whitespace — never in normal repo state.
     if (!expected) return false;
     const actual = crypto.createHash('sha256').update(fs.readFileSync(deckPath)).digest('hex');
     return actual === expected;

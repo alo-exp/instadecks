@@ -1,2 +1,8 @@
-# POST-PATCH SHA — recorded after applying require-path patch (line 6) and SAMPLES-extraction substitution (lines 107-150). See ANNO-02/03/04.
-186d881bbc200d695266ca5588a49c1a1a1dfc4ce70cc19563c1cfaf1050d545  annotate.js
+# POST-PATCH SHA — updated 2026-04-28 to reflect Live-E2E MINOR #1 fix
+# (footer parameterized via sample.deckTitle / sample.deckTotal). annotate.js
+# is no longer treated as a SHA-pinned binary asset (CLAUDE.md updated in
+# commit ed12484); this baseline now serves as a drift detector under
+# standard test discipline. The Tier-1 normalized-SHA visual-regression
+# test (tests/annotate-visual-regression.test.js) is the authoritative
+# behavior gate — confirmed passing post-fix.
+9c99d7e8d8b940acf0e778bf47da4def84619365393782dae4bb69b151aea19c  annotate.js

@@ -74,6 +74,39 @@ test('adapter.adaptFindings without deckMeta omits deckTitle/deckTotal (back-com
   assert.equal(samples[0].deckTotal, undefined);
 });
 
+test('buildSlide uses sample.deckTitle/deckTotal when provided (covers truthy fallback branch)', () => {
+  const { loadAnnotateInternals, makeRecordingPres } = require('./helpers/annotate-vm');
+  const sample = {
+    slideNum: 1, title: 'S1',
+    annotations: [{ sev: 'major', nx: 0.5, ny: 0.5, text: 'hi' }],
+    deckTitle: 'My Custom Deck',
+    deckTotal: 8,
+  };
+  const internals = loadAnnotateInternals({ samples: [sample] });
+  const { pres, calls } = makeRecordingPres();
+  internals.buildSlide(pres, sample);
+  // Footer addText must contain the user-supplied deckTitle and deckTotal.
+  const footer = calls.find(c => c.method === 'addText' &&
+    typeof c.text === 'string' && c.text.includes('Slide 1 / 8'));
+  assert.ok(footer, 'expected footer with custom deckTotal=8');
+  assert.match(footer.text, /My Custom Deck/, 'expected footer with custom deckTitle');
+});
+
+test('buildSlide falls back to "Agentic Disruption" / 43 when sample.deckTitle/deckTotal absent', () => {
+  const { loadAnnotateInternals, makeRecordingPres } = require('./helpers/annotate-vm');
+  const sample = {
+    slideNum: 5, title: 'S5',
+    annotations: [{ sev: 'minor', nx: 0.4, ny: 0.4, text: 'hi' }],
+  };
+  const internals = loadAnnotateInternals({ samples: [sample] });
+  const { pres, calls } = makeRecordingPres();
+  internals.buildSlide(pres, sample);
+  const footer = calls.find(c => c.method === 'addText' &&
+    typeof c.text === 'string' && c.text.includes('Agentic Disruption'));
+  assert.ok(footer, 'expected fallback footer "Agentic Disruption"');
+  assert.match(footer.text, /Slide 5 \/ 43/, 'expected fallback total 43');
+});
+
 test('readDeckMeta extracts dc:title and slide count from a PPTX', async () => {
   const { readDeckMeta } = require('../skills/annotate/scripts/adapter');
   const fixtureDeck = path.join(
