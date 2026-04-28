@@ -19,6 +19,38 @@ const REQUIRED_FINDING_FIELDS = [
 ];
 const STRING_FIELDS = ['rationale', 'location', 'standard', 'fix'];
 
+// decodeXmlEntities — decode the 5 XML predefined entities + numeric (decimal &
+// hexadecimal) character references. Live-E2E R4 MAJOR R4-1: dc:title in
+// docProps/core.xml stores `&` as `&amp;` etc.; without decoding, annotate.js's
+// footer band renders literal "&amp;" instead of "&". Hand-rolled decoder
+// (no xml-parser dep) — sufficient because we only consume <dc:title> text
+// content, which is plain CDATA-like character data.
+function decodeXmlEntities(s) {
+  /* c8 ignore next */ // Defensive: non-string input guarded — readDeckMeta only invokes with regex-captured strings.
+  if (typeof s !== 'string') return s;
+  return s
+    // Numeric (hex) entities first — order matters since the named-entity sweep
+    // would otherwise leave `&#x...;` alone but the regex is anchored so this
+    // ordering is purely defensive against future regex changes.
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      const code = parseInt(hex, 16);
+      /* c8 ignore next */ // Defensive: parseInt(<hex regex match>,16) is always finite — falsy branch unreachable.
+      return Number.isFinite(code) ? String.fromCodePoint(code) : _;
+    })
+    .replace(/&#(\d+);/g, (_, dec) => {
+      const code = parseInt(dec, 10);
+      /* c8 ignore next */ // Defensive: parseInt(<digit regex match>,10) is always finite — falsy branch unreachable.
+      return Number.isFinite(code) ? String.fromCodePoint(code) : _;
+    })
+    // The 5 XML predefined entities. `&amp;` MUST be last so we don't double-
+    // decode constructs like `&amp;lt;` (intended literal `&lt;`).
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, '&');
+}
+
 // readDeckMeta(deckPath) → { deckTitle, deckTotal }
 //
 // Extracts dc:title from docProps/core.xml and counts ppt/slides/slideN.xml
@@ -35,7 +67,10 @@ function readDeckMeta(deckPath) {
         if (!errCore && typeof coreXml === 'string') {
           // Match <dc:title>...</dc:title> (also tolerate dc: prefix variants).
           const m = coreXml.match(/<dc:title[^>]*>([\s\S]*?)<\/dc:title>/);
-          if (m) deckTitle = m[1].trim();
+          // Live-E2E R4 MAJOR R4-1: core.xml is well-formed XML — entity-decode
+          // the captured text so consumers (annotate.js footer) see the literal
+          // characters the deck author typed, not the encoded form.
+          if (m) deckTitle = decodeXmlEntities(m[1]).trim();
         }
         execFile('unzip', ['-l', deckPath], { maxBuffer: 4 * 1024 * 1024 },
           (errList, listOut) => {
@@ -138,4 +173,4 @@ function adaptFindings(doc, deckMeta) {
   return samples;
 }
 
-module.exports = { adaptFindings, readDeckMeta, SEV_MAP };
+module.exports = { adaptFindings, readDeckMeta, decodeXmlEntities, SEV_MAP };
