@@ -122,6 +122,13 @@ test('seg primitive — degenerate (zero-length) segment clamps w,h to 0.002', (
   assert.equal(c.opts.line.width, 1.1);
 });
 
+test('circleDot primitive — default transparency=0 when trans omitted', () => {
+  const internals = loadAnnotateInternals();
+  const { pres, slide, calls } = makeRecordingPres();
+  internals.circleDot(slide, pres, 1, 1, 0.05, 'FFFFFF');
+  assert.equal(calls[0].opts.fill.transparency, 0);
+});
+
 test('circleDot primitive — OVAL centred on (cx,cy) with radius r', () => {
   const internals = loadAnnotateInternals();
   const { pres, slide, calls } = makeRecordingPres();

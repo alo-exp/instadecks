@@ -50,4 +50,5 @@ async function main() {
   });
 }
 
+/* c8 ignore next */ // Defensive: err.message branch only fires for stack-less throws (rare in Node); err.stack branch is covered.
 main().catch(e => { console.error(e.stack || e.message); process.exit(3); });

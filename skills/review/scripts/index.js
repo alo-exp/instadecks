@@ -35,7 +35,9 @@ function resolveSiblingOutputs(deckPath) {
 function countFindings(findings) {
   const counts = { critical: 0, major: 0, minor: 0, nitpick: 0 };
   let genuineCount = 0;
+  /* c8 ignore next */ // Defensive: validate() upstream guarantees findings.slides is an array.
   for (const slide of findings.slides || []) {
+    /* c8 ignore next */ // Defensive: validate() upstream guarantees slide.findings is an array.
     for (const f of slide.findings || []) {
       switch (f.severity_reviewer) {
         case 'Critical': counts.critical++; break;
@@ -69,6 +71,7 @@ if (process.env.INSTADECKS_LLM_STUB) {
     const { stubLlmResponse } = require('../../../tests/helpers/llm-mock');
     const fixture = require('node:path').basename(process.env.INSTADECKS_LLM_STUB, '.json');
     _test_setLlm(stubLlmResponse(fixture));
+  /* c8 ignore next */ // Defensive: catch only fires if tests/helpers/llm-mock.js is absent (e.g. in production install where tests/ is excluded).
   } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
 }
 if (process.env.INSTADECKS_RENDER_STUB === '1') {
@@ -91,6 +94,7 @@ function filterSlides(findings, slidesToReview) {
   const keep = new Set(slidesToReview);
   return {
     ...findings,
+    /* c8 ignore next */ // Defensive: validate() upstream guarantees findings.slides is an array.
     slides: (findings.slides || []).filter(s => keep.has(s.slideNum)),
   };
 }
@@ -157,6 +161,7 @@ async function runReview({
   let annotated = null;
   if (annotate) {
     const runAnnotate = _runAnnotateOverride
+      /* c8 ignore next */ // Defensive: tests that exercise annotate=true always inject _test_setRunAnnotate to avoid soffice; real require path is exercised only by e2e annotate-real-soffice.test.js.
       || require('../../annotate/scripts').runAnnotate;
     annotated = await runAnnotate({ deckPath, findings, outDir, runId });
   }

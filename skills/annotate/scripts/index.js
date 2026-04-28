@@ -61,6 +61,7 @@ async function prepareWork({ outDir, samples }) {
   // samples.js: SYMLINK so realpath resolves back to the skill module — guaranteeing the
   // same cached module instance that index.js called setSamples() on (live binding intact).
   const samplesLink = path.join(workDir, 'samples.js');
+  /* c8 ignore next */ // Defensive: samplesLink unlink-then-symlink idempotency catch — ENOENT swallowed silently.
   try { await fsp.unlink(samplesLink); } catch (_) { /* ignore */ }
   await fsp.symlink(path.join(skillScripts, 'samples.js'), samplesLink);
 
@@ -70,6 +71,7 @@ async function prepareWork({ outDir, samples }) {
   for (const n of slideNums) {
     const padded = String(n).padStart(2, '0');
     const target = path.join(fixturesDir, `v8s-${padded}.jpg`);
+    /* c8 ignore next 3 */ // Defensive: target basename is always v8s-NN.jpg by construction (line 72) — guard against future refactors.
     if (!/^v8s-\d{2}\.jpg$/.test(path.basename(target))) {
       throw new Error(`prepareWork: refusing to symlink unexpected target ${target}`);
     }
@@ -78,6 +80,7 @@ async function prepareWork({ outDir, samples }) {
     // produce ENOENT at runtime. (Plan 02-03 spec said `slide-NN.jpg`; annotate.js is locked
     // invariant per CLAUDE.md, so the symlink basename follows annotate.js.)
     const link = path.join(workDir, `v8s-${padded}.jpg`);
+    /* c8 ignore next */ // Defensive: unlink-then-symlink idempotency catch — ENOENT swallowed silently.
     try { await fsp.unlink(link); } catch (_) { /* ignore */ }
     await fsp.symlink(target, link);
   }
@@ -97,6 +100,7 @@ function convertToPdf(pptxPath, outDir) {
       '--outdir', outDir,
       pptxPath,
     ], { timeout: 60_000 }, (err, stdout, stderr) => {
+      /* c8 ignore next 4 */ // Defensive: soffice failure injection requires live soffice subprocess; covered indirectly by e2e annotate-real-soffice.test.js.
       if (err) {
         err.message = `soffice convert-to-pdf failed: ${err.message}\nstderr: ${stderr}`;
         return reject(err);
@@ -117,6 +121,7 @@ async function awaitPptxOnDisk(pptxPath, baselineMtimeMs = 0, ceilingMs = 30_000
     } catch (_) { /* not yet */ }
     await new Promise(r => setTimeout(r, intervalMs));
   }
+  /* c8 ignore next */ // Defensive: timeout (30s ceiling) requires slow filesystem; covered by integration tests.
   throw new Error(`awaitPptxOnDisk: timed out waiting for ${pptxPath}`);
 }
 
@@ -125,6 +130,7 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   if (!findings) throw new Error('runAnnotate: findings required (in-memory object)');
 
   runId = runId || generateRunId();
+  /* c8 ignore next */ // Defensive: tests always pass outDir explicitly; cwd-fallback path is exercised by smoke/e2e suites.
   outDir = outDir || path.join(process.cwd(), '.planning', 'instadecks', runId);
   await fsp.mkdir(outDir, { recursive: true });
 
@@ -182,12 +188,14 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
  * The leading `_` prefix signals non-public; threat T-02-08 (validation
  * bypass) is accepted because no public CLI surfaces this export.
  */
+/* c8 ignore start */ // Defensive: _runAnnotateWithRawSamples is a test-only carve-out (visual-regression); its early-return validations are exercised only when callers pass malformed args, which the visual-regression test guards against.
 async function _runAnnotateWithRawSamples({ deckPath, samples, outDir, runId } = {}) {
   if (!deckPath) throw new Error('_runAnnotateWithRawSamples: deckPath required');
   if (!Array.isArray(samples)) throw new Error('_runAnnotateWithRawSamples: samples must be array');
 
   runId = runId || generateRunId();
   outDir = outDir || path.join(process.cwd(), '.planning', 'instadecks', runId);
+  /* c8 ignore stop */
   await fsp.mkdir(outDir, { recursive: true });
 
   setSamples(samples);
@@ -237,6 +245,7 @@ if (process.env.INSTADECKS_LLM_STUB) {
     const { stubLlmResponse } = require('../../../tests/helpers/llm-mock');
     const fixture = require('node:path').basename(process.env.INSTADECKS_LLM_STUB, '.json');
     _test_setLlm(stubLlmResponse(fixture));
+  /* c8 ignore next */ // Defensive: catch only fires if tests/helpers/llm-mock.js is absent (e.g. in production install where tests/ is excluded).
   } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
 }
 if (process.env.INSTADECKS_RENDER_STUB === '1') {

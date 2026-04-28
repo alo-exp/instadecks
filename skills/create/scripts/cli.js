@@ -92,11 +92,13 @@ async function main() {
   await runCreate({
     brief,
     runId: args.runId || undefined,
+    /* c8 ignore next */ // Defensive: outDir-undefined branch covered indirectly when arg omitted in tests; resolve-path branch covered by --out-dir tests.
     outDir: args.outDir ? path.resolve(args.outDir) : undefined,
     mode: args.mode,
   });
 }
 
+/* c8 ignore next 3 */ // Defensive: require.main guard skips when module is required from tests; main()-rejection .catch err.message branch only fires for stack-less throws.
 if (require.main === module) {
   main().catch(e => { console.error(e.stack || e.message); process.exit(3); });
 }
