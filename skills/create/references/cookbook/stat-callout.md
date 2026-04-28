@@ -41,6 +41,33 @@ function renderStatCallout(slide, { title, statValue, statLabel, supporting, sou
 | Action title naming the implication | Topic title: `'Q3 Revenue'` |
 | Supporting prose to the right of the number | Wrap the number in supporting text (visual clash) |
 
+## Sizing rule of thumb (overflow guard)
+
+The hero number is the single biggest source of overflow in this recipe. At
+fontSize 60–110pt a 3-character stat will wrap to two lines if the box width is
+too tight. Use this width-to-fontSize ratio:
+
+| Hero stat                         | fontSize | Min box width `w` |
+|-----------------------------------|----------|-------------------|
+| 2-char (e.g. `42`)                | 72       | ≥ 3.0″            |
+| 3-char (e.g. `112%`)              | 72       | ≥ 4.0″            |
+| 3-char (e.g. `112%`)              | 110      | ≥ 5.0″            |
+| 4-char (e.g. `$8.7M`)             | 110      | ≥ 6.5″            |
+
+Rule of thumb: at fontSize 110pt allow ≥ 1.5″ per glyph; at 72pt allow ≥ 1.0″
+per glyph. When in doubt, set `fit: 'shrink'` (or `autoFit: true`) on the stat
+text so pptxgenjs scales the glyphs to fit instead of wrapping.
+
+```javascript
+slide.addText(statValue, {
+  x: MARGIN_X, y: 1.4, w: 4.5, h: 2.5,
+  fontFace: TYPE.heading, fontSize: 110, bold: true, color: PALETTE.primary,
+  align: 'left', valign: 'top', margin: 0,
+  fit: 'shrink',          // shrink-to-fit overflow guard
+  autoFit: true,          // belt + suspenders for older pptxgenjs callsites
+});
+```
+
 ## When to use
 
 A hero statistic that anchors a beat — one number the audience should remember. Pair with one sentence of supporting context.
