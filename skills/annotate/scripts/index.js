@@ -10,7 +10,7 @@ const fsp = require('node:fs/promises');
 const fs = require('node:fs');
 const { execFile, spawnSync } = require('node:child_process');
 const crypto = require('node:crypto');
-const { adaptFindings } = require('./adapter');
+const { adaptFindings, readDeckMeta } = require('./adapter');
 const { setSamples } = require('./samples');
 
 function generateRunId() {
@@ -209,7 +209,12 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   outDir = outDir || path.join(process.cwd(), '.planning', 'instadecks', runId);
   await fsp.mkdir(outDir, { recursive: true });
 
-  const samples = adaptFindings(findings);
+  // Live-E2E MINOR #1: extract deck title + slide count so annotate.js's footer
+  // band reflects the user's actual deck rather than the v8-hardcoded
+  // "Agentic Disruption · Slide N / 43". readDeckMeta soft-fails to {'',0}
+  // which lets annotate.js fall back to its own hardcoded defaults.
+  const deckMeta = await readDeckMeta(deckPath);
+  const samples = adaptFindings(findings, deckMeta);
   await fsp.writeFile(path.join(outDir, 'findings.json'), JSON.stringify(findings, null, 2));
 
   setSamples(samples);

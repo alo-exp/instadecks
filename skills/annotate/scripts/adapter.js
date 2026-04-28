@@ -2,6 +2,14 @@
 // adapter.js — validate findings → filter genuine == true → collapse 4-tier severity to 3-tier.
 // Per Phase 2 D-07 (fail-loud, structured errors) and ANNO-05/ANNO-06.
 // Severity collapse table sourced from skills/review/references/findings-schema.md §5.
+//
+// Live-E2E MINOR #1 fix: also exposes readDeckMeta(deckPath) which extracts
+// dc:title (deck title) and slide count from a PPTX. The values are forwarded
+// onto each sample as sample.deckTitle / sample.deckTotal so annotate.js's
+// footer band reflects the user's deck instead of hardcoded "Agentic Disruption · Slide N / 43".
+
+const { execFile } = require('node:child_process');
+const path = require('node:path');
 
 const SEV_MAP = { Critical: 'major', Major: 'major', Minor: 'minor', Nitpick: 'polish' };
 const VALID_CATEGORY = new Set(['defect', 'improvement', 'style', 'content']);
@@ -11,7 +19,39 @@ const REQUIRED_FINDING_FIELDS = [
 ];
 const STRING_FIELDS = ['rationale', 'location', 'standard', 'fix'];
 
-function adaptFindings(doc) {
+// readDeckMeta(deckPath) → { deckTitle, deckTotal }
+//
+// Extracts dc:title from docProps/core.xml and counts ppt/slides/slideN.xml
+// entries via `unzip` (no jszip runtime dep — `unzip` is already used by
+// skills/create/scripts/index.js for slide counting and is part of the
+// platform deps the SessionStart hook checks). Soft-fails: returns
+// { deckTitle: '', deckTotal: 0 } when unzip is missing or fields absent
+// so callers can downgrade gracefully to the hardcoded fallback in annotate.js.
+function readDeckMeta(deckPath) {
+  return new Promise((resolve) => {
+    execFile('unzip', ['-p', deckPath, 'docProps/core.xml'], { maxBuffer: 4 * 1024 * 1024 },
+      (errCore, coreXml) => {
+        let deckTitle = '';
+        if (!errCore && typeof coreXml === 'string') {
+          // Match <dc:title>...</dc:title> (also tolerate dc: prefix variants).
+          const m = coreXml.match(/<dc:title[^>]*>([\s\S]*?)<\/dc:title>/);
+          if (m) deckTitle = m[1].trim();
+        }
+        execFile('unzip', ['-l', deckPath], { maxBuffer: 4 * 1024 * 1024 },
+          (errList, listOut) => {
+            let deckTotal = 0;
+            /* c8 ignore next */ // Defensive: unzip-list failure mirrors create/index.js countSlides path; covered indirectly by integration tests.
+            if (!errList && typeof listOut === 'string') {
+              const matches = listOut.match(/ppt\/slides\/slide\d+\.xml/g) || [];
+              deckTotal = new Set(matches).size;
+            }
+            resolve({ deckTitle, deckTotal });
+          });
+      });
+  });
+}
+
+function adaptFindings(doc, deckMeta) {
   if (doc === null || typeof doc !== 'object' || Array.isArray(doc)) {
     throw new Error(`Unsupported findings schema version ${doc && doc.schema_version}. /annotate supports 1.x.`);
   }
@@ -84,10 +124,17 @@ function adaptFindings(doc) {
       .filter((f) => f.genuine === true)
       .map((f) => ({ sev: SEV_MAP[f.severity_reviewer], nx: f.nx, ny: f.ny, text: f.text }));
     if (annotations.length > 0) {
-      samples.push({ slideNum: slide.slideNum, title: slide.title, annotations });
+      const sample = { slideNum: slide.slideNum, title: slide.title, annotations };
+      if (deckMeta && typeof deckMeta === 'object') {
+        if (deckMeta.deckTitle) sample.deckTitle = deckMeta.deckTitle;
+        if (typeof deckMeta.deckTotal === 'number' && deckMeta.deckTotal > 0) {
+          sample.deckTotal = deckMeta.deckTotal;
+        }
+      }
+      samples.push(sample);
     }
   }
   return samples;
 }
 
-module.exports = { adaptFindings, SEV_MAP };
+module.exports = { adaptFindings, readDeckMeta, SEV_MAP };

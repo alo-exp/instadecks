@@ -455,8 +455,14 @@ function buildSlide(pres, sample) {
   layoutTB(above, true);
   layoutTB(below, false);
 
-  // Footer
-  s.addText(`Agentic Disruption  ·  Slide ${sample.slideNum} / 43`, {
+  // Footer — parameterized via sample.deckTitle and sample.deckTotal (added by
+  // adapter.js when a deckPath is supplied). Falls back to the historical v8
+  // BluePrestige values ("Agentic Disruption" / 43) when absent so the Tier-1
+  // visual-regression baseline (which passes raw SAMPLES with no deckTitle/
+  // deckTotal) keeps SHA-matching.
+  const _deckTitle = (sample.deckTitle && String(sample.deckTitle).trim()) || 'Agentic Disruption';
+  const _deckTotal = (typeof sample.deckTotal === 'number' && sample.deckTotal > 0) ? sample.deckTotal : 43;
+  s.addText(`${_deckTitle}  ·  Slide ${sample.slideNum} / ${_deckTotal}`, {
     x: 0, y: FOOTER_Y, w: SW, h: SH - FOOTER_Y,
     fontFace: 'IBM Plex Sans', fontSize: 7, color: C.footer,
     align: 'center', valign: 'middle',
