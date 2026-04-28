@@ -14,6 +14,56 @@ const { validateBrief } = require('./lib/deck-brief');
 const { lintCjs } = require('./lib/enum-lint');
 const { render: renderRationale } = require('./lib/render-rationale');
 
+// Live E2E Round 3 MAJOR N1: best-effort static extraction of PALETTE / TYPE /
+// motif from a render-deck.cjs source string. Returns { palette, typography,
+// motif } where each value is a markdown snippet (or null when no match). The
+// regexes are deliberately permissive — quoted hex colors and font names are
+// extracted from `const PALETTE = { ... }` / `const TYPE = { ... }` blocks
+// (also accepts COLORS / TYPOGRAPHY synonyms). Pure function — no I/O.
+function extractHeuristicDesign(cjsSrc) {
+  const result = { palette: null, typography: null, motif: null };
+  /* c8 ignore next */ // Defensive: caller always passes the cjsSrc loaded via fsp.readFile (non-empty string); the typeof/empty guard is unreachable in practice.
+  if (typeof cjsSrc !== 'string' || cjsSrc.length === 0) return result;
+
+  // Palette block: `const PALETTE = {...}` or `const COLORS = {...}` (single-line OK).
+  const palMatch = cjsSrc.match(/const\s+(?:PALETTE|COLORS)\s*=\s*\{([^}]*)\}/);
+  if (palMatch) {
+    const body = palMatch[1];
+    const pairs = [];
+    const pairRe = /(\w+)\s*:\s*['"]([0-9A-Fa-f]{6})['"]/g;
+    let m;
+    while ((m = pairRe.exec(body)) !== null) {
+      pairs.push(`${m[1]}: \`${m[2]}\``);
+    }
+    if (pairs.length > 0) {
+      result.palette = pairs.join(', ');
+    }
+  }
+
+  // Typography block: `const TYPE = {...}` or `const TYPOGRAPHY = {...}`.
+  const typMatch = cjsSrc.match(/const\s+(?:TYPE|TYPOGRAPHY)\s*=\s*\{([^}]*)\}/);
+  if (typMatch) {
+    const body = typMatch[1];
+    const pairs = [];
+    const pairRe = /(\w+)\s*:\s*['"]([^'"]+)['"]/g;
+    let m;
+    while ((m = pairRe.exec(body)) !== null) {
+      pairs.push(`${m[1]}: ${m[2]}`);
+    }
+    if (pairs.length > 0) {
+      result.typography = pairs.join(', ');
+    }
+  }
+
+  // Motif: leading `// Motif: <description>` comment.
+  const motifMatch = cjsSrc.match(/\/\/\s*Motif:\s*(.+)/);
+  if (motifMatch) {
+    result.motif = motifMatch[1].trim();
+  }
+
+  return result;
+}
+
 function generateRunId() {
   const d = new Date();
   const pad = n => String(n).padStart(2, '0');
@@ -239,6 +289,11 @@ async function runCreate({
   const slidesCount = await countSlides(deckPath);
 
   // 10. Design rationale — always written so the SKILL.md output contract holds.
+  // Heuristic extraction (Live E2E Round 3 MAJOR N1): when designChoices is
+  // absent, statically parse render-deck.cjs for PALETTE / TYPE constants so
+  // the rationale surfaces what the agent actually wrote rather than flat
+  // [TBD]. Best-effort regex — failure to match leaves [TBD] in place.
+  const heuristic = extractHeuristicDesign(cjsSrc);
   // With designChoices: render the full fixed-template via lib/render-rationale.
   // Without designChoices (e.g. standalone mode where the agent authored the deck
   // without surfacing structured palette/typography choices): write a minimal stub
@@ -263,6 +318,18 @@ async function runCreate({
       ? brief.key_claims.map((kc) => `- Slide ${kc.slide_idx}: ${kc.claim}`).join('\n')
       : '_(no key_claims authored in brief)_';
     /* c8 ignore stop */
+    // MAJOR N1: surface heuristically-extracted constants where possible;
+    // keep [TBD] (with the --design-choices hint) when extraction returns null.
+    const HINT = '*[Heuristic extraction from render-deck.cjs — pass `--design-choices design.json` to the standalone CLI for a fully-structured handoff.]*';
+    const paletteBody = heuristic.palette
+      ? `Extracted from render-deck.cjs PALETTE/COLORS block — ${heuristic.palette}.\n\n${HINT}`
+      : `[TBD — agent did not capture structured design choices and no PALETTE/COLORS block was found in render-deck.cjs.]\n\n${HINT}`;
+    const typographyBody = heuristic.typography
+      ? `Extracted from render-deck.cjs TYPE/TYPOGRAPHY block — ${heuristic.typography}.\n\n${HINT}`
+      : `[TBD — agent did not capture structured design choices and no TYPE/TYPOGRAPHY block was found in render-deck.cjs.]\n\n${HINT}`;
+    const motifBody = heuristic.motif
+      ? `${heuristic.motif}\n\n${HINT}`
+      : `[TBD — agent did not capture a structured motif description; add a leading \`// Motif: ...\` comment to render-deck.cjs or pass --design-choices.]\n\n${HINT}`;
     const stub =
       `# Design Rationale — ${brief.topic}\n\n` +
       `*Brief topic:* ${brief.topic}\n\n` +
@@ -270,17 +337,14 @@ async function runCreate({
       `*Render path:* render-deck.cjs (agent-authored)\n\n` +
       `## Audience\n\n${brief.audience}\n\n` +
       `## Tone\n\n${brief.tone}\n\n` +
-      `## Palette\n\n[TBD — agent did not capture structured design choices in this run; ` +
-      `palette tokens were inlined directly into render-deck.cjs without being surfaced ` +
-      `via the structured-handoff contract.]\n\n` +
-      `## Typography\n\n[TBD — agent did not capture structured design choices in this run; ` +
-      `font choices were inlined directly into render-deck.cjs.]\n\n` +
-      `## Motif\n\n[TBD — agent did not capture a structured motif description in this run.]\n\n` +
+      `## Palette\n\n${paletteBody}\n\n` +
+      `## Typography\n\n${typographyBody}\n\n` +
+      `## Motif\n\n${motifBody}\n\n` +
       `## Narrative Arc\n\n${arcLines}\n\n` +
       `### Key claims by slide\n\n${claimLines}\n\n` +
-      `## Key Tradeoffs\n\n[Not authored in standalone mode without structured design choices.]\n\n` +
-      `## Reviewer Notes\n\n[Not authored in standalone mode without structured design choices. ` +
-      `Run /instadecks:review on deck.pptx to populate this section in a follow-up artifact.]\n`;
+      `## Key Tradeoffs\n\n[TBD — not authored in standalone mode without structured design choices.]\n\n${HINT}\n\n` +
+      `## Reviewer Notes\n\n[TBD — not authored in standalone mode without structured design choices. ` +
+      `Run /instadecks:review on deck.pptx to populate this section in a follow-up artifact.]\n\n${HINT}\n`;
     await fsp.writeFile(rationalePath, stub);
   }
 

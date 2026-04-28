@@ -105,6 +105,43 @@ Write to `${runDir}/render-deck.cjs`.
 
 ### Step 4 — Call runCreate
 
+**Standalone CLI with structured handoff** — pass design choices via a JSON file so the design-rationale gets the full Palette / Typography / Motif / Tradeoffs sections instead of heuristic [TBD] fallbacks:
+
+```bash
+node ${CLAUDE_PLUGIN_ROOT}/skills/create/scripts/cli.js \
+  --brief brief.json \
+  --design-choices design-choices.json \
+  --out-dir .
+```
+
+`design-choices.json` shape (matches the `designChoices` arg below):
+
+```json
+{
+  "palette": {
+    "name": "midnight-citrine",
+    "primary": "1E2761",
+    "secondary": "CADCFC",
+    "accent": "F4C141",
+    "rationale": "Cooler executive base with a citrine accent for the upside slide."
+  },
+  "typography": {
+    "heading": "IBM Plex Sans",
+    "body": "IBM Plex Sans",
+    "rationale": "Single-family pairing for board-room legibility."
+  },
+  "motif": "Quiet diagonals as section bookends; no decorative imagery on data slides.",
+  "tradeoffs": [
+    "Skipped a third accent to keep board-deck restraint",
+    "Chose IBM Plex over a serif/sans pair to maximize on-screen legibility"
+  ]
+}
+```
+
+If `--design-choices` is omitted in standalone mode, runCreate statically parses your render-deck.cjs for `const PALETTE = {...}` / `const TYPE = {...}` blocks and a leading `// Motif: ...` comment, surfacing whatever it can find in the rationale (sections without matches stay `[TBD]` with a hint to use `--design-choices`).
+
+**Pipelined (in-process):**
+
 ```js
 const { runCreate } = require('${CLAUDE_PLUGIN_ROOT}/skills/create/scripts/index');
 const result = await runCreate({
