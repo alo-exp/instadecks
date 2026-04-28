@@ -54,13 +54,14 @@ function resolveSoftCap(softCapFlag) {
 }
 
 function parseArgs(argv) {
-  const args = { brief: null, runId: null, outDir: null, mode: 'standalone', softCap: null };
+  const args = { brief: null, runId: null, outDir: null, mode: 'standalone', softCap: null, designChoices: null };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--brief') { args.brief = argv[++i]; }
     else if (a === '--run-id') { args.runId = argv[++i]; }
     else if (a === '--out-dir') { args.outDir = argv[++i]; }
     else if (a === '--mode') { args.mode = argv[++i]; }
+    else if (a === '--design-choices') { args.designChoices = argv[++i]; }
     else if (typeof a === 'string' && a.startsWith('--soft-cap=')) {
       args.softCap = parseSoftCapFlag([a]);
     }
@@ -89,12 +90,22 @@ async function main() {
     console.error(`cli.js: failed to read --brief: ${e.message}`);
     process.exit(2);
   }
+  let designChoices = null;
+  if (args.designChoices) {
+    try {
+      designChoices = JSON.parse(fs.readFileSync(path.resolve(args.designChoices), 'utf8'));
+    } catch (e) {
+      console.error(`cli.js: failed to read --design-choices: ${e.message}`);
+      process.exit(2);
+    }
+  }
   await runCreate({
     brief,
     runId: args.runId || undefined,
     /* c8 ignore next */ // Defensive: outDir-undefined branch covered indirectly when arg omitted in tests; resolve-path branch covered by --out-dir tests.
     outDir: args.outDir ? path.resolve(args.outDir) : undefined,
     mode: args.mode,
+    designChoices,
   });
 }
 
