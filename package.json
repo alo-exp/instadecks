@@ -7,7 +7,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "c8 --100 --check-coverage --reporter text node --test 'tests/**/*.test.js'",
+    "test": "CI=true c8 --100 --check-coverage --reporter text node --test 'tests/**/*.test.js'",
     "coverage": "c8 --reporter html --reporter text node --test 'tests/**/*.test.js'",
     "test:smoke": "node --test 'tests/smoke/**/*.test.js'",
     "test:e2e": "node --test 'tests/e2e/**/*.test.js'",
