@@ -238,11 +238,23 @@ async function runCreate({
   // 9. Slide count.
   const slidesCount = await countSlides(deckPath);
 
-  // 10. Design rationale — write only if designChoices supplied; else agent writes.
+  // 10. Design rationale — always written so the SKILL.md output contract holds.
+  // With designChoices: render the full fixed-template via lib/render-rationale.
+  // Without designChoices (e.g. standalone mode where the agent authored the deck
+  // without surfacing structured palette/typography choices): write a minimal stub
+  // honoring the contract. Fixes BLOCKER #2 (rationalePath used to be silently absent).
   const rationalePath = path.join(resolvedOut, 'design-rationale.md');
   if (designChoices) {
     const md = renderRationale({ brief, designChoices });
     await fsp.writeFile(rationalePath, md);
+  } else {
+    const stub =
+      `# Design Rationale\n\n` +
+      `*Brief:* ${(brief && brief.title) || (brief && brief.topic) || '(untitled)'}\n\n` +
+      `*Author mode:* ${mode}\n\n` +
+      `*Render path:* render-deck.cjs (agent-authored)\n\n` +
+      `[No structured design choices captured in this run.]\n`;
+    await fsp.writeFile(rationalePath, stub);
   }
 
   const result = {

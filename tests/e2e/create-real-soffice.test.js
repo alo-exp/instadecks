@@ -50,6 +50,13 @@ test('e2e: /create end-to-end with real soffice', { timeout: 120000 }, (t) => {
     const pptxStat = fs.statSync(path.join(tmp, pptx));
     assert.ok(pptxStat.size > 10_000,
       `expected non-trivial pptx (>10KB); got ${pptxStat.size} bytes`);
+    // FIX BLOCKER #2: design-rationale.md must always exist post-run (SKILL.md contract).
+    const rationalePath = path.join(tmp, 'design-rationale.md');
+    assert.ok(fs.existsSync(rationalePath),
+      `expected design-rationale.md at ${rationalePath} (BLOCKER #2: rationalePath was silently never written)`);
+    const rationaleBody = fs.readFileSync(rationalePath, 'utf8');
+    assert.ok(rationaleBody.startsWith('# Design Rationale'),
+      `design-rationale.md should start with '# Design Rationale' header; got: ${rationaleBody.slice(0, 80)}`);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
