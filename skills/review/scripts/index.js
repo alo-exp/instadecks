@@ -55,6 +55,38 @@ function countFindings(findings) {
 let _runAnnotateOverride = null;
 function _test_setRunAnnotate(fn) { _runAnnotateOverride = fn; }
 
+// Phase 5 D-03 / Q-1 / CRT-13 — slidesToReview filter (NON-BREAKING; default null = full review).
+// Filter only drops entries from findings.slides[]; never mutates finding shape (P-01 invariant —
+// severity collapse remains the /annotate adapter's exclusive job, per CLAUDE.md).
+function filterSlides(findings, slidesToReview) {
+  if (slidesToReview == null || slidesToReview === 'all') return findings;
+  if (!Array.isArray(slidesToReview)) {
+    throw new Error(`runReview: slidesToReview must be null|'all'|int[] (got ${JSON.stringify(slidesToReview)})`);
+  }
+  for (const n of slidesToReview) {
+    if (!Number.isInteger(n) || n < 1) {
+      throw new Error(`runReview: slidesToReview entries must be positive integers (got ${JSON.stringify(n)})`);
+    }
+  }
+  const keep = new Set(slidesToReview);
+  return {
+    ...findings,
+    slides: (findings.slides || []).filter(s => keep.has(s.slideNum)),
+  };
+}
+
+/**
+ * runReview — DECK-VDA review orchestrator.
+ *
+ * @param {object} opts
+ * @param {string} opts.deckPath
+ * @param {string} [opts.runId]
+ * @param {string} [opts.outDir]
+ * @param {'standalone'|'structured-handoff'} [opts.mode]
+ * @param {object} opts.findings              // findings-schema.md v1.0
+ * @param {boolean} [opts.annotate=false]
+ * @param {null|'all'|number[]} [opts.slidesToReview=null]   // Phase 5 D-03 — diff-only review filter
+ */
 async function runReview({
   deckPath,
   runId,
@@ -62,6 +94,7 @@ async function runReview({
   mode = 'standalone',
   findings,
   annotate = false,
+  slidesToReview = null,
 } = {}) {
   if (!deckPath) throw new Error('runReview: deckPath required');
   if (!findings) throw new Error('runReview: findings required (in-memory object honoring findings-schema.md v1.0)');
@@ -71,6 +104,9 @@ async function runReview({
 
   // 1. Validate (throws pinpoint Error on violation; P-01 guard rejects pre-collapsed severities).
   validate(findings);
+
+  // 1b. Phase 5 D-03 — filter findings.slides[] to in-scope slideNums (NON-BREAKING; default null).
+  findings = filterSlides(findings, slidesToReview);
 
   // 2. Resolve outputs.
   runId = runId || generateRunId();
