@@ -31,6 +31,11 @@ test('cli-create-branches', async (t) => {
     assert.equal(a.outDir, 'outpos');
   });
 
+  await t.test('parseArgs: --design-choices populates designChoices', () => {
+    const a = parseArgs(['--brief', 'b.json', '--design-choices', 'dc.json']);
+    assert.equal(a.designChoices, 'dc.json');
+  });
+
   await t.test('parseArgs: --soft-cap=accept populates softCap', () => {
     const a = parseArgs(['--brief', 'b.json', '--soft-cap=accept']);
     assert.equal(a.softCap, 'accept');

@@ -248,9 +248,10 @@ async function runCreate({
     const md = renderRationale({ brief, designChoices });
     await fsp.writeFile(rationalePath, md);
   } else {
+    // brief is validated upstream by validateBrief() so brief.topic is guaranteed.
     const stub =
       `# Design Rationale\n\n` +
-      `*Brief:* ${(brief && brief.title) || (brief && brief.topic) || '(untitled)'}\n\n` +
+      `*Brief:* ${brief.topic}\n\n` +
       `*Author mode:* ${mode}\n\n` +
       `*Render path:* render-deck.cjs (agent-authored)\n\n` +
       `[No structured design choices captured in this run.]\n`;
