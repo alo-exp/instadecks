@@ -118,10 +118,25 @@ Decimal phases appear between their surrounding integers in numeric order.
   5. README.md is finalized with install / usage / examples / `/instadecks:doctor` self-check; the `doctor` skill verifies system tool availability and reports gaps with install instructions
 **Plans**: TBD
 
+### Phase 8: Test Coverage to 100%
+**Goal**: Bring the entire Instadecks codebase to 100% test coverage across unit, integration, smoke, and (local-only) E2E layers — wire `c8` into CI as a hard gate so coverage regression fails the build. Includes outcome-based unit tests for every SKILL.md instruction (mocked LLM, deterministic asserted outcomes), bats tests for all bash scripts, geometry tests for `annotate.js`, and full branch coverage of orchestrators (soffice-failure, network-failure, interrupt, oscillation, soft-cap).
+**Depends on**: Phase 7
+**Requirements**: TEST-01..TEST-08 (to be defined in CONTEXT.md)
+**Success Criteria** (what must be TRUE):
+  1. `npm test` produces a c8 coverage report showing 100% lines/branches/functions/statements across every covered file (annotate.js INCLUDED, not excluded); CI fails on regression below 100%
+  2. Every `lib/*.js`, every cli.js, every orchestrator (`runCreate` / `runReview` / `runContentReview` / `runAnnotate`), every `tools/*.js`, and `skills/annotate/scripts/annotate.js` has direct unit tests covering all branches including failure paths (soffice missing, network errors, interrupt flag, oscillation hash equality, soft-cap user-choice paths)
+  3. Every bash script (`scripts/pptx-to-images.sh`, `hooks/check-deps.sh`, `skills/doctor/scripts/check.sh`) has bats tests covering happy-path + failure modes
+  4. Every SKILL.md (5 skills) has outcome-based unit tests that mock the LLM step and assert deterministic outcomes (JSON shape, finding IDs, severity values, render artifacts, schema conformance) for every instruction in the playbook
+  5. New `tests/smoke/` suite invokes each cli.js with `--help` + minimal valid input, asserts exit 0 + expected stdout shape; runs in CI in <30s
+  6. Integration tests cover every branch of the auto-refine loop: cycle 1 zero-findings confirmation, oscillation hash equality (D-09), soft-cap 4-option UX, top-of-cycle interrupt, schema v1.1 routing, content-vs-design boundary bidirectional
+  7. `npm run test:e2e` runs real-soffice E2E locally if `soffice` is on PATH; skipped silently when absent; never runs in CI; FRESH-INSTALL.md remains the human E2E gate for v0.1.0
+  8. Coverage gate added to CI workflow: `c8 --100 npm test` (or equivalent) fails the build on any regression
+**Plans**: TBD (waves: 8-01 c8 wiring + baseline, 8-02 lib/orchestrator gap-fill, 8-03 annotate.js geometry, 8-04 bats for bash scripts, 8-05 outcome-based SKILL.md tests, 8-06 smoke suite + E2E runner, 8-07 CI gate + sign-off)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -132,3 +147,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 5. `/instadecks:create` Auto-Refine Loop | 0/TBD | Not started | - |
 | 6. `/instadecks:content-review` | 0/TBD | Not started | - |
 | 7. Marketplace Publication & Release Polish | 0/TBD | Not started | - |
+| 8. Test Coverage to 100% | 0/TBD | Not started | - |

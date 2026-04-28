@@ -16,7 +16,7 @@
 
 ### Locked invariants (do not violate)
 
-- **`annotate.js` is treated as a SHA-pinned binary asset.** The geometry, polygon math, charPts table, color/transparency, miter-join logic, layout constants, and `MAX_SIDE` overflow logic are VERBATIM from `/Users/shafqat/Documents/Projects/Sourcevo/v5-blue-prestige/annotate.js`. The ONLY permitted modification is the documented one-line require-path patch so pptxgenjs resolves out of `${CLAUDE_PLUGIN_DATA}/node_modules`. Any other edit fails CI.
+- **`annotate.js` is under standard test discipline** (Phase 8 onward). Geometry primitives (polygon math, charPts table, miter-join, MAX_SIDE overflow, color/transparency, layout constants) are covered by direct unit tests and counted toward the 100% c8 coverage gate like every other source file. The historical require-path patch (so pptxgenjs resolves from `${CLAUDE_PLUGIN_DATA}/node_modules`) remains the canonical edit on record; other edits are allowed when justified by tests and visual-regression sign-off.
 - **pptxgenjs is pinned at exactly `4.0.1`** (no caret) in `package.json` and `package-lock.json` is committed. Bumping requires explicit visual-regression sign-off.
 - **No reaches outside the plugin tree.** All paths via `${CLAUDE_PLUGIN_ROOT}` or `${CLAUDE_PLUGIN_DATA}`. Hardcoded `/Users/`, `~/.claude/`, `/home/`, `C:\\` etc. fail the lint gate.
 - **Severity collapse 4→3 happens at the `/annotate` adapter only.** Reviewers (`/review`, `/content-review`) keep the full 4-tier (Critical / Major / Minor / Nitpick) taxonomy in their JSON output. The collapse to MAJOR / MINOR / POLISH applies only when building the SAMPLES array passed to `annotate.js`.
@@ -29,8 +29,8 @@
 - `hooks/hooks.json`, `hooks/check-deps.sh` — SessionStart non-blocking dep check + `npm ci --omit=dev` first-run install
 - `skills/<name>/SKILL.md` — agent-facing playbooks (thin)
 - `skills/<name>/scripts/` — skill-private Node code; only multi-skill helpers go to plugin-level `scripts/`
-- `skills/annotate/scripts/annotate.js` — verbatim binary asset
-- `skills/annotate/scripts/samples.js` — extracted SAMPLES data so geometry code stays unmodified
+- `skills/annotate/scripts/annotate.js` — geometry/render module under standard test discipline (100% c8 coverage)
+- `skills/annotate/scripts/samples.js` — extracted SAMPLES data; kept separate to keep geometry module focused
 - `skills/review/references/findings-schema.md` — locked JSON contract
 - `tests/fixtures/sample-findings.json`, `tests/fixtures/v8-reference/` — canonical fixture + visual regression baselines
 - `tools/validate-manifest.js` — CI manifest schema validator
@@ -39,7 +39,7 @@
 
 ### Don't get cute
 
-- This project is a productization of existing, calibrated work. The v8 BluePrestige output is the spec — match it. "Improvements" to `annotate.js` geometry, colors, transparency, fonts, layout constants, or the SAMPLES contract are out of scope and will be reverted.
+- This project is a productization of existing, calibrated work. The v8 BluePrestige output is the spec — match it. Behavior changes to `annotate.js` geometry, colors, transparency, fonts, layout constants, or the SAMPLES contract require justification and visual-regression sign-off; refactors that preserve output (and are gated by tests + the visual-regression baseline) are allowed.
 - Auto-refine "improvements" (clever convergence heuristics, alternate cap mechanisms, additional severity tiers) are also out of scope. The convergence rule above is locked.
 
 ### Reference docs
