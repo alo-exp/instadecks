@@ -1,0 +1,11 @@
+{
+  "all": true,
+  "include": ["skills/**/*.js", "tools/**/*.js"],
+  "exclude": [
+    "tests/**",
+    "**/*.test.js",
+    "**/fixtures/**"
+  ],
+  "reporter": ["text", "lcov"],
+  "check-coverage": false
+}
