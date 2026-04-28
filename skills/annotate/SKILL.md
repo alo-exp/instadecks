@@ -29,7 +29,12 @@ Use this skill when:
 ## Outputs
 
 - `<deckBase>.annotated.pptx` and `<deckBase>.annotated.pdf` written sibling-of-input. Existing siblings are silently overwritten on re-run (D-04). If the input already ends in `.annotated.pptx`, the suffix is not duplicated (P-05).
-- `.planning/instadecks/<runId>/` archive containing: `findings.json` copy, `work/v8s-NN.jpg` symlinks to slide images, `work/Annotations_Sample.pptx`, `Annotations_Sample.pdf`. Each prior run remains preserved here.
+- `.planning/instadecks/<runId>/` archive containing: `findings.json` copy, `work/v8s-NN.jpg` symlinks (or fresh-rendered JPGs) of slide images, `work/Annotations_Sample.pptx`, `Annotations_Sample.pdf`. Each prior run remains preserved here.
+
+> **Important — overlay artifacts are delta-only, not full-deck.**
+> `<deckBase>.annotated.pptx` and `<deckBase>.annotated.pdf` contain overlay slides ONLY for slides with at least one genuine finding — they are NOT a full copy of your deck with overlays burned in. Your original `<deck>.pptx` is unchanged.
+>
+> To view the overlays in context, use the annotated PPTX as a layered overlay on top of the original deck inside your presentation tool (PowerPoint, Keynote, Google Slides import-overlay), or render the annotated PDF side-by-side with the original PDF. A future release may merge overlays back into a full-deck copy; for v0.1.0 the delta-only artifact is canonical so the round-trip is non-destructive.
 
 ## Invocation modes
 
