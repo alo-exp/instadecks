@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** A user can hand Claude Code arbitrary input material and end up with a polished, design-reviewed, annotated PPTX + PDF — without having to know about pptxgenjs, custom-geometry arrows, or our deck-design-review skill — and the output quality matches what we ship by hand today.
-**Current focus:** Phase 3 COMPLETE — all 5 plans landed; ready for Phase 4 (`/instadecks:create` scaffold + render cookbook)
+**Current focus:** Phase 8 COMPLETE — 100% c8 coverage gate live in CI; v0.1.0 release-ready (pending human-only verifications scaffolded in RELEASE.md §1)
 **Current milestone:** v0.1.0 — Plugin v0.1.0 Public Release
 
 ## Current Position
 
-Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 7 phases, 67 requirements
-Phase: 3 of 7 (`/instadecks:review`) — COMPLETE (5/5 plans)
-Plan: 5 of 5 in Phase 3 (03-05 complete)
-Status: Phase 3 complete — DECK-VDA canonicalized in SKILL.md, NOTICE attribution landed, end-to-end integration test green; full repo suite 129 pass / 2 skip / 0 fail; RVW-01..RVW-11 all closed. SUMMARYs for 03-02/03-03/03-04 backfilled in this session (executors hit SB hook before SUMMARY emission; commits durable).
-Last activity: 2026-04-28 — Plan 03-05 completed (Wave 3 closer)
+Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 8 phases (incl. Phase 8 test-coverage closure), 67+ requirements
+Phase: 8 of 8 (Test Coverage to 100%) — COMPLETE (7/7 plans)
+Plan: 7 of 7 in Phase 8 (08-07 complete)
+Status: Phase 8 complete — c8 100% gate live in CI (lines/branches/funcs/stmts); bats wired (Gate 5b/5c apt install + run); e2e local-only via CI=true env var (CONTEXT D-08); CONTEXT D-01 reversal applied (annotate.js under standard test discipline); 878 tests / 855 pass / 0 fail / 23 skipped; v0.1.0 release readiness intact.
+Last activity: 2026-04-28 — Plan 08-07 sign-off (Phase 8 closer)
 
-Progress: [██████░░░░] 43%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -52,6 +52,8 @@ Recent decisions affecting current work:
 - Pre-Phase 1 (granularity = "fine"): split /create into Phase 4 (scaffold + 8 slide types + PowerPoint gate) and Phase 5 (auto-refine loop) to isolate the highest-risk subsystem
 - Plan 02-04 (2026-04-28, Rule 4 user-approved Option A): Tier 1 visual regression redefined as structural-XML normalized SHA (not byte-identical) — pptxgenjs 4.0.1 timestamps + absolute-path `descr` attributes preclude byte-equivalence. New baseline `Annotations_Sample.pptx.normalized.sha256` pinned. Original `Annotations_Sample.pptx.sha256` retained as committed-binary self-check.
 - Plan 03-01 (2026-04-28, Rule 3 auto-fix): macOS dev hosts lack `timeout`/`gtimeout`; added a probe in `scripts/pptx-to-images.sh` that defines a no-op `timeout` shim function ONLY if neither binary is present. Preserves verbatim `timeout 60 soffice` invocation form (static assertions still match) and keeps script runnable without coreutils. Production CI must provide GNU coreutils for real wall-clock cap.
+- Plan 08-01 / 08-07 (2026-04-28): annotate.js standard test discipline (CONTEXT D-01 reversal); c8 100% lines/branches/functions/statements is now a CI hard gate (Gate 6 invokes `npm test` = `c8 --100 --check-coverage`); bats covers the 3 bash scripts (Gate 5b/5c install + run); e2e never runs in CI (FRESH-INSTALL.md remains the human v0.1.0 gate); `npm test` prefixes `CI=true` so dev hosts with soffice locally also auto-skip e2e.
+- Plan 08-07 escalation (2026-04-28): On first `npm test` invocation Plan 08-07 surfaced 22 files <100% (gaps in adapter validation branches, DI hooks, render §5 group-slides, license-audit Promise body, fixture-builder catch branches). Per the plan's escalation protocol + W-7 (per-plan re-run budget), gaps were routed to Plan 08-02b which closed all of them in commit c90ce9a. Re-run of `npm test` exited 0 — Phase 8 sign-off proceeded.
 
 ### Pending Todos
 
