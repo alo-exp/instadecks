@@ -47,16 +47,24 @@ The hero number is the single biggest source of overflow in this recipe. At
 fontSize 60–110pt a 3-character stat will wrap to two lines if the box width is
 too tight. Use this width-to-fontSize ratio:
 
-| Hero stat                         | fontSize | Min box width `w` |
-|-----------------------------------|----------|-------------------|
-| 2-char (e.g. `42`)                | 72       | ≥ 3.0″            |
-| 3-char (e.g. `112%`)              | 72       | ≥ 4.0″            |
-| 3-char (e.g. `112%`)              | 110      | ≥ 5.0″            |
-| 4-char (e.g. `$8.7M`)             | 110      | ≥ 6.5″            |
+| Hero stat                         | fontSize | Min box width `w` | Supporting-text x ≥ |
+|-----------------------------------|----------|-------------------|---------------------|
+| 1–2 char (e.g. `5×`, `42`)        | 72–90    | ≥ 2.0″            | ≥ 2.8″              |
+| 3-char (e.g. `112%`)              | 72       | ≥ 4.0″            | ≥ 4.8″              |
+| 3-char (e.g. `112%`)              | 110      | ≥ 4.5″            | ≥ 5.3″              |
+| 4-char (e.g. `$8.7M`)             | 110      | ≥ 6.5″            | ≥ 7.3″              |
+| 5+ char (e.g. `$2.4M+`)           | 90       | ≥ 6.5″            | ≥ 7.3″              |
 
 Rule of thumb: at fontSize 110pt allow ≥ 1.5″ per glyph; at 72pt allow ≥ 1.0″
-per glyph. When in doubt, set `fit: 'shrink'` (or `autoFit: true`) on the stat
-text so pptxgenjs scales the glyphs to fit instead of wrapping.
+per glyph. The supporting-text x ≥ column is `MARGIN_X (0.5) + w + 0.3″ gap` —
+use the paired value to avoid hero-vs-supporting overlap. When in doubt, set
+`fit: 'shrink'` (or `autoFit: true`) on the stat text so pptxgenjs scales the
+glyphs to fit instead of wrapping.
+
+**Anti-pattern:** DON'T use the recipe's default `x: 5.3″` for the supporting
+text when hero box `w > 4.5″`. The hero ends at `MARGIN_X + w` so a w=6.5″
+hero ends at x=7.0″, overlapping the 5.3″ supporting region (which extends to
+x=9.5″). Always pair w with the Supporting-text x ≥ value from the table.
 
 ```javascript
 slide.addText(statValue, {
