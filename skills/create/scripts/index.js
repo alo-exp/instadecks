@@ -116,6 +116,17 @@ function countSlides(pptxPath) {
 let _spawnOverride = null;
 function _test_setSpawn(fn) { _spawnOverride = fn; }
 
+// Phase 5 — Test-only override hooks for runReview / runCreate. These are part of the
+// export surface (mirrors Phase 3 _test_setRunAnnotate precedent at
+// skills/review/scripts/index.js:55-56). runCreate's behavior is UNCHANGED — the hooks
+// exist so future loop-driver test surfaces (and the integration test scaffolding) have a
+// uniform place to inject mocks. Per D-01 the auto-refine loop lives in SKILL.md, not in
+// runCreate, so these hooks are not consumed inside this file.
+let _runReviewOverride = null;
+let _runCreateOverride = null;
+function _test_setRunReview(fn) { _runReviewOverride = fn; }
+function _test_setRunCreate(fn) { _runCreateOverride = fn; }
+
 async function runCreate({
   brief,
   runId,
@@ -223,4 +234,6 @@ module.exports = {
   generateRunId,
   resolveOutDir,
   _test_setSpawn,
+  _test_setRunReview,
+  _test_setRunCreate,
 };
