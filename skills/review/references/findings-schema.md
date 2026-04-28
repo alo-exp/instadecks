@@ -11,7 +11,7 @@ This file is THE canonical JSON contract for design/content findings produced by
 
 ```jsonc
 {
-  "schema_version": "1.0",            // REQUIRED; MUST be the first key
+  "schema_version": "1.1",            // REQUIRED; MUST be the first key
   "deck": "<filename or path>",       // REQUIRED; the deck the findings refer to
   "generated_at": "<ISO8601>",        // REQUIRED; when the findings were produced
   "slides": [                         // REQUIRED; one entry per reviewed slide
@@ -99,7 +99,7 @@ The 4→3 severity collapse and the `genuine: false` filter happen exclusively a
 
 ## 6. Schema version policy (D-07)
 
-- The `/annotate` adapter accepts any `schema_version` in the `1.x` range (currently `"1.0"`).
+- The `/annotate` adapter accepts any `schema_version` in the `1.x` range (currently `"1.1"`).
 - Unknown major versions (e.g., `"2.0"`, `"3.5"`) are rejected with the explicit error string:
 
   ```
