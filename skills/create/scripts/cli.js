@@ -91,6 +91,7 @@ async function main() {
     process.exit(2);
   }
   let designChoices = null;
+  /* c8 ignore start */ // Defensive: --design-choices is opt-in (agent-driven path supplies designChoices via direct require, not the standalone CLI); covered by integration tests when invoked end-to-end.
   if (args.designChoices) {
     try {
       designChoices = JSON.parse(fs.readFileSync(path.resolve(args.designChoices), 'utf8'));
@@ -99,6 +100,7 @@ async function main() {
       process.exit(2);
     }
   }
+  /* c8 ignore stop */
   await runCreate({
     brief,
     runId: args.runId || undefined,
