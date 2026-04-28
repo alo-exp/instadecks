@@ -42,9 +42,9 @@ test('render-rationale: byte-stable across two calls with identical args', () =>
   assert.equal(a, b);
 });
 
-test('render-rationale: empty reviewerNotes uses Phase-4 placeholder', () => {
+test('render-rationale: empty reviewerNotes uses clean-converge placeholder', () => {
   const md = render({ brief: SAMPLE_BRIEF, designChoices: DESIGN_CHOICES });
-  assert.match(md, /empty in Phase 4/);
+  assert.match(md, /no reviewer findings/);
 });
 
 test('render-rationale: brief is required', () => {

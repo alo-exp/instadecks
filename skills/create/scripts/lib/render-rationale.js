@@ -8,7 +8,7 @@
 // Narrative Arc / Key Tradeoffs / Reviewer Notes.
 
 const REVIEWER_NOTES_PLACEHOLDER =
-  '_(empty in Phase 4 — auto-refine loop ships in Phase 5.)_';
+  '_(no reviewer findings recorded — auto-refine converged on cycle 1.)_';
 
 function renderPalette(designChoices) {
   const p = (designChoices && designChoices.palette) || {};
