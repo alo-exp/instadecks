@@ -55,3 +55,14 @@ literature; no content is copied or derived from any proprietary source.
 R18 AI-tell detection patterns in skills/review/scripts/ai-tells.js are original
 pattern-matchers; the underlying design heuristics (e.g. "horizontal accent line
 under titles" as an LLM-authored signature) are unprotectable observations.
+
+--------------------------------------------------------------------
+
+## annotate.js binary-asset note
+
+skills/annotate/scripts/annotate.js is bundled VERBATIM from internal Sourcevo
+v8 BluePrestige (see CLAUDE.md SHA-pin invariant); the only documented
+modification is a one-line require-path patch so pptxgenjs resolves out of
+${CLAUDE_PLUGIN_DATA}/node_modules. Geometry, polygon math, charPts table,
+color/transparency, miter-join logic, layout constants, and MAX_SIDE overflow
+logic are unchanged from the upstream source.
