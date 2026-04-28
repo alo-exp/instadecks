@@ -30,7 +30,7 @@ Do NOT use this skill for design critique (`/instadecks:review`), annotation ove
 
 ## Locked invariants (do not violate)
 
-- Use `pres.shapes.*` ENUM constants only — never `addShape('oval', …)` (CRT-15). `lib/enum-lint.js` blocks string-literal shape names BEFORE spawn; `tools/lint-pptxgenjs-enums.js` enforces the same in CI.
+- Use `pres.shapes.*` ENUM constants only — never `addShape('oval', …)` (CRT-15). `lib/enum-lint.js` blocks string-literal shape names BEFORE spawn; `tools/lint-pptxgenjs-enums.js` enforces the same in CI. <!-- enum-lint-allow: anti-pattern doc -->
 - 6-character hex colors with no `#` prefix (CRT-15 sibling rule). 8-char hex (`FF000040`) corrupts OOXML.
 - Action titles (claim, not topic) per D-06 — `lib/title-check.js` warns on blocked words ("Overview", "Introduction", "Outline", "Agenda", "Summary", "Conclusion", "Q&A", "Background"). Use `{action_title_override:true}` ONLY for legit cases like the closing "Thank You" slide.
 - Fresh option object per `addShape` call (pptxgenjs mutates in place — sharing options across calls produces silent rendering bugs).
@@ -94,6 +94,8 @@ Compose render-deck.cjs:
 2. Define PALETTE + TYPE constants from chosen design.
 3. For each beat: copy the recipe code, instantiate the slide, fill params.
 4. Always: ENUM constants (`pres.shapes.OVAL`, never `'oval'`); 6-char hex no `#`; `addNotes()` last per recipe.
+   <!-- enum-lint-allow: anti-pattern doc -->
+
 5. Action titles: every slide title MUST be a claim. `lib/title-check.js` warns on blocked words — use `{action_title_override:true}` ONLY for legit cases like the closing "Thank You".
 
 Write to `${runDir}/render-deck.cjs`.
