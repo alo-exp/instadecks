@@ -84,6 +84,17 @@
 - [ ] **CRV-10**: Hard content-vs-design boundary: content-review does NOT comment on visual/typographic/layout issues (those are `/review`'s domain); `/review` does NOT comment on argument structure or narrative
 - [ ] **CRV-11**: Standalone in v1 (NOT integrated into `/create`'s auto-refine loop — that's a v2 candidate); but pipeline-into-`/annotate` works for content findings
 
+### Test Coverage (TEST)
+
+- [ ] **TEST-01**: `npm test` produces a c8 coverage report showing 100% lines/branches/functions/statements across every covered file (annotate.js INCLUDED, not excluded); CI fails on regression below 100%
+- [ ] **TEST-02**: Every `lib/*.js`, every cli.js, every orchestrator (`runCreate`/`runReview`/`runContentReview`/`runAnnotate`), every `tools/*.js`, and `skills/annotate/scripts/annotate.js` has direct unit tests covering all branches including failure paths (soffice missing, network errors, interrupt flag, oscillation hash equality, soft-cap user-choice paths)
+- [ ] **TEST-03**: Every bash script (`scripts/pptx-to-images.sh`, `hooks/check-deps.sh`, `skills/doctor/scripts/check.sh`) has bats tests covering happy-path + failure modes
+- [ ] **TEST-04**: Every SKILL.md (5 skills) has outcome-based unit tests that mock the LLM step and assert deterministic outcomes (JSON shape, finding IDs, severity values, render artifacts, schema conformance) for every instruction in the playbook
+- [ ] **TEST-05**: New `tests/smoke/` suite invokes each cli.js with `--help` + minimal valid input, asserts exit 0 + expected stdout shape; runs in CI in <30s
+- [ ] **TEST-06**: Integration tests cover every branch of the auto-refine loop: cycle 1 zero-findings confirmation, oscillation hash equality (D-09), soft-cap 4-option UX, top-of-cycle interrupt, schema v1.1 routing, content-vs-design boundary bidirectional
+- [ ] **TEST-07**: `npm run test:e2e` runs real-soffice E2E locally if `soffice` is on PATH; skipped silently when absent; never runs in CI; FRESH-INSTALL.md remains the human E2E gate for v0.1.0
+- [ ] **TEST-08**: Coverage gate added to CI workflow: `npm test` (c8 --100 --check-coverage per D-02) fails the build on any regression below 100%
+
 ### Marketplace & Distribution (DIST)
 
 - [ ] **DIST-01**: All four user-invocable skill descriptions follow the imperative-voice keyword-front-loaded pattern, ≤ 1024 chars, third-person voice, with embedded examples
