@@ -57,6 +57,24 @@ function countFindings(findings) {
 let _runAnnotateOverride = null;
 function _test_setRunAnnotate(fn) { _runAnnotateOverride = fn; }
 
+// Plan 8-02 / CONTEXT D-05 — single LLM-DI carve-out (BLOCKER B-3 single source of truth).
+// Default behavior unchanged; Plans 8-05/8-06 consume these hooks.
+let _llmStub = null;
+function _test_setLlm(fn) { _llmStub = fn; }
+let _renderImagesStub = null;
+function _test_setRenderImages(fn) { _renderImagesStub = fn; }
+
+if (process.env.INSTADECKS_LLM_STUB) {
+  try {
+    const { stubLlmResponse } = require('../../../tests/helpers/llm-mock');
+    const fixture = require('node:path').basename(process.env.INSTADECKS_LLM_STUB, '.json');
+    _test_setLlm(stubLlmResponse(fixture));
+  } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
+}
+if (process.env.INSTADECKS_RENDER_STUB === '1') {
+  _test_setRenderImages(async () => 'stubbed-render');
+}
+
 /**
  * runContentReview — argument-quality / story-flow review orchestrator.
  *
@@ -152,4 +170,6 @@ module.exports = {
   generateRunId,
   resolveSiblingOutputs,
   _test_setRunAnnotate,
+  _test_setLlm,
+  _test_setRenderImages,
 };

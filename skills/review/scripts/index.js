@@ -55,6 +55,26 @@ function countFindings(findings) {
 let _runAnnotateOverride = null;
 function _test_setRunAnnotate(fn) { _runAnnotateOverride = fn; }
 
+// Plan 8-02 / CONTEXT D-05 — single LLM-DI carve-out (BLOCKER B-3 single source of truth).
+// runReview itself does not call an LLM (the agent triages findings outside this orchestrator),
+// but the hook is exposed uniformly for parity with the other 3 orchestrators so Plans 8-05/8-06
+// have one consistent injection contract. Default behavior unchanged.
+let _llmStub = null;
+function _test_setLlm(fn) { _llmStub = fn; }
+let _renderImagesStub = null;
+function _test_setRenderImages(fn) { _renderImagesStub = fn; }
+
+if (process.env.INSTADECKS_LLM_STUB) {
+  try {
+    const { stubLlmResponse } = require('../../../tests/helpers/llm-mock');
+    const fixture = require('node:path').basename(process.env.INSTADECKS_LLM_STUB, '.json');
+    _test_setLlm(stubLlmResponse(fixture));
+  } catch (e) { if (e.code !== 'MODULE_NOT_FOUND') throw e; }
+}
+if (process.env.INSTADECKS_RENDER_STUB === '1') {
+  _test_setRenderImages(async () => 'stubbed-render');
+}
+
 // Phase 5 D-03 / Q-1 / CRT-13 — slidesToReview filter (NON-BREAKING; default null = full review).
 // Filter only drops entries from findings.slides[]; never mutates finding shape (P-01 invariant —
 // severity collapse remains the /annotate adapter's exclusive job, per CLAUDE.md).
@@ -167,4 +187,6 @@ module.exports = {
   generateRunId,
   resolveSiblingOutputs,
   _test_setRunAnnotate,
+  _test_setLlm,
+  _test_setRenderImages,
 };
