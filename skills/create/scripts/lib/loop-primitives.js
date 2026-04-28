@@ -74,6 +74,7 @@ async function slideImagesSha(cycleDir) {
     const st = await fsp.stat(slidesSub);
     if (st.isDirectory()) dir = slidesSub;
   } catch (e) {
+    /* c8 ignore next */ // Defensive: stat failures other than ENOENT (EACCES, etc.) are extreme filesystem states; ENOENT branch is the common case.
     if (!e || e.code !== 'ENOENT') throw e;
   }
   let entries;

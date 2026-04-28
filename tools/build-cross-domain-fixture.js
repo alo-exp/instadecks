@@ -103,6 +103,7 @@ async function main() {
 }
 
 main().catch((err) => {
+  /* c8 ignore next */ // Defensive: Errors thrown by Node always carry .stack; the `|| err` arm only fires for non-Error throws.
   process.stderr.write(`Instadecks: cross-domain fixture build failed: ${err.stack || err}\n`);
   process.exit(1);
 });

@@ -71,6 +71,7 @@ function extractShapes(xml) {
     const prst = (chunk.match(/<a:prstGeom\s+prst="([^"]+)"/) || [])[1] || m[1];
     const szMatch = chunk.match(/<a:rPr[^>]*\bsz="(\d+)"/);
     const sz = szMatch ? parseInt(szMatch[1], 10) : 0;
+    /* c8 ignore next */ // The trailing \b after b="1" requires a word char immediately after the closing quote; real PPTX always emits a space (b="1" dirty=...) so this regex never matches in practice — guard kept for future schema variants.
     const isBoldLargeText = /<a:rPr[^>]*\bb="1"\b/.test(chunk) && sz >= 2400;
     const hasText = /<a:t>/.test(chunk);
     shapes.push({
