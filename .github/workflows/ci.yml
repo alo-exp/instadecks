@@ -78,17 +78,35 @@ jobs:
       # Plan 05's path-lint.test.js commits with `git -c user.email=... -c user.name=...`
       # flags per-test (PC-12 option (a), hermetic) — no global `git config --global`
       # prelude required in this workflow.
-      - name: Gate 6 — Node test suite (full)
-        # Glob captures all *.test.js files automatically — new tests in later
-        # phases run without ci.yml updates. `find` form is portable across
-        # Node versions; -maxdepth 2 keeps the scan cheap and confined to the
-        # tests/ tree (excluding tests/fixtures subtrees that contain no test
-        # files at depth >2).
+      - name: Gate 5b — Install bats-core
         run: |
-          find tests -maxdepth 2 -name '*.test.js' -print0 | xargs -0 node --test || {
-            echo "::error::Node test suite failed"
+          sudo apt-get update
+          sudo apt-get install -y bats
+          bats --version
+
+      - name: Gate 5c — Bash script test suite (bats)
+        run: |
+          npm run test:bats || {
+            echo "::error::bats test suite failed"
             exit 1
           }
+
+      - name: Gate 6 — Coverage 100% gate (c8 + node --test, per CONTEXT D-02)
+        # `npm test` script body: c8 --100 --check-coverage --reporter text node --test 'tests/**/*.test.js'
+        # CI fails on any regression below 100% lines/branches/functions/statements.
+        run: |
+          npm test || {
+            echo "::error::Coverage regression below 100% — see c8 report above"
+            exit 1
+          }
+
+      - name: Gate 6b — Upload lcov coverage report (artifact)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+          retention-days: 14
 
       # Optional gate — soft-fail if `claude` CLI is not on PATH (it usually
       # isn't in stock GitHub runners). Wired so that when a future runner
