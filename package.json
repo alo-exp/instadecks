@@ -17,6 +17,7 @@
     "validate:manifest": "node tools/validate-manifest.js",
     "assert:pin": "node tools/assert-pptxgenjs-pin.js",
     "lint:enums": "node tools/lint-pptxgenjs-enums.js",
+    "lint:cookbook": "node tools/validate-cookbook.js",
     "audit:allowed-tools": "node tools/audit-allowed-tools.js",
     "audit:licenses": "node tools/license-audit.js"
   },

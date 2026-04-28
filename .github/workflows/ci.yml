@@ -55,6 +55,13 @@ jobs:
             exit 1
           }
 
+      - name: Gate 3b — Cookbook recipe-link validator
+        run: |
+          npm run lint:cookbook || {
+            echo "::error::Cookbook recipe link validation failed (missing target file)"
+            exit 1
+          }
+
       # license-checker resolves from the local devDep installed in `npm ci`
       # above (PC-13). No `npx --yes` flag needed. jszip's
       # `(MIT OR GPL-3.0-or-later)` SPDX expression does NOT trip the
