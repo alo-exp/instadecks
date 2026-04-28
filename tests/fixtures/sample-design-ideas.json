@@ -1,0 +1,14 @@
+{
+  "palettes": [
+    { "name": "Midnight Plex",  "primary": "1E2761", "secondary": "CADCFC", "accent": "FFFFFF", "ink": "0B1020", "muted": "6B7280" },
+    { "name": "Forest Brief",   "primary": "1F4D2C", "secondary": "C7E8C7", "accent": "FFFFFF", "ink": "0E1A12", "muted": "6B7280" },
+    { "name": "Ember Mono",     "primary": "8A2A1E", "secondary": "F2D9C9", "accent": "FFFFFF", "ink": "1A0E0B", "muted": "7B6F6A" },
+    { "name": "Slate Press",    "primary": "2B2E33", "secondary": "D9DCE0", "accent": "FFFFFF", "ink": "0B0C0E", "muted": "6B7280" }
+  ],
+  "typography_pairs": [
+    { "heading": "IBM Plex Sans", "body": "IBM Plex Sans" },
+    { "heading": "Inter",         "body": "IBM Plex Sans" },
+    { "heading": "Source Serif Pro", "body": "IBM Plex Sans" },
+    { "heading": "IBM Plex Sans", "body": "IBM Plex Serif" }
+  ]
+}
