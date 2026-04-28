@@ -1,6 +1,6 @@
 ---
 name: create
-description: Generate a polished slide deck (PPTX + PDF + design-rationale) from any input. This skill should be used when the user supplies markdown / PDF / PPTX / URL / image / transcript / brief and asks for a deck, slides, presentation, or pitch. Composes a per-run render-deck.cjs from a curated pptxgenjs cookbook, picks palette and typography from author-original design guidance, and emits 8 slide types at 16:9 with action titles, page numbers, source lines, and speaker notes.
+description: Generate a polished slide deck (PPTX + PDF + design-rationale) from any input. This skill should be used when the user supplies markdown / PDF / PPTX / URL / image / transcript / brief and asks for a deck, slides, presentation, or pitch. Composes a per-run render-deck.cjs from a curated pptxgenjs cookbook, picks palette and typography from author-original design guidance, and emits 8 slide types at 16:9 with action titles, page numbers, source lines, and speaker notes. Auto-refines the deck via an internal review-fix loop (trigger phrases: 'auto-refine deck', 'iterate until clean', 'convergence loop') until reviewer reports zero genuine findings or the user accepts the soft cap at cycle 5.
 allowed-tools:
   - Bash(node:*)
   - Bash(soffice:*)
@@ -35,6 +35,10 @@ Do NOT use this skill for design critique (`/instadecks:review`), annotation ove
 - Fresh option object per `addShape` call (pptxgenjs mutates in place — sharing options across calls produces silent rendering bugs).
 - Output paths: `${CLAUDE_PLUGIN_ROOT}` / `${CLAUDE_PLUGIN_DATA}` only — no hardcoded user paths. `tools/lint-paths.sh` enforces.
 - `references/design-ideas.md` is author-original (Q-1) — do NOT reference Anthropic pptx-skill palette/typography names. Sniff-grep gate is CI-armed.
+- Auto-refine convergence rule is `findings_genuine == 0 AND cycle >= 2`; cycle 1 with zero genuine findings forces one full confirmation cycle before convergence (D-07). Never converge on cycle 1.
+- Oscillation rule is `issue_set_hash_N == issue_set_hash_{N-2} AND genuine_count_N > 0`; halt and surface the ledger via `detectOscillation` (D-09). The earlier subset-style description is superseded.
+- Soft cap is at cycle 5: surface a 4-option AskUserQuestion (Continue / Accept / Specify / Stop). Never hardcode a hard cap; the user, not the loop, decides termination past cycle 5.
+- User interrupt is checked at TOP-OF-CYCLE only via `checkInterrupt(runDir)` against `${runDir}/.interrupt` (D-04). No mid-cycle abort; in-progress cycles always run to completion before the interrupt is honored.
 
 ## How to use
 
@@ -131,7 +135,7 @@ If you passed `designChoices`, runCreate already wrote a baseline. Open `${runDi
 - ## Motif — 1 paragraph
 - ## Narrative Arc — numbered list of slides
 - ## Key Tradeoffs — bullets
-- ## Reviewer Notes — leave the Phase 4 placeholder (auto-refine ships in Phase 5)
+- ## Reviewer Notes — populated by the auto-refine loop from the ledger (per-cycle skipped findings + final-cycle non-genuine findings); placeholder only on clean cycle-1-and-2 convergence
 
 ### Step 6 — Surface warnings + outputs to the user
 
@@ -154,11 +158,89 @@ If `result.warnings.length > 0`, surface them (e.g., "xmllint missing — OOXML 
 
 ## Out of scope (deferred)
 
-- Auto-refine loop / convergence — **Phase 5** (CRT-07..CRT-14).
 - /content-review integration — **v2** (PROJECT.md).
 - Real-PowerPoint open gate (Mac + Windows) — **Phase 7 release** (D-05 Layer 3; `tests/POWERPOINT-COMPATIBILITY.md`).
 - Brand auto-detection from URL — **v2**.
 - In-deck image generation — **v2**.
+
+## Auto-Refine Loop
+
+Wrap `runCreate` in an agent-owned review-fix convergence loop (D-01). Each cycle: check interrupt → render → image → review (scoped per D-03) → triage findings → hash issue set → append ledger → check oscillation (D-09) → check convergence (D-07) → soft-cap if cycle ≥ 5. See `references/auto-refine-playbook.md` for the full numbered pseudocode (steps 1-14), worked example, `slidesToReview` decision tree, and D-09 oscillation rationale. The loop is PROSE owned by the agent; control flow lives here, not in code (D-01).
+
+### Run-dir layout
+
+```
+<runDir>/
+  brief.json
+  refine-ledger.jsonl              # JSONL — append-only, one line per cycle (D-02)
+  cycle-1/
+    render-deck.cjs
+    slides/slide-01.jpg .. slide-NN.jpg
+    findings.json                  # raw runReview output (Phase 3 schema)
+    findings.triaged.json          # agent-set genuine + triage_rationale (D-08)
+  cycle-2/
+    ...
+  deck.pptx                        # final-cycle deck
+  deck.pdf
+  design-rationale.md              # populated reviewerNotes from ledger
+  deck.annotated.pptx              # final-cycle findings union (D-06)
+  deck.annotated.pdf
+  render-deck.cjs                  # final-cycle render script (audit trail)
+```
+
+The `<runDir>/.interrupt` flag file (touched by the user out-of-band) signals top-of-cycle exit per D-04.
+
+### Per-cycle summary
+
+Each cycle invokes the primitives in this order: `checkInterrupt` → render-deck.cjs author/edit → `runCreate` → `pptx-to-images.sh` → `slidesChangedSinceLastCycle` (cycle ≥ 2) → `runReview` (with `slidesToReview`) → triage → `hashIssueSet` → `appendLedger` → `detectOscillation` → convergence check → soft-cap `AskUserQuestion` at cycle ≥ 5. Cycle 1 always runs `slidesToReview = null` (full review). Cycle 2 forces a full review when cycle 1 returned zero genuine findings (D-07 confirmation). Cycle 3+ defaults to diff-only via SHA byte-comparison of slide images (D-03). Triage stamps each finding with a stable `id = "${slideNum}-${sha1(text).slice(0,8)}"`, a `genuine` boolean, and a 1-2 sentence `triage_rationale`; only `genuine && severity ∈ {Critical, Major}` flow into the next cycle's fix list. Skipped IDs are accumulated in the ledger and excluded from future fix lists (do not relitigate intentionally-skipped findings). Per-cycle output spec is `findings.triaged.json` per `references/findings-triaged-schema.md` in the review skill. See `references/auto-refine-playbook.md` for the full numbered pseudocode (steps 1-14).
+
+### AskUserQuestion soft-cap prompt (verbatim — D-05)
+
+When cycle ≥ 5 completes without convergence, surface the user this 4-option prompt verbatim:
+
+```
+5 refine cycles complete; still {N} genuine findings. Choose:
+A. Continue refining (one more cycle).
+B. Accept current deck as final.
+C. Specify exactly what to fix (free-text).
+D. Stop and let me review the ledger.
+```
+
+Routing:
+
+- **A (Continue)** — increment cycle and loop back to step 1; user may re-prompt at any cycle.
+- **B (Accept)** — append a closing ledger entry with `ended_via='soft-cap-accepted'`; finalize the bundle.
+- **C (Specify)** — read the user's free-text fix list; treat it as the next cycle's fix list and ignore reviewer findings for that one cycle (user override).
+- **D (Stop)** — append `ended_via='soft-cap-stopped'`; surface the ledger path and exit.
+
+**Standalone-mode fallback:** if running non-interactive (`CI=1`, `NON_INTERACTIVE=1`, or stdout is not a TTY), default to B (Accept) and emit a stderr warning. The standalone CLI also accepts `--soft-cap=<accept|stop|continue>` (Plan 05-04).
+
+### Post-loop bundle (D-06; CRT-14)
+
+After the loop exits (any `ended_via`), execute the following in order:
+
+a. Compose the final `reviewerNotes` string from the ledger: per-cycle `skipped_finding_ids` (with their `triage_rationale`) plus the final cycle's non-genuine findings.
+b. Render `design-rationale.md` via `lib/render-rationale.js` with the populated `reviewerNotes`.
+c. Convert `deck.pptx` → `deck.pdf` via soffice (per Phase 4 `runCreate`; soft on missing tool).
+d. If the final cycle's `findings.json` has any findings (genuine + non-genuine union), invoke `runAnnotate({deckPath: deck.pptx, findings, outDir: runDir, runId})` → `deck.annotated.pptx` + `deck.annotated.pdf`.
+e. If the final findings union is empty (clean convergence), SKIP the annotated artifacts and surface to the user: "Clean convergence — no annotation overlay generated." (Pitfall 7).
+f. Surface the 8-artifact bundle (deck.pptx, deck.pdf, design-rationale.md, findings.json, deck.annotated.pptx, deck.annotated.pdf, refine-ledger.jsonl, render-deck.cjs) to the user.
+
+### Anti-patterns to avoid
+
+- Mid-cycle abort — interrupts are honored at TOP-OF-CYCLE only (D-04). Once a cycle starts, run it to completion.
+- Mutating `findings.json` in place — JSONL ledger is append-only; raw reviewer output is immutable. Triage writes a sibling `findings.triaged.json`.
+- Re-fixing intentionally-skipped findings — the ledger's accumulated `skipped_finding_ids` are excluded from every future fix list.
+- Hardcoding a hard cap — only the cycle-5 AskUserQuestion gates further work; the user owns termination past 5.
+- Assuming `runCreate` idempotency on identical input — re-rendering may produce byte-different PPTX; SHA-diff slide images, not the PPTX file.
+
+### See also
+
+- `${CLAUDE_PLUGIN_ROOT}/skills/create/references/auto-refine-playbook.md` — full numbered pseudocode (steps 1-14), worked example, `slidesToReview` decision tree, D-09 oscillation rationale.
+- `${CLAUDE_PLUGIN_ROOT}/skills/create/scripts/lib/loop-primitives.js` — `appendLedger`, `readLedger`, `checkInterrupt`, `hashIssueSet`, `slidesChangedSinceLastCycle`.
+- `${CLAUDE_PLUGIN_ROOT}/skills/create/scripts/lib/oscillation.js` — `detectOscillation` (D-09).
+- `${CLAUDE_PLUGIN_ROOT}/skills/review/references/findings-triaged-schema.md` — `findings.triaged.json` shape (id, genuine, triage_rationale).
+- `${CLAUDE_PLUGIN_ROOT}/.planning/phases/05-instadecks-create-auto-refine/05-CONTEXT.md` — D-01..D-09 source of truth.
 
 ## See also
 
