@@ -19,6 +19,14 @@ test('e2e: /create end-to-end with real soffice', { timeout: 120000 }, (t) => {
     const briefPath = path.resolve(__dirname, '..', 'fixtures', 'sample-brief.json');
     assert.ok(fs.existsSync(briefPath), `sample-brief.json missing at ${briefPath}`);
 
+    // Per Phase 4 architecture, the LLM (agent) authors render-deck.cjs into the
+    // run directory before runCreate spawns it. The e2e test stubs the LLM, so we
+    // pre-stage the canonical fixture render-deck.cjs (covers all 9 cookbook recipes,
+    // ENUM-clean) into <tmp>/render-deck.cjs to simulate that authoring step.
+    const fixtureCjs = path.resolve(__dirname, '..', 'fixtures', 'sample-render-deck.cjs');
+    assert.ok(fs.existsSync(fixtureCjs), `sample-render-deck.cjs missing at ${fixtureCjs}`);
+    fs.copyFileSync(fixtureCjs, path.join(tmp, 'render-deck.cjs'));
+
     const cli = path.resolve(__dirname, '..', '..', 'skills', 'create', 'scripts', 'cli.js');
     const stub = path.resolve(__dirname, '..', 'fixtures', 'llm-stubs', 'create-cycle-2-converged.json');
     const env = {
@@ -39,6 +47,9 @@ test('e2e: /create end-to-end with real soffice', { timeout: 120000 }, (t) => {
     }
     const pptx = fs.readdirSync(tmp).find(f => f.endsWith('.pptx'));
     assert.ok(pptx, `expected a .pptx artifact in ${tmp}; saw: ${fs.readdirSync(tmp).join(', ')}`);
+    const pptxStat = fs.statSync(path.join(tmp, pptx));
+    assert.ok(pptxStat.size > 10_000,
+      `expected non-trivial pptx (>10KB); got ${pptxStat.size} bytes`);
   } finally {
     fs.rmSync(tmp, { recursive: true, force: true });
   }
