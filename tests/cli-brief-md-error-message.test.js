@@ -28,7 +28,7 @@ test('--brief-md: error message guides user to agent mode + canonical JSON', () 
     assert.notEqual(r.status, 0);
     assert.match(r.stderr, /brief-normalizer: no LLM configured/);
     assert.match(r.stderr, /Claude Code agent mode/);
-    assert.match(r.stderr, /\/instadecks:create/);
+    assert.match(r.stderr, /\/instadecks-create/);
     assert.match(r.stderr, /canonical JSON/);
     assert.match(r.stderr, /brief\.json/);
     assert.match(r.stderr, /SKILL\.md/);

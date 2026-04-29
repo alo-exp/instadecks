@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-// cli.js — Standalone CLI for /instadecks:create. Mirrors skills/review/scripts/cli.js shape.
+// cli.js — Standalone CLI for /instadecks-create. Mirrors skills/review/scripts/cli.js shape.
 // Usage: cli.js [outDir] (--brief <path.json> | --brief-text <text> | --brief-md <path.md>
 //        | --brief-files <a.pdf,b.docx>) [--run-id <id>] [--out-dir <dir>]
 //        [--mode standalone|structured-handoff] [--soft-cap=<accept|stop|continue>]

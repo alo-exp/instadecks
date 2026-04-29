@@ -1,5 +1,5 @@
 'use strict';
-// index.js — /instadecks:create orchestrator. Phase 4 ships single-cycle generation;
+// index.js — /instadecks-create orchestrator. Phase 4 ships single-cycle generation;
 // Phase 5 will wrap this with the auto-refine loop. Mirrors skills/review/scripts/index.js
 // shape per D-08. CRT-01 (brief→outputs), CRT-02 (cookbook composition), CRT-03 (per-run cjs),
 // CRT-06+CRT-15 (ENUM gate Layer 2 + xmllint sanity). P-07 NODE_PATH; P-08 xmllint soft-fail.
@@ -440,9 +440,9 @@ async function runCreate({
     // in manual mode the user authors it from the cookbook recipes).
     throw new Error(
       `render-deck.cjs not found at ${cjsPath}\n\n` +
-      '`/instadecks:create` requires the agent (Claude in agent mode, OR you authoring\n' +
+      '`/instadecks-create` requires the agent (Claude in agent mode, OR you authoring\n' +
       'manually) to write a render-deck.cjs file FIRST based on the brief.\n\n' +
-      'For agent mode: invoke /instadecks:create in Claude Code; the agent authors\n' +
+      'For agent mode: invoke /instadecks-create in Claude Code; the agent authors\n' +
       '  render-deck.cjs from your brief and places it at the path above.\n\n' +
       'For standalone manual mode:\n' +
       '  1. Run `cli.js --scaffold <out-dir>` to write a starter render-deck.template.cjs\n' +
@@ -574,7 +574,7 @@ async function runCreate({
       `### Key claims by slide\n\n${claimLines}\n\n` +
       `## Key Tradeoffs\n\n[TBD — not authored in standalone mode without structured design choices.]\n\n` +
       `## Reviewer Notes\n\n[TBD — not authored in standalone mode without structured design choices. ` +
-      `Run /instadecks:review on deck.pptx to populate this section in a follow-up artifact.]\n`;
+      `Run /instadecks-review on deck.pptx to populate this section in a follow-up artifact.]\n`;
     await fsp.writeFile(rationalePath, stub);
   }
 
