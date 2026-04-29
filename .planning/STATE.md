@@ -14,7 +14,7 @@ Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 8 phases (incl. Phase 8 tes
 Phase: 8 of 8 (Test Coverage to 100%) — COMPLETE (7/7 plans)
 Plan: 7 of 7 in Phase 8 (08-07 complete)
 Status: Phase 8 complete — c8 100% gate live in CI (lines/branches/funcs/stmts); bats wired (Gate 5b/5c apt install + run); e2e local-only via CI=true env var (CONTEXT D-08); CONTEXT D-01 reversal applied (annotate.js under standard test discipline); 878 tests / 855 pass / 0 fail / 23 skipped; v0.1.0 release readiness intact.
-Last activity: 2026-04-29 — Plan 10-04 sign-off (HARD-12 fresh-install Docker harness automated)
+Last activity: 2026-04-29 — Plan 10-05 sign-off (HARD-13/HARD-14 release automation: marketplace PR + tag scripts + dry-run + 2 npm scripts; 1209 tests pass; c8 100% intact)
 
 Progress: [██████████] 100%
 
@@ -54,6 +54,7 @@ Recent decisions affecting current work:
 - Plan 03-01 (2026-04-28, Rule 3 auto-fix): macOS dev hosts lack `timeout`/`gtimeout`; added a probe in `scripts/pptx-to-images.sh` that defines a no-op `timeout` shim function ONLY if neither binary is present. Preserves verbatim `timeout 60 soffice` invocation form (static assertions still match) and keeps script runnable without coreutils. Production CI must provide GNU coreutils for real wall-clock cap.
 - Plan 08-01 / 08-07 (2026-04-28): annotate.js standard test discipline (CONTEXT D-01 reversal); c8 100% lines/branches/functions/statements is now a CI hard gate (Gate 6 invokes `npm test` = `c8 --100 --check-coverage`); bats covers the 3 bash scripts (Gate 5b/5c install + run); e2e never runs in CI (FRESH-INSTALL.md remains the human v0.1.0 gate); `npm test` prefixes `CI=true` so dev hosts with soffice locally also auto-skip e2e.
 - Plan 08-07 escalation (2026-04-28): On first `npm test` invocation Plan 08-07 surfaced 22 files <100% (gaps in adapter validation branches, DI hooks, render §5 group-slides, license-audit Promise body, fixture-builder catch branches). Per the plan's escalation protocol + W-7 (per-plan re-run budget), gaps were routed to Plan 08-02b which closed all of them in commit c90ce9a. Re-run of `npm test` exited 0 — Phase 8 sign-off proceeded.
+- Plan 10-05 (2026-04-29): HARD-13 + HARD-14 release automation. `tools/submit-marketplace-pr.sh` (gh-CLI driven; --simulate sandbox; appends PR URL to RELEASE.md) + `tools/release-v0.1.0.sh` (10 gates + STATE flip + CHANGELOG + signed-tag-with-fallback per W-1; --dry-run + INSTADECKS_RELEASE_SIMULATE=1 short-circuits; STRICT=1 makes fresh-install non-skippable). 2 npm scripts (`release:dry-run`, `release`). 7 sandbox tests. Tag NOT pushed in this run — deferred to user authorization or Plan 10-06 E2E. Commits e5078e0 + 92c484b.
 - Plan 10-04 (2026-04-29): HARD-12 fresh-install gate automated via Docker. Mac+Windows runner variants OUT OF SCOPE per SPEC §Out of Scope, deferred to v1.x; Linux automated via `tests/automation/Dockerfile.fresh-install` + `run-fresh-install.sh` + `node:test` driver gated by `(CI=true || RUN_DOCKER_TESTS=1) && hasDocker()`. Stub findings (`tests/fixtures/sample-findings.json` rebound at runtime) used to satisfy `/review` + `/content-review` standalone CLI's `--findings` requirement (LLM step is agent-mode-only). 1202 tests / 1170 pass / 0 fail / 32 skipped; 100% c8 coverage gate intact. Commits 238d05e + addf406.
 
 ### Pending Todos
