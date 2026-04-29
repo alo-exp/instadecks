@@ -1,0 +1,12 @@
+{
+  "_comment": "Marketplace catalog patch applied by tools/submit-marketplace-pr.sh. target_file is path relative to the cloned alo-labs/claude-plugins repo; entry is appended to the top-level `plugins` array.",
+  "target_file": "plugins.json",
+  "insert_after_path": "$.plugins[-1]",
+  "entry": {
+    "name": "instadecks",
+    "source": { "source": "github", "repo": "alo-exp/instadecks" },
+    "category": "productivity",
+    "version": "0.1.0",
+    "description": "Generate, review, and annotate polished presentation decks. Four slash skills powered by pptxgenjs + DECK-VDA design review + auto-refine convergence loop."
+  }
+}
