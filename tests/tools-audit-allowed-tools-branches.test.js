@@ -78,7 +78,7 @@ test('tools-audit-allowed-tools-branches', async (t) => {
     try {
       const r = run(root);
       assert.equal(r.ok, false);
-      assert.match(r.error, /skills dir missing/);
+      assert.match(r.error, /no command or skill files found/);
     } finally {
       fs.rmSync(root, { recursive: true, force: true });
     }
