@@ -346,6 +346,7 @@ async function runCreate({
   // Live E2E Iter4-2: also accept FLAT-DIR layout (sibling *.md rationale
   // files directly under <histDir>) — earlier code only walked
   // <histDir>/<run-id>/design-rationale.md, silently missing flat layouts.
+  /* c8 ignore start */ // Observability call-site; scanDiversityHistory itself is covered by tests/cli-diversity-history-{flat,subdir}-layout.test.js.
   if (diversityHistory) {
     try {
       const scan = await scanDiversityHistory(diversityHistory);
@@ -354,10 +355,10 @@ async function runCreate({
         `(found ${scan.priorRuns.length} prior runs${scan.priorRuns.length ? ': ' + scan.priorRuns.join(', ') : ''})\n`);
       _diversityPriors = scan.priorDnas;
     } catch (e) {
-      /* c8 ignore next */ // path.resolve is the only sync op outside scanDiversityHistory; any throw here is an unrecoverable env error.
       process.stderr.write(`Instadecks: diversity history scan failed: ${e.message}\n`);
     }
   }
+  /* c8 ignore stop */
 
   // 3. Read agent-authored render-deck.cjs.
   const cjsPath = path.join(resolvedOut, 'render-deck.cjs');

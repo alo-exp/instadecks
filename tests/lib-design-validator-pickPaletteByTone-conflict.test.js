@@ -81,3 +81,41 @@ test('empty palettes returns null (returnMeta: { palette: null })', () => {
   const r = pickPaletteByTone({ palettes: [] }, ['x'], 0, { returnMeta: true });
   assert.equal(r.palette, null);
 });
+
+test('object-form opts: missing/non-finite seed defaults to 0', () => {
+  // Covers branch where seedOrOpts is object but .seed is non-finite.
+  const r = pickPaletteByTone(IDEAS, ['finance'], { excludeNames: [] });
+  assert.ok(r);
+  assert.ok(r.tone_tags.includes('finance'));
+});
+
+test('object-form opts: omitted excludeNames falls back to null (|| branch)', () => {
+  // Covers `excludeNames = seedOrOpts.excludeNames || null` falsy branch.
+  const r = pickPaletteByTone(IDEAS, ['finance'], { seed: 0 });
+  assert.ok(r);
+  assert.ok(r.tone_tags.includes('finance'));
+});
+
+test('object-form opts: explicit finite seed in object form', () => {
+  const r = pickPaletteByTone(IDEAS, ['finance'], { seed: 2, returnMeta: true });
+  assert.ok(r.palette);
+  assert.ok(r.palette.tone_tags.includes('finance'));
+});
+
+test('excludeNames accepts a Set instance (not just Array)', () => {
+  // Covers `excludeNames instanceof Set` branch.
+  const exclude = new Set(['Indigo Dawn']);
+  const p = pickPaletteByTone(IDEAS, ['finance'], 0, { excludeNames: exclude });
+  assert.ok(p);
+  assert.notEqual(p.name, 'Indigo Dawn');
+  assert.ok(p.tone_tags.includes('finance'));
+});
+
+test('all palettes excluded with no tone match: legacy (non-meta) returns seeded fallback', () => {
+  // Covers the !returnMeta branch on the final all-excluded fallback line.
+  const allNames = IDEAS.palettes.map(p => p.name);
+  const p = pickPaletteByTone(IDEAS, ['no-match'], 0, { excludeNames: allNames });
+  assert.ok(p);
+  // Seeded fallback at seed=0 → first palette.
+  assert.equal(p.name, IDEAS.palettes[0].name);
+});
