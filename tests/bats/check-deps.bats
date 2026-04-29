@@ -45,7 +45,7 @@ esac
   # three so the font-install branch is not triggered (it would fail under the
   # bats sandbox because only IBM_Plex_Sans/ is seeded by the test setup).
   stub_bin fc-list 0 'echo "IBM Plex Sans:style=Regular"; echo "IBM Plex Serif:style=Regular"; echo "IBM Plex Mono:style=Regular"'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"deps OK"* ]]
 }
@@ -55,7 +55,7 @@ esac
   stub_node 20
   stub_bin shasum 0 'echo "abc  -"'
   echo "abc" > "$CLAUDE_PLUGIN_DATA/.npm-installed-sentinel"
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"missing soffice"* ]]
 }
@@ -65,7 +65,7 @@ esac
   stub_node 20
   stub_bin shasum 0 'echo "abc  -"'
   echo "abc" > "$CLAUDE_PLUGIN_DATA/.npm-installed-sentinel"
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"missing pdftoppm"* ]]
 }
@@ -76,7 +76,7 @@ esac
   stub_node 16
   stub_bin shasum 0 'echo "abc  -"'
   echo "abc" > "$CLAUDE_PLUGIN_DATA/.npm-installed-sentinel"
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"node 16 < 18"* ]]
 }
@@ -88,7 +88,7 @@ esac
   stub_bin shasum 0 'echo "newsha  -"'
   # No prior sentinel → mismatch → npm ci runs.
   stub_bin npm 0 ''
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   grep -q '^npm: ci --omit=dev' "$STUB_LOG"
   [ -f "$CLAUDE_PLUGIN_DATA/.npm-installed-sentinel" ]
@@ -103,14 +103,14 @@ esac
   echo "samesha" > "$CLAUDE_PLUGIN_DATA/.npm-installed-sentinel"
   # Loud-fail npm so we'd see if it ran.
   stub_bin npm 99 'echo "should-not-run" >&2'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   ! grep -q '^npm:' "$STUB_LOG"
 }
 
 @test "FOUND-03: hook exits 0 even when every dep is missing" {
   # No stubs → soffice/pdftoppm/node/npm/shasum all absent (PATH limited).
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Instadecks:"* ]]
 }
@@ -121,7 +121,7 @@ esac
   stub_node 20
   stub_bin shasum 0 'echo "newsha2  -"'
   stub_bin npm 1 'echo "boom" >&2'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"npm ci failed"* ]]
 }

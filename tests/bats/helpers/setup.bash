@@ -39,10 +39,60 @@ unstub_bin() {
   rm -f "$BATS_TEST_TMPDIR/bin/$1"
 }
 
-# isolate_path: reset PATH to ONLY the stub dir + minimal coreutils so real
-# soffice/pdftoppm/node on the host cannot leak into a test.
+# isolate_path: reset PATH to ONLY the stub dir + a curated coreutils sandbox so
+# real soffice/pdftoppm/node/fc-list on the host cannot leak into a test.
+#
+# Mac happens to ship /usr/bin without soffice/pdftoppm/fc-list. Linux CI runners
+# (and any host with libreoffice/poppler/fontconfig installed) DO have those in
+# /usr/bin, which would defeat the missing-tool branches. Build a per-test
+# sandbox at $BATS_TEST_TMPDIR/cu/ that symlinks ONLY a curated coreutils list
+# (sed/grep/head/etc.) — explicitly excluding soffice, pdftoppm, fc-list, node,
+# timeout, gtimeout — and use that instead of /usr/bin:/bin.
 isolate_path() {
-  export PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin"
+  local cu="$BATS_TEST_TMPDIR/cu"
+  mkdir -p "$cu"
+  local utils=(sed grep head basename dirname tr cat ls cut awk bash sh env wc \
+               mkdir rm cp mv chmod find sort uniq tee tail printf echo test \
+               stat readlink which command id whoami uname date xargs unzip \
+               sleep tar gzip gunzip jq mktemp file)
+  local roots=(/usr/bin /bin /usr/local/bin /opt/homebrew/bin)
+  local u r src
+  for u in "${utils[@]}"; do
+    for r in "${roots[@]}"; do
+      src="$r/$u"
+      if [ -e "$src" ] && [ ! -e "$cu/$u" ]; then
+        ln -sf "$src" "$cu/$u" 2>/dev/null || true
+      fi
+    done
+  done
+  export PATH="$BATS_TEST_TMPDIR/bin:$cu"
+}
+
+# iso_path: build the coreutils sandbox (idempotent) and echo the curated PATH
+# string. Use inside `run env PATH="$(iso_path)" ...` to substitute for the old
+# `PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin"` pattern that leaked real
+# soffice/pdftoppm/fc-list/timeout from /usr/bin on Linux CI runners.
+iso_path() {
+  local cu="$BATS_TEST_TMPDIR/cu"
+  if [ ! -d "$cu" ]; then
+    mkdir -p "$cu"
+    local utils=(sed grep head basename dirname tr cat ls cut awk bash sh env wc \
+                 mkdir rm cp mv chmod find sort uniq tee tail printf echo test \
+                 stat readlink which command id whoami uname date xargs unzip \
+                 sleep tar gzip gunzip jq mktemp file xxd od dd shasum sha256sum \
+                 touch ln expr seq diff hostname true false yes cmp)
+    local roots=(/usr/bin /bin /usr/local/bin /opt/homebrew/bin)
+    local u r src
+    for u in "${utils[@]}"; do
+      for r in "${roots[@]}"; do
+        src="$r/$u"
+        if [ -e "$src" ] && [ ! -e "$cu/$u" ]; then
+          ln -sf "$src" "$cu/$u" 2>/dev/null || true
+        fi
+      done
+    done
+  fi
+  echo "$BATS_TEST_TMPDIR/bin:$cu"
 }
 
 # fixture_pptx DEST — copy a known-good pptx fixture to DEST (creates parent).

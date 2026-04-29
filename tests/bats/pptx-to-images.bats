@@ -164,9 +164,9 @@ head -c 2048 /dev/zero | tr "\0" "x" > "$JPG"
   # shifts the cap arg and execs the command. Verifies happy path still works.
   stub_soffice_ok
   stub_pdftoppm_ok
-  PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" command -v timeout >/dev/null && skip "timeout binary present in /usr/bin or /bin; cannot test shim"
-  PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" command -v gtimeout >/dev/null && skip "gtimeout present; cannot test shim"
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT" "$IN" "$OUT"
+  PATH="$(iso_path)" command -v timeout >/dev/null && skip "timeout binary present in /usr/bin or /bin; cannot test shim"
+  PATH="$(iso_path)" command -v gtimeout >/dev/null && skip "gtimeout present; cannot test shim"
+  run env PATH="$(iso_path)" bash "$SCRIPT" "$IN" "$OUT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"no timeout/gtimeout in PATH"* ]] || [[ "$output" == *"warning"* ]]
 }

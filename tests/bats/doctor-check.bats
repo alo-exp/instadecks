@@ -32,7 +32,7 @@ exit 0
   stub_bin soffice 0 ''
   stub_bin pdftoppm 0 ''
   stub_bin fc-list 0 'echo "IBM Plex Sans:style=Regular"'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"all required prerequisites OK"* ]]
   [[ "$output" == *"[OK] node"* ]]
@@ -46,7 +46,7 @@ exit 0
   stub_node 20
   stub_bin pdftoppm 0 ''
   stub_bin fc-list 0 'echo "IBM Plex Sans"'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"[MISSING] soffice"* ]]
   [[ "$output" == *"brew install --cask libreoffice"* ]]
@@ -56,7 +56,7 @@ exit 0
   stub_node 20
   stub_bin soffice 0 ''
   stub_bin fc-list 0 'echo "IBM Plex Sans"'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"[MISSING] pdftoppm"* ]]
   [[ "$output" == *"brew install poppler"* ]]
@@ -66,7 +66,7 @@ exit 0
   stub_bin soffice 0 ''
   stub_bin pdftoppm 0 ''
   stub_bin fc-list 0 'echo "IBM Plex Sans"'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"[MISSING] node"* ]]
 }
@@ -76,7 +76,7 @@ exit 0
   stub_bin soffice 0 ''
   stub_bin pdftoppm 0 ''
   stub_bin fc-list 0 'echo "IBM Plex Sans"'
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"node ≥ 18"* ]] || [[ "$output" == *"node \xe2\x89\xa5 18"* ]]
 }
@@ -88,7 +88,7 @@ exit 0
   stub_bin fc-list 0 'echo "IBM Plex Sans"'
   printf '{\n  "name": "pptxgenjs",\n  "version": "3.12.0"\n}\n' \
     > "$CLAUDE_PLUGIN_DATA/node_modules/pptxgenjs/package.json"
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"pptxgenjs version drift"* ]]
   [[ "$output" == *"3.12.0"* ]]
@@ -100,7 +100,7 @@ exit 0
   stub_bin pdftoppm 0 ''
   stub_bin fc-list 0 'echo "IBM Plex Sans"'
   rm -rf "$CLAUDE_PLUGIN_DATA/node_modules"
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 1 ]
   [[ "$output" == *"pptxgenjs not installed"* ]]
   [[ "$output" == *"npm ci --omit=dev"* ]]
@@ -111,7 +111,7 @@ exit 0
   stub_bin soffice 0 ''
   stub_bin pdftoppm 0 ''
   stub_bin fc-list 0 'echo "Helvetica:style=Regular"'  # no IBM Plex Sans line
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  run env PATH="$(iso_path)" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"[WARN] IBM Plex Sans"* ]]
 }
