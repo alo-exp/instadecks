@@ -151,10 +151,25 @@ Decimal phases appear between their surrounding integers in numeric order.
   10. 100% c8 coverage gate stays green; all existing tests pass; new tests for variant coverage, palette library, typography library, motif library, brief normalizer
 **Plans**: TBD (estimated waves: 9-01 palettes + typography + motifs libraries; 9-02 cookbook variant additions; 9-03 SKILL.md design-DNA picker + cookbook.md restructure; 9-04 brief-normalizer + polymorphic intake; 9-05 design-validator updates + invariant reversal; 9-06 live E2E with varied input shapes + 2-clean-rounds verification)
 
+### Phase 10: Hardening, Documentation Compliance, and Release Automation
+**Goal**: Close all known backlog items surfaced through 8 live E2E iterations + /silver-scan, bring documentation to 100% compliance with `docs/doc-scheme.md`, and AUTOMATE every previously-human gate from RELEASE.md §1 (activation panel, permission-mode matrix, fresh-install Mac+Win, marketplace PR, tag push) so v0.1.0 can ship without a human in the loop.
+**Depends on**: Phase 9
+**Requirements**: HARD-01..HARD-15 (defined in CONTEXT.md)
+**Success Criteria** (what must be TRUE):
+  1. **Backlog closure**: enum-lint extended to flag typo'd `pres.shapes.<KEY>` references that resolve to undefined; soffice cold-start race in parallel runCreate invocations gracefully serialized via cwd-locking; tools/license-audit.js test gap (lines 133-134) closed; `c8 --100 --check-coverage` gate passes without exclusions
+  2. **Documentation compliance** (per `docs/doc-scheme.md`): all core files exist with current content (ARCHITECTURE.md, TESTING.md, CHANGELOG.md, knowledge/INDEX.md, doc-scheme.md); knowledge/`YYYY-MM.md` and lessons/`YYYY-MM.md` populated with non-trivial entries from the 10-phase build; size caps enforced (docs ≤500 lines, knowledge/lessons ≤300, planning ≤300); INDEX.md links every doc; CICD.md updated; README.md finalized for marketplace; SECURITY.md scaffolded post-audit; CONTRIBUTING.md added
+  3. **Activation panel automation**: new harness in `tests/automation/activation-panel.test.js` that simulates Claude Code skill-activation matching against the 40-prompt panel using the agent's description-matching heuristics; passes ≥8/10 per skill; runs in CI (mocked deterministic matcher); replaces manual scoring in `tests/activation-panel.md`
+  4. **Permission-mode automation**: `tests/automation/permission-mode.test.js` programmatically loads each SKILL.md's `allowed-tools` list, validates against actual `Bash(<tool>:*)` invocations in the script, and asserts coverage in both `default` and `dontAsk` simulation modes; replaces manual `tests/PERMISSION-MODE.md` runs
+  5. **Fresh-install automation**: `tests/automation/fresh-install.test.js` that exercises `/plugin install` flow against an isolated CLAUDE_PLUGIN_ROOT/CLAUDE_PLUGIN_DATA via Docker container; runs all 4 user-invocable skills against canonical brief; produces real PPTX/PDF/findings/annotated artifacts; verifies bytes; passes on Linux runner (Mac+Windows variants documented as platform-specific runners)
+  6. **Marketplace PR automation**: `tools/submit-marketplace-pr.sh` that uses `gh` to fork `alo-labs/claude-plugins`, applies the patch from `.planning/marketplace-patch.json`, opens PR with the prepared body from `.planning/marketplace-pr.md`, captures URL into `.planning/RELEASE.md`
+  7. **Tag automation**: `tools/release-v0.1.0.sh` (or invocation of `/silver-create-release v0.1.0`) that runs all gates above, on green flips STATE.md to `released`, generates CHANGELOG entry, signs and pushes tag
+  8. **End-to-end release simulation**: `npm run release:dry-run` runs the full automated chain (gates → marketplace PR draft → tag prep) without pushing; on success, `npm run release` does the real thing
+**Plans**: TBD (estimated waves: 10-01 backlog closure, 10-02 doc-scheme audit + fill, 10-03 activation panel + permission-mode automation, 10-04 fresh-install Docker harness, 10-05 marketplace + tag automation, 10-06 release dry-run E2E)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 9 → 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -167,3 +182,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Marketplace Publication & Release Polish | 0/TBD | Not started | - |
 | 8. Test Coverage to 100% | 7/7 | Complete | 2026-04-28 |
 | 9. Design Variety & Modern Aesthetics + Brief-Shape Polymorphism | 0/TBD | Not started | - |
+| 10. Hardening, Documentation Compliance, and Release Automation | 0/TBD | Not started | - |
