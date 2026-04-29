@@ -150,12 +150,14 @@ function renderStatCalloutD(slide, { title, statValue, statLabel, supporting, so
     color: PALETTE.muted, align: 'left', margin: 0,
   });
 
-  // Hero stat — fills slide.
+  // Hero stat — fills slide. fontSize ≥ 120 → MUST include fit: 'shrink' AND
+  // autoFit: true; valign: 'top' prevents vertical-center collapse on shrink
+  // (Live E2E Iteration 2 Fix #4).
   slide.addText(statValue, {
     x: MARGIN_X, y: 0.9, w: W - 1.0, h: 3.4,
     fontFace: TYPE.heading, fontSize: 240, bold: true,
     color: PALETTE.accent, align: 'left', valign: 'top', margin: 0,
-    fit: 'shrink',
+    fit: 'shrink', autoFit: true,
   });
 
   // Thin secondary rule.
@@ -243,6 +245,18 @@ function renderStatCalloutE(slide, { title, statValue, statLabel, source, pageNu
 | Hero number 60–72pt (or 240pt for D) | Hero number ≤ 36pt (loses callout impact in A/D) |
 | Action title naming the implication | Topic title: `'Q3 Revenue'` |
 | Supporting prose to the right of the number | Wrap the number in supporting text (visual clash) |
+
+## Hero numeral overflow rule (fontSize ≥ 120) — Live E2E Iteration 2 Fix #4
+
+**Any text-box with `fontSize >= 120` MUST include `fit: 'shrink'` AND
+`autoFit: true`.** Sizes ≥ 160 should also include `valign: 'top'` to prevent
+vertical-center collapse on shrink. Without these, hero numerals wrap to a
+second line and bleed off-slide (observed at fontSize 200 in Live E2E
+Iteration 2).
+
+**Anti-pattern:** ❌ `fontSize: 200, bold: true, color: ...` without
+`fit: 'shrink'` — wide glyph pairs (`05`, `08`, `09`) will silently wrap and
+clip. ✅ Always pair fontSize ≥ 120 with `fit: 'shrink', autoFit: true`.
 
 ## Sizing rule of thumb (overflow guard)
 

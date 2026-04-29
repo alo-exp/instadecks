@@ -50,7 +50,7 @@ function renderQuoteB(slide, { quote, attribution, role, pageNum, total }) {
     x: MARGIN_X, y: 0.4, w: 1.5, h: 1.6,
     fontFace: TYPE.heading, fontSize: 160, bold: true,
     color: PALETTE.secondary, align: 'left', valign: 'top', margin: 0,
-    fit: 'shrink',
+    fit: 'shrink', autoFit: true,
   });
 
   slide.addText(quote, {
