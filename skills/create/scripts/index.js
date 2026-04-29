@@ -267,6 +267,31 @@ function countSlides(pptxPath) {
   });
 }
 
+// HARD-02: cwd-scoped lock to serialize parallel runCreate invocations against
+// the same outDir. soffice's user-profile lock can race on cold start when two
+// runCreate calls fire concurrently — this serializes them. Lock is acquired
+// via fs.openSync(path, 'wx') (atomic exclusive create), retried every 250ms,
+// soft-fails after 30s wall clock with a stderr message and proceeds anyway.
+async function acquireCwdLock(dir) {
+  const lockPath = path.join(dir, '.runCreate.lock');
+  const timeoutMs = parseInt(process.env.INSTADECKS_LOCK_TIMEOUT_MS, 10) || 30_000;
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    try {
+      const fd = fs.openSync(lockPath, 'wx');
+      fs.writeSync(fd, String(process.pid));
+      fs.closeSync(fd);
+      return () => { try { fs.unlinkSync(lockPath); } catch { /* lock already gone */ } };
+    } catch (e) {
+      /* c8 ignore next */ // Defensive: openSync only throws EEXIST in this code path; non-EEXIST errors imply fs corruption.
+      if (e.code !== 'EEXIST') throw e;
+      await new Promise((r) => setTimeout(r, 250));
+    }
+  }
+  process.stderr.write(`runCreate: cwd lock timeout (${timeoutMs}ms) on ${dir} — soft-fail, proceeding without lock\n`);
+  return () => {}; // no-op release on soft-fail (we never owned the lock)
+}
+
 // Test-only spawn override (parallels Phase 3 _test_setRunAnnotate).
 let _spawnOverride = null;
 function _test_setSpawn(fn) { _spawnOverride = fn; }
@@ -333,6 +358,11 @@ async function runCreate({
   runId = runId || generateRunId();
   const resolvedOut = resolveOutDir(outDir, runId);
   await fsp.mkdir(resolvedOut, { recursive: true });
+
+  // HARD-02: acquire cwd lock to serialize parallel runCreate invocations
+  // against the same outDir. Released in the finally below.
+  const releaseLock = await acquireCwdLock(resolvedOut);
+  try {
 
   const warnings = [];
   let _diversityPriors = null;
@@ -603,6 +633,9 @@ async function runCreate({
   }
 
   return result;
+  } finally {
+    releaseLock();
+  }
 }
 
 module.exports = {
