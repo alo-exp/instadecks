@@ -97,6 +97,8 @@ if (!r.ok) throw new Error(r.violations.map(v => v.message).join('; '));
 
 3. **Diversity audit** — if `.planning/instadecks/` contains prior runs, sort run-ids descending and READ the `design-rationale.md` of the **last 3 prior runs**. Extract the palette / typography / motif each one used. **DO NOT pick the same palette / typography / motif combination** as any of the last 3. If the hash-seed picker lands on a recently-used combination, advance the seed (e.g., increment the modulo offset) until the rolled DNA differs from all 3 priors on at least one axis.
 
+3a. **Tone-tag fit gate (Live E2E Iteration 1 Fix #8)** — each palette in `references/palettes.md` declares a `**Tone tags:** <comma-separated-keywords>` line. After the diversity audit, intersect the rolled palette's tone tags against `brief.tone` keywords (and `brief.audience` keywords). **If the intersection is empty**, the palette is tone-mismatched (e.g., Burnt Sienna's `travel,hospitality` against a `finance,executive` brief). Advance the hash seed by 1 (or pick the next palette in the alphabetic list whose tone tags intersect with the brief). This is a soft-tighten on top of the diversity audit; both must pass.
+
 4. **Defaults prohibition** — **NEVER** default to verdant-steel + Plex Serif + underline-accent. That is the v8 register; Phase 9 explicitly relaxes the "match v8" invariant. Different decks must look meaningfully different. If your roll lands there by chance, re-roll on the next seed offset.
 
 5. **Variant IDs** — when picking cookbook recipes in Step 3, each recipe ships ≥3 variants per the convention `{recipe}-[A-E]-{shorthand}` (see `references/cookbook.md` → "Variant IDs" section). Pick variants consistent with the rolled motif:
@@ -288,7 +290,7 @@ After the loop exits (any `ended_via`), execute the following in order:
 a. Compose the final `reviewerNotes` string from the ledger: per-cycle `skipped_finding_ids` (with their `triage_rationale`) plus the final cycle's non-genuine findings.
 b. Render `design-rationale.md` via `lib/render-rationale.js` with the populated `reviewerNotes`.
 c. Convert `deck.pptx` → `deck.pdf` via soffice (per Phase 4 `runCreate`; soft on missing tool).
-d. If the final cycle's `findings.json` has any findings (genuine + non-genuine union), invoke `runAnnotate({deckPath: deck.pptx, findings, outDir: runDir, runId})` → `deck.annotated.pptx` + `deck.annotated.pdf`.
+d. If the final cycle's `findings.json` has any **genuine** findings (`genuine === true` count > 0), invoke `runAnnotate({deckPath: deck.pptx, findings, outDir: runDir, runId})` → `deck.annotated.pptx` + `deck.annotated.pdf`. (Live E2E Iteration 1 Fix #11: aligned to adapter behavior — non-genuine findings are filtered by the adapter, so passing only-non-genuine findings would produce an empty annotated deck. runAnnotate now short-circuits in that case and returns `{annotatedSlideCount:0, message, ...}` with no .pptx/.pdf written; consumers should treat that as "clean convergence".)
 e. If the final findings union is empty (clean convergence), SKIP the annotated artifacts and surface to the user: "Clean convergence — no annotation overlay generated." (Pitfall 7).
 f. Surface the 8-artifact bundle (deck.pptx, deck.pdf, design-rationale.md, findings.json, deck.annotated.pptx, deck.annotated.pdf, refine-ledger.jsonl, render-deck.cjs) to the user.
 

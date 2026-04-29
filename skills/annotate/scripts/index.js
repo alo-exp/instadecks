@@ -218,6 +218,29 @@ async function runAnnotate({ deckPath, findings, outDir, runId } = {}) {
   const samples = adaptFindings(findings, deckMeta);
   await fsp.writeFile(path.join(outDir, 'findings.json'), JSON.stringify(findings, null, 2));
 
+  // Live E2E Iteration 1 — Fix #6: when post-genuine-filter samples are empty,
+  // there is nothing to annotate. Writing an empty deck.annotated.pptx + .pdf
+  // wastes I/O and misleads users. Short-circuit with a structured signal.
+  if (samples.length === 0) {
+    /* c8 ignore next */ // Defensive: deckTotal is always a number from readDeckMeta.
+    const sourceSlideCount = (deckMeta && typeof deckMeta.deckTotal === 'number') ? deckMeta.deckTotal : 0;
+    const message = 'Clean convergence — no genuine findings; no annotation overlay generated';
+    process.stderr.write(message + '\n');
+    return {
+      pptxPath: null,
+      pdfPath: null,
+      annotatedPath: null,
+      annotatedPdfPath: null,
+      runDir: outDir,
+      runId,
+      pptxRun: null,
+      pdfRun: null,
+      annotatedSlideCount: 0,
+      sourceSlideCount,
+      message,
+    };
+  }
+
   setSamples(samples);
   const work = await prepareWork({ outDir, samples, deckPath });
   ensurePptxgenjsPath();
