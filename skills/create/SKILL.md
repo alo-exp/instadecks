@@ -87,6 +87,25 @@ const r = validateDesignChoice({ palette, typography, brief, designIdeas });
 if (!r.ok) throw new Error(r.violations.map(v => v.message).join('; '));
 ```
 
+### Step 2.5 — Choose design DNA
+
+**Before authoring render-deck.cjs**, roll a design DNA that varies meaningfully per brief. Phase 9 (D-05) makes this a hard pre-step — the v8 BluePrestige look is **one** valid DNA among many, not the default.
+
+1. **Roll a design DNA from `references/palettes.md`, `references/typography.md`, `references/motifs.md`** — copy hex values, font names, and motif treatments verbatim from those library files. Do not invent new palettes/fonts/motifs; the curated libraries are the agent's allowed surface.
+
+2. **Hash-seed picker** — compute a deterministic hash-seed over `brief.audience + brief.tone` (e.g., `crypto.createHash('sha1').update(audience + '|' + tone).digest()` and reduce modulo each library's entry count). The same brief produces the same DNA on re-run; different briefs roll different DNAs. This is the deterministic-per-brief variety mechanism — no randomness source required.
+
+3. **Diversity audit** — if `.planning/instadecks/` contains prior runs, sort run-ids descending and READ the `design-rationale.md` of the **last 3 prior runs**. Extract the palette / typography / motif each one used. **DO NOT pick the same palette / typography / motif combination** as any of the last 3. If the hash-seed picker lands on a recently-used combination, advance the seed (e.g., increment the modulo offset) until the rolled DNA differs from all 3 priors on at least one axis.
+
+4. **Defaults prohibition** — **NEVER** default to verdant-steel + Plex Serif + underline-accent. That is the v8 register; Phase 9 explicitly relaxes the "match v8" invariant. Different decks must look meaningfully different. If your roll lands there by chance, re-roll on the next seed offset.
+
+5. **Variant IDs** — when picking cookbook recipes in Step 3, each recipe ships ≥3 variants per the convention `{recipe}-[A-E]-{shorthand}` (see `references/cookbook.md` → "Variant IDs" section). Pick variants consistent with the rolled motif:
+   - title-A-centered-classic vs title-C-oversized-numeral vs title-D-type-as-image
+   - stat-callout-B-asymmetric-grid vs stat-callout-D-full-bleed-numeral
+   - Vary variant choice across the 9 slide types so 3+ slides do not share the same `recipe-variant` ID (design-validator flags diversity violations).
+
+Persist the rolled DNA into `design-choices.json` so Step 4 (`runCreate`) writes it into `design-rationale.md`.
+
 ### Step 3 — Compose render-deck.cjs from the cookbook
 
 Read `references/cookbook.md` (master) and the per-recipe files in `references/cookbook/*.md`. For each beat in `narrative_arc`, pick the recipe that matches the beat's intent (cookbook recipe-index table maps slide types → "When to use"). **Vary recipe across beats** — repeating the same recipe more than 3 consecutive slides triggers R18 in `/instadecks:review`.
