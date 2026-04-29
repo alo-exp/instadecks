@@ -1,6 +1,6 @@
 ---
-name: content-review
-description: Critique a presentation deck's content, argument quality, story flow, claim-evidence balance, narrative arc (setup tension resolution), and standalone-readability for a stranger reader — answer "is my deck persuasive". This skill should be used when the user asks for content review, argument review, narrative review, story flow critique, Pyramid Principle / MECE structural check, narrative arc audit (setup tension resolution), action-title quality, claim/evidence audit, persuasive-message audit, or asks "would a stranger reading this deck without me get the message" — distinct from `/instadecks:review` which covers visual design defects. Runs four code-side mechanical checks (action-title / redundancy / jargon / length) plus four prompt-side judgment checks (Pyramid/MECE, narrative-arc, claim-evidence, standalone-readability), emits findings JSON v1.1 + fixed-template Markdown report, and optionally pipelines into `/instadecks:annotate`.
+name: instadecks-content-review
+description: Critique a presentation deck's content, argument quality, story flow, claim-evidence balance, narrative arc (setup tension resolution), and standalone-readability for a stranger reader — answer "is my deck persuasive". This skill should be used when the user asks for content review, argument review, narrative review, story flow critique, Pyramid Principle / MECE structural check, narrative arc audit (setup tension resolution), action-title quality, claim/evidence audit, persuasive-message audit, or asks "would a stranger reading this deck without me get the message" — distinct from `/instadecks-review` which covers visual design defects. Runs four code-side mechanical checks (action-title / redundancy / jargon / length) plus four prompt-side judgment checks (Pyramid/MECE, narrative-arc, claim-evidence, standalone-readability), emits findings JSON v1.1 + fixed-template Markdown report, and optionally pipelines into `/instadecks-annotate`.
 allowed-tools:
   - Bash(node:*)
   - Bash(npm:*)
@@ -13,9 +13,9 @@ user-invocable: true
 version: 0.1.0
 ---
 
-# /instadecks:content-review — Argument Quality, Story Flow, Claim/Evidence Critique
+# /instadecks-content-review — Argument Quality, Story Flow, Claim/Evidence Critique
 
-Critique a presentation deck's argument structure, story flow, and claim/evidence balance — NOT visual design. Produces a deterministic findings JSON (schema v1.1), a fixed-template Markdown report, and an LLM-authored narrative report. Optionally pipelines into `/instadecks:annotate` for an overlaid PPTX + PDF.
+Critique a presentation deck's argument structure, story flow, and claim/evidence balance — NOT visual design. Produces a deterministic findings JSON (schema v1.1), a fixed-template Markdown report, and an LLM-authored narrative report. Optionally pipelines into `/instadecks-annotate` for an overlaid PPTX + PDF.
 
 ## When to invoke
 
@@ -24,21 +24,21 @@ Use this skill when:
 - The user asks for **content review**, **argument review**, **narrative review**, **story flow critique**, or "is my deck persuasive?".
 - The user asks for a **Pyramid Principle / MECE** structural check, **narrative arc** audit, **action-title quality** review, or **claim/evidence** audit.
 - The user asks "would a stranger reading this deck without me get the message?" (standalone-readability).
-- Another skill pipelines a content findings doc into `/instadecks:annotate` (the same handoff `/instadecks:review` uses).
+- Another skill pipelines a content findings doc into `/instadecks-annotate` (the same handoff `/instadecks-review` uses).
 
-Do NOT use this skill for visual / typographic / layout critique — that is `/instadecks:review`'s territory (DECK-VDA 4-pass methodology). See "Content-vs-design boundary" below.
+Do NOT use this skill for visual / typographic / layout critique — that is `/instadecks-review`'s territory (DECK-VDA 4-pass methodology). See "Content-vs-design boundary" below.
 
 ## Locked invariant — content-vs-design boundary
 
-> **If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/review`'s domain.**
+> **If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/instadecks-review`'s domain.**
 
-This is a CLAUDE.md hard invariant. Visual / typographic / layout findings belong to `/instadecks:review`. The boundary is enforced by `tests/content-vs-design-boundary.test.js` (CRV-10, lands in Plan 06-03). Crossover is a defect.
+This is a CLAUDE.md hard invariant. Visual / typographic / layout findings belong to `/instadecks-review`. The boundary is enforced by `tests/content-vs-design-boundary.test.js` (CRV-10, lands in Plan 06-03). Crossover is a defect.
 
 ## Inputs
 
 - **`deckPath`** (required) — path to `.pptx` deck. PDF input is NOT supported in v1 (text extraction is lossy).
-- **Optional `contentExtract`** — pre-extracted content object (saves re-parsing when called from `/instadecks:create` in v2).
-- **`--annotate` flag** — gates the pipeline into `/instadecks:annotate` per inherited Phase 3 D-03. Default = standalone (no annotation). Natural-language synonyms (`annotate`, `overlay`, `markup`) also trigger.
+- **Optional `contentExtract`** — pre-extracted content object (saves re-parsing when called from `/instadecks-create` in v2).
+- **`--annotate` flag** — gates the pipeline into `/instadecks-annotate` per inherited Phase 3 D-03. Default = standalone (no annotation). Natural-language synonyms (`annotate`, `overlay`, `markup`) also trigger.
 - **Optional `--run-id`** — override auto-generated run-id (`YYYYMMDD-HHMMSS-<6hex>`).
 - **Optional `--out-dir`** — override default `.planning/instadecks/<runId>/`.
 
@@ -50,7 +50,7 @@ This is a CLAUDE.md hard invariant. Visual / typographic / layout findings belon
 - `<deck>.content-review.md` — fixed-template report rendered by `skills/content-review/scripts/render-content-fixed.js`. Deterministic; same input → byte-identical output.
 - `<deck>.content-review.narrative.md` — LLM-authored narrative on argument flow / persuasiveness (≥200 words, cites slide numbers + finding text). Authored AFTER `runContentReview` returns; the orchestrator returns the path but does NOT write the file.
 
-**With `--annotate`** (5 files): adds `<deck>.annotated.pptx` and `<deck>.annotated.pdf` via `/instadecks:annotate`.
+**With `--annotate`** (5 files): adds `<deck>.annotated.pptx` and `<deck>.annotated.pdf` via `/instadecks-annotate`.
 
 A run-dir mirror at `.planning/instadecks/<runId>/` archives copies of the JSON + MD for audit.
 
@@ -65,7 +65,7 @@ node skills/content-review/scripts/cli.js <deckPath> --findings <doc.json> [--ou
 Prints the run summary as JSON to stdout.
 
 > **Important — the CLI is a findings post-processor / annotator dispatcher, NOT a reviewer.**
-> Producing findings from a deck (the LLM reading slide text + speaker notes and applying the 8 content checks described below) is an **agent-mode** step. The CLI accepts pre-authored findings JSON (`--findings`) and exits non-zero without it; it then renders the fixed-template MD, optionally pipes into `/instadecks:annotate`, and archives outputs. To produce findings end-to-end from a `.pptx`, invoke `/instadecks:content-review` in agent mode.
+> Producing findings from a deck (the LLM reading slide text + speaker notes and applying the 8 content checks described below) is an **agent-mode** step. The CLI accepts pre-authored findings JSON (`--findings`) and exits non-zero without it; it then renders the fixed-template MD, optionally pipes into `/instadecks-annotate`, and archives outputs. To produce findings end-to-end from a `.pptx`, invoke `/instadecks-content-review` in agent mode.
 
 **Structured handoff** — for skills/scripts importing in-process:
 
@@ -176,7 +176,7 @@ Emit a finding when:
 
 **Finding shape:** same; `standard`: `"Standalone readability (Reynolds, Presentation Zen 2008; audience-fit per Knaflic 2015)"`.
 
-> **Boundary reminder:** standalone-readability is about WHETHER THE WORDS / DATA make sense alone — NOT about visual readability (contrast, font size, alignment). If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/review`'s domain.
+> **Boundary reminder:** standalone-readability is about WHETHER THE WORDS / DATA make sense alone — NOT about visual readability (contrast, font size, alignment). If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/instadecks-review`'s domain.
 
 ## Severity grammar (4-tier producer side)
 
@@ -187,7 +187,7 @@ Emit a finding when:
 | Minor | 🟡 | Unsourced number; hyperbolic claim; missing introduction of internal codename. |
 | Nitpick | ⚪ | "As discussed on slide 3..." backreference (non-load-bearing). |
 
-**Producers (this skill, `/instadecks:review`) ALWAYS emit the full 4-tier vocabulary.** The 4→3 collapse to MAJOR / MINOR / POLISH happens ONLY at the `/instadecks:annotate` adapter. Pre-collapsing here is a contract violation (P-01).
+**Producers (this skill, `/instadecks-review`) ALWAYS emit the full 4-tier vocabulary.** The 4→3 collapse to MAJOR / MINOR / POLISH happens ONLY at the `/instadecks-annotate` adapter. Pre-collapsing here is a contract violation (P-01).
 
 **Calibration rule:** when uncertain between two tiers, choose the LOWER tier. Reviewers calibrate up via second pass, never down.
 
@@ -232,7 +232,7 @@ Triggers:
 - Explicit `--annotate` flag on the CLI.
 - Natural-language mention in the user's prompt: `annotate`, `overlay`, `markup`, "show me the issues on the slides", or similar.
 
-When triggered, the agent passes `annotate: true` to `runContentReview`, which lazy-loads `runAnnotate` from `/instadecks:annotate` (P-07 / CRV-11) and produces the two extra outputs. The `/annotate` adapter accepts `category: "content"` (Plan 06-01 lockstep patch) and applies the standard severity collapse: Critical/Major content → MAJOR (orange); Minor → MINOR (blue); Nitpick → POLISH (grey).
+When triggered, the agent passes `annotate: true` to `runContentReview`, which lazy-loads `runAnnotate` from `/instadecks-annotate` (P-07 / CRV-11) and produces the two extra outputs. The `/instadecks-annotate` adapter accepts `category: "content"` (Plan 06-01 lockstep patch) and applies the standard severity collapse: Critical/Major content → MAJOR (orange); Minor → MINOR (blue); Nitpick → POLISH (grey).
 
 ## Two-report architecture (D-04)
 
@@ -245,7 +245,7 @@ Two Markdown reports are produced per run:
 
 1. **Cite, don't paraphrase.** Every Critical or Major finding must cite a concrete slide number / location. If you cannot cite it, downgrade to Minor or drop it.
 2. **No invented standards.** The "Standard violated" field references real, named principles (Minto, Duarte, Heath, Reynolds, Knaflic) or omit the field. Do not coin standards.
-3. **Stay in your lane.** Do NOT flag visual / typographic / layout issues. That is `/instadecks:review`'s territory. **If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/review`'s domain.**
+3. **Stay in your lane.** Do NOT flag visual / typographic / layout issues. That is `/instadecks-review`'s territory. **If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/instadecks-review`'s domain.**
 4. **No Critical without a Fix.** Every Critical finding has a concrete actionable fix. "Reconsider" is not a fix.
 5. **Calibrate down on uncertainty.** If you are between Major and Minor, choose Minor. Reviewers add severity in pass 2, never subtract it.
 
@@ -255,12 +255,12 @@ Two Markdown reports are produced per run:
 
 ## Environment
 
-`CLAUDE_PLUGIN_ROOT`, `CLAUDE_PLUGIN_DATA`, `CLAUDE_SESSION_ID` — consumed transitively by `/instadecks:annotate` when piped.
+`CLAUDE_PLUGIN_ROOT`, `CLAUDE_PLUGIN_DATA`, `CLAUDE_SESSION_ID` — consumed transitively by `/instadecks-annotate` when piped.
 
 ## Deferred (out of scope for this skill / this milestone)
 
 - **CRV-10 boundary regression test** — fixture deck + cross-domain test, lands in Plan 06-03.
-- **Content-review integration into `/create`'s loop** — v2 (PROJECT.md).
+- **Content-review integration into `/instadecks-create`'s loop** — v2 (PROJECT.md).
 - **PDF input** — v1.x.
 - **Phase 7 DIST-02** — activation-rate tuning ≥8/10 on the description string.
 - **Per-check accuracy metrics dashboard** — v1.x.

@@ -1,5 +1,5 @@
 ---
-name: doctor
+name: instadecks-doctor
 description: Self-check Instadecks system prerequisites and report green/red status with per-gap install hints. This skill should be used when the user asks to "check Instadecks setup", "diagnose Instadecks", "is Instadecks ready", "Instadecks doctor", or "what's missing for Instadecks". Probes soffice (LibreOffice), pdftoppm (Poppler), node version, pinned pptxgenjs install under the plugin data dir, and IBM Plex Sans font presence. Emits a structured table of OK / MISSING rows with copy-pasteable install commands per OS (brew on Mac, apt on Linux, choco on Windows). Run after first install or whenever a deck-generation invocation fails with a missing-binary error.
 allowed-tools:
   - Bash(node:*)
@@ -13,9 +13,9 @@ user-invocable: true
 version: 0.1.0
 ---
 
-# /instadecks:doctor — System Prerequisite Self-Check
+# /instadecks-doctor — System Prerequisite Self-Check
 
-Self-check Instadecks system prerequisites and report green/red status with per-gap install hints. Useful after a fresh install, after a host OS upgrade, or whenever another skill (`/instadecks:create`, `/instadecks:review`, `/instadecks:annotate`) fails with a missing-binary error.
+Self-check Instadecks system prerequisites and report green/red status with per-gap install hints. Useful after a fresh install, after a host OS upgrade, or whenever another skill (`/instadecks-create`, `/instadecks-review`, `/instadecks-annotate`) fails with a missing-binary error.
 
 ## When to invoke
 
