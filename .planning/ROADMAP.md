@@ -12,6 +12,7 @@ Instadecks ships a Claude Code marketplace plugin with four user-invocable slash
 
 Decimal phases appear between their surrounding integers in numeric order.
 
+- [x] **Phase 10: Hardening, Documentation Compliance, and Release Automation** - Every previously-human gate automated; v0.1.0 release-readiness via single green-button `npm run release:dry-run` *(complete 2026-04-29 — 6/6 plans, HARD-01..HARD-15)*
 - [ ] **Phase 1: Plugin Foundation, Contract & CI Gates** - Loadable plugin skeleton with locked JSON contract, CI gates, fonts, and visual-regression baselines
 - [x] **Phase 8: Test Coverage to 100%** - c8 100% gate live in CI; bats wired; e2e local-only; 100% lines/branches/funcs/stmts achieved 2026-04-28 (878 tests)
 - [x] **Phase 2: `/instadecks:annotate`** - Verbatim `annotate.js` wired to the locked contract; produces annotated PPTX + PDF overlays *(complete 2026-04-28 — 4/4 plans, ANNO-01..ANNO-11)*
@@ -164,7 +165,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   6. **Marketplace PR automation**: `tools/submit-marketplace-pr.sh` that uses `gh` to fork `alo-labs/claude-plugins`, applies the patch from `.planning/marketplace-patch.json`, opens PR with the prepared body from `.planning/marketplace-pr.md`, captures URL into `.planning/RELEASE.md`
   7. **Tag automation**: `tools/release-v0.1.0.sh` (or invocation of `/silver-create-release v0.1.0`) that runs all gates above, on green flips STATE.md to `released`, generates CHANGELOG entry, signs and pushes tag
   8. **End-to-end release simulation**: `npm run release:dry-run` runs the full automated chain (gates → marketplace PR draft → tag prep) without pushing; on success, `npm run release` does the real thing
-**Plans**: TBD (estimated waves: 10-01 backlog closure, 10-02 doc-scheme audit + fill, 10-03 activation panel + permission-mode automation, 10-04 fresh-install Docker harness, 10-05 marketplace + tag automation, 10-06 release dry-run E2E)
+**Plans**: 6 plans
+- [x] 10-01-backlog-defects-PLAN.md — HARD-01/02/03 closed: enum-lint typo detection, `.runCreate.lock` cwd-lock, license-audit OK-path coverage
+- [x] 10-02-doc-scheme-compliance-PLAN.md — HARD-04..HARD-09 closed: knowledge/lessons populated, SECURITY.md + CONTRIBUTING.md scaffolded, `tools/lint-doc-size.js` + `--orphans` mode + CI Gate 7
+- [x] 10-03-activation-and-permission-automation-PLAN.md — HARD-10/11 closed: activation-panel Jaccard matcher (≥ 8/10 per skill) + permission-mode AST walker (default + dontAsk)
+- [x] 10-04-fresh-install-docker-PLAN.md — HARD-12 closed: Linux Docker harness running 4 user-invocable skills against canonical brief; Mac+Windows deferred to v1.x
+- [x] 10-05-release-automation-PLAN.md — HARD-13/14 closed: `tools/submit-marketplace-pr.sh` + `tools/release-v0.1.0.sh` + `npm run release:dry-run` / `npm run release`
+- [x] 10-06-release-dry-run-e2e-PLAN.md — HARD-15 closed: `tests/release-dry-run-e2e.test.js` (RUN_RELEASE_E2E=1) — single green-button verification of the entire release chain
 
 ## Progress
 
@@ -182,4 +189,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 7. Marketplace Publication & Release Polish | 0/TBD | Not started | - |
 | 8. Test Coverage to 100% | 7/7 | Complete | 2026-04-28 |
 | 9. Design Variety & Modern Aesthetics + Brief-Shape Polymorphism | 0/TBD | Not started | - |
-| 10. Hardening, Documentation Compliance, and Release Automation | 0/TBD | Not started | - |
+| 10. Hardening, Documentation Compliance, and Release Automation | 6/6 | Complete | 2026-04-29 |
