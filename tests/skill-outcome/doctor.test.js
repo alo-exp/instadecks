@@ -90,13 +90,18 @@ function buildCoreutilsSandbox() {
 }
 
 test('missing soffice → install instruction surfaced in stdout', () => {
-  const r = runDoctor({ pathOverride: SANDBOX_PATH, pluginData: freshTmp('drctr-pd') });
+  // Linux CI installs libreoffice into /usr/bin/soffice, defeating SANDBOX_PATH.
+  // Use the curated coreutils sandbox (excludes soffice/pdftoppm/fc-list/node).
+  const sandbox = buildCoreutilsSandbox();
+  const r = runDoctor({ pathOverride: sandbox, pluginData: freshTmp('drctr-pd') });
   assert.match(r.stdout, /\[MISSING\] soffice/);
   assert.match(r.stdout, /install: brew install --cask libreoffice/);
 });
 
 test('missing pdftoppm → poppler install instruction surfaced', () => {
-  const r = runDoctor({ pathOverride: SANDBOX_PATH, pluginData: freshTmp('drctr-pd-2') });
+  // Linux CI installs poppler-utils into /usr/bin/pdftoppm, defeating SANDBOX_PATH.
+  const sandbox = buildCoreutilsSandbox();
+  const r = runDoctor({ pathOverride: sandbox, pluginData: freshTmp('drctr-pd-2') });
   assert.match(r.stdout, /\[MISSING\] pdftoppm/);
   assert.match(r.stdout, /install: brew install poppler/);
 });
