@@ -213,6 +213,10 @@ async function runCreate({
   outDir,
   mode = 'standalone',
   designChoices = null,
+  cycleCount = null,
+  convergenceReason = null,
+  /* c8 ignore next */ // Live E2E Iteration 2 Fix #13: agent-mode reads this; CLI passthrough.
+  diversityHistory = null, // eslint-disable-line no-unused-vars
 } = {}) {
   if (!brief) throw new Error('runCreate: brief required');
   if (mode !== 'standalone' && mode !== 'structured-handoff') {
@@ -340,19 +344,32 @@ async function runCreate({
       : '_(no key_claims authored in brief)_';
     /* c8 ignore stop */
     // MAJOR N1: surface heuristically-extracted constants where possible;
-    // keep [TBD] (with the --design-choices hint) when extraction returns null.
-    const HINT = '*[Heuristic extraction from render-deck.cjs — pass `--design-choices design.json` to the standalone CLI for a fully-structured handoff.]*';
+    // keep [TBD] when extraction returns null. Live E2E Iteration 2 Fix #6:
+    // emit the heuristic-extraction notice ONCE at the top (after shorthand
+    // lines, before sections), not after every section — repeating it 4×
+    // reads as scolding.
+    const NOTICE = '> *Note: Palette/Typography/Motif heuristically extracted from render-deck.cjs. Pass `--design-choices design.json` for fully-structured handoff.*';
     const paletteBody = heuristic.palette
-      ? `Extracted from render-deck.cjs PALETTE/COLORS block — ${heuristic.palette}.\n\n${HINT}`
-      : `[TBD — agent did not capture structured design choices and no PALETTE/COLORS block was found in render-deck.cjs.]\n\n${HINT}`;
+      ? `Extracted from render-deck.cjs PALETTE/COLORS block — ${heuristic.palette}.`
+      : `[TBD — agent did not capture structured design choices and no PALETTE/COLORS block was found in render-deck.cjs.]`;
     const typographyBody = heuristic.typography
-      ? `Extracted from render-deck.cjs TYPE/TYPOGRAPHY block — ${heuristic.typography}.\n\n${HINT}`
-      : `[TBD — agent did not capture structured design choices and no TYPE/TYPOGRAPHY block was found in render-deck.cjs.]\n\n${HINT}`;
+      ? `Extracted from render-deck.cjs TYPE/TYPOGRAPHY block — ${heuristic.typography}.`
+      : `[TBD — agent did not capture structured design choices and no TYPE/TYPOGRAPHY block was found in render-deck.cjs.]`;
     const motifBody = heuristic.motif
-      ? `${heuristic.motif}\n\n${HINT}`
-      : `[TBD — agent did not capture a structured motif description; add a leading \`// Motif: ...\` comment to render-deck.cjs or pass --design-choices.]\n\n${HINT}`;
+      ? `${heuristic.motif}`
+      : `[TBD — agent did not capture a structured motif description; add a leading \`// Motif: ...\` comment to render-deck.cjs or pass --design-choices.]`;
+    // Shorthand lines for regex tooling (Live E2E Iter2 Fix #5): emit
+    // **Palette:** / **Typography:** / **Motif:** RIGHT AFTER the H1 title
+    // and BEFORE any section heading.
+    const shortPalette = heuristic.palette || '(unnamed)';
+    const shortTypography = heuristic.typography || '(unnamed)';
+    const shortMotif = heuristic.motif || '(unnamed)';
     const stub =
       `# Design Rationale — ${brief.topic}\n\n` +
+      `**Palette:** ${shortPalette}\n` +
+      `**Typography:** ${shortTypography}\n` +
+      `**Motif:** ${shortMotif}\n\n` +
+      `${NOTICE}\n\n` +
       `*Brief topic:* ${brief.topic}\n\n` +
       `*Author mode:* ${mode}\n\n` +
       `*Render path:* render-deck.cjs (agent-authored)\n\n` +
@@ -363,11 +380,24 @@ async function runCreate({
       `## Motif\n\n${motifBody}\n\n` +
       `## Narrative Arc\n\n${arcLines}\n\n` +
       `### Key claims by slide\n\n${claimLines}\n\n` +
-      `## Key Tradeoffs\n\n[TBD — not authored in standalone mode without structured design choices.]\n\n${HINT}\n\n` +
+      `## Key Tradeoffs\n\n[TBD — not authored in standalone mode without structured design choices.]\n\n` +
       `## Reviewer Notes\n\n[TBD — not authored in standalone mode without structured design choices. ` +
-      `Run /instadecks:review on deck.pptx to populate this section in a follow-up artifact.]\n\n${HINT}\n`;
+      `Run /instadecks:review on deck.pptx to populate this section in a follow-up artifact.]\n`;
     await fsp.writeFile(rationalePath, stub);
   }
+
+  // Live E2E Iteration 2 Fix #11: surface cycleCount + convergenceReason so
+  // wrappers can tell whether the auto-refine loop converged, oscillated, or
+  // soft-capped. Standalone CLI (no in-loop runs): defaults to
+  // {cycleCount:1, convergenceReason:'standalone-no-loop'}. Agent-mode
+  // wrappers may inject the loop's actual values via the runCreate args.
+  const resolvedCycleCount =
+    Number.isInteger(cycleCount) && cycleCount > 0 ? cycleCount : 1;
+  const VALID_REASONS = new Set([
+    'converged', 'oscillation', 'soft-cap', 'standalone-no-loop',
+  ]);
+  const resolvedReason = VALID_REASONS.has(convergenceReason)
+    ? convergenceReason : 'standalone-no-loop';
 
   const result = {
     deckPath,
@@ -377,6 +407,8 @@ async function runCreate({
     runId,
     slidesCount,
     warnings,
+    cycleCount: resolvedCycleCount,
+    convergenceReason: resolvedReason,
   };
 
   if (mode === 'standalone') {
