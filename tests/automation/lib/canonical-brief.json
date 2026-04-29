@@ -1,0 +1,25 @@
+{
+  "topic": "AI in Healthcare 2026 — Funding Ask",
+  "audience": "Hospital executives and senior leadership team",
+  "tone": "editorial-mono, executive, authoritative",
+  "narrative_arc": [
+    "Title — AI in Healthcare 2026 funding ask",
+    "Context — adoption pressure on regional hospital networks",
+    "Key insight — single hero stat anchoring the case for investment",
+    "Evidence — comparison of pilot vs. control cohorts",
+    "Implications — what the data means for the next planning cycle",
+    "Recommendation — concrete next-step funding ask",
+    "Risks — top 2 risks and mitigations",
+    "Closing — decision needed and call to action"
+  ],
+  "key_claims": [
+    { "slide_idx": 2, "claim": "AI triage cut median ED wait time by 38%", "evidence": "12-week pilot at 3 sites", "source": "internal pilot report, 2026-Q1" },
+    { "slide_idx": 3, "claim": "Pilot cohort outperformed control on 4 of 5 KPIs", "evidence": "Comparison of pilot vs. control sites", "source": "internal analytics, 2026-03" },
+    { "slide_idx": 5, "claim": "Recommend approving $4.2M scale-out budget by 2026-11-15", "evidence": "Capacity model + projected ROI", "source": "finance + people-ops capacity model" }
+  ],
+  "asset_hints": {
+    "images": [],
+    "logos": []
+  },
+  "source_files": []
+}
