@@ -1,15 +1,32 @@
 'use strict';
-// design-validator.js — D-04 palette + typography guardrails.
-// Pure function (no fs). Rules:
+// design-validator.js — D-04 palette + typography guardrails (legacy structured API)
+// PLUS Plan 09-05 palette-aware render-source validator.
+//
+// Legacy rules (preserved, structured-input API: validateDesignChoice):
 //   R1-default-blue: palette.primary in {0070C0,1F4E79,2E75B6} without
 //                    corporate/blue/finance justification in brief.tone/topic.
 //   R2-typography-pinned: {heading,body} pair not present in
 //                    designIdeas.typography_pairs.
 //   R3-hex-shape: any palette field not exactly 6 hex chars (no leading '#').
+//
+// Plan 09-05 rules (new, render-source string API: validateRenderSource):
+//   - Module reads `references/palettes.md` at init; builds RECOGNIZED_PALETTES
+//     (Map<name, {bg,primary,...}>) and RECOGNIZED_HEX (Set of all hex values).
+//   - default-calibri: render uses fontFace: 'Calibri'
+//   - office-blue: '#0070C0' is the only non-default accent and no other
+//     RECOGNIZED_HEX values (beyond bg/ink) appear in the render
+//   - stock-placeholder: filenames matching /(stock|placeholder|sample|untitled|img\d+)/i
+//   - diversity-violation: ≥3 slides share the same `// VARIANT: <id>` marker
+//   - asymmetric-layout: REMOVED (legitimate per CONTEXT D-07)
+//   - saturated-primary / non-default-blue: SKIPPED when offending hex ∈ RECOGNIZED_HEX
+
+const fs = require('node:fs');
+const path = require('node:path');
+
+// --- Legacy structured-input API (unchanged) -----------------------------
 
 const DEFAULT_BLUE_HEXES = new Set(['0070C0', '1F4E79', '2E75B6']);
 const BLUE_OVERRIDE_KEYWORDS = ['corporate', 'blue', 'finance'];
-
 const HEX6 = /^[0-9A-Fa-f]{6}$/;
 
 function r1DefaultBlue(palette, brief) {
@@ -70,7 +87,144 @@ function validateDesignChoice({ palette, typography, brief, designIdeas } = {}) 
   return { ok: violations.length === 0, violations };
 }
 
+// --- Plan 09-05: palette-aware render-source validator -------------------
+
+const PALETTES_MD_PATH = path.join(__dirname, '..', '..', 'references', 'palettes.md');
+
+function buildPaletteRegistry(palettesText) {
+  // Parse `## <Name>` H2 boundaries; within each block, parse `| role | \`#RRGGBB\` |` rows.
+  const palettes = new Map();
+  const allHex = new Set();
+  const sections = palettesText.split(/^## /m).slice(1); // drop preamble
+  for (const section of sections) {
+    const nameMatch = section.match(/^([^\n]+)\n/);
+    if (!nameMatch) continue;
+    const name = nameMatch[1].trim();
+    const roles = {};
+    const rowRe = /\|\s*(bg|primary|secondary|accent|ink|muted)\s*\|\s*`#([0-9A-Fa-f]{6})`\s*\|/g;
+    let m;
+    while ((m = rowRe.exec(section)) !== null) {
+      const role = m[1];
+      const hex = m[2].toUpperCase();
+      roles[role] = hex;
+      allHex.add(hex);
+    }
+    if (Object.keys(roles).length > 0) {
+      palettes.set(name, roles);
+    }
+  }
+  return { palettes, allHex };
+}
+
+const _palettesText = fs.readFileSync(PALETTES_MD_PATH, 'utf8');
+const { palettes: RECOGNIZED_PALETTES, allHex: RECOGNIZED_HEX } = buildPaletteRegistry(_palettesText);
+
+const STOCK_RE = /(stock|placeholder|sample|untitled|img\d+)/i;
+const VARIANT_RE = /\/\/\s*VARIANT:\s*([A-Za-z0-9_-]+)/g;
+const HEX_LITERAL_RE = /#?([0-9A-Fa-f]{6})\b/g;
+const OFFICE_BLUE = '0070C0';
+
+function extractVariantMarkers(src) {
+  const markers = [];
+  let m;
+  VARIANT_RE.lastIndex = 0;
+  while ((m = VARIANT_RE.exec(src)) !== null) {
+    markers.push(m[1]);
+  }
+  return markers;
+}
+
+function extractHexValues(src) {
+  const found = new Set();
+  let m;
+  HEX_LITERAL_RE.lastIndex = 0;
+  while ((m = HEX_LITERAL_RE.exec(src)) !== null) {
+    found.add(m[1].toUpperCase());
+  }
+  return found;
+}
+
+function checkDefaultCalibri(src) {
+  if (/fontFace\s*:\s*['"]Calibri['"]/i.test(src)) {
+    return { id: 'default-calibri', severity: 'major', message: 'default Calibri fontFace detected — pick a recognized type pair' };
+  }
+  return null;
+}
+
+function checkOfficeBlue(src, hexes) {
+  if (!hexes.has(OFFICE_BLUE)) return null;
+  // Office-blue is fine if any OTHER recognized-palette hex is also present in the render.
+  for (const hex of hexes) {
+    if (hex === OFFICE_BLUE) continue;
+    if (RECOGNIZED_HEX.has(hex)) return null;
+  }
+  return { id: 'office-blue', severity: 'major', message: 'Office-blue (#0070C0) is the only accent — pick a curated palette from palettes.md' };
+}
+
+function checkStockPlaceholder(src) {
+  // Look for filenames in addImage path strings or similar.
+  const re = /['"]([^'"\s]*?(?:stock|placeholder|sample|untitled|img\d+)[^'"\s]*?)['"]/i;
+  const m = re.exec(src);
+  if (m) {
+    return { id: 'stock-placeholder', severity: 'major', message: `generic stock-photo placeholder filename "${m[1]}"` };
+  }
+  return null;
+}
+
+function checkDiversityViolation(markers) {
+  if (markers.length === 0) return null;
+  const indexByVariant = new Map();
+  markers.forEach((id, i) => {
+    if (!indexByVariant.has(id)) indexByVariant.set(id, []);
+    indexByVariant.get(id).push(i);
+  });
+  for (const [id, slides] of indexByVariant) {
+    if (slides.length >= 3) {
+      return {
+        id: 'diversity-violation',
+        severity: 'major',
+        message: `Variant ${id} used ${slides.length} times — vary the layout (max 2 per deck)`,
+        slides,
+      };
+    }
+  }
+  return null;
+}
+
+function validateRenderSource(src) {
+  const findings = [];
+  const hexes = extractHexValues(src);
+  const markers = extractVariantMarkers(src);
+
+  const f1 = checkDefaultCalibri(src);
+  if (f1) findings.push(f1);
+  const f2 = checkOfficeBlue(src, hexes);
+  if (f2) findings.push(f2);
+  const f3 = checkStockPlaceholder(src);
+  if (f3) findings.push(f3);
+  const f4 = checkDiversityViolation(markers);
+  if (f4) findings.push(f4);
+
+  return { ok: findings.length === 0, findings };
+}
+
 module.exports = {
   validateDesignChoice,
-  _internal: { DEFAULT_BLUE_HEXES, BLUE_OVERRIDE_KEYWORDS, r1DefaultBlue, r2TypographyPinned, r3HexShape },
+  validateRenderSource,
+  _internal: {
+    DEFAULT_BLUE_HEXES,
+    BLUE_OVERRIDE_KEYWORDS,
+    r1DefaultBlue,
+    r2TypographyPinned,
+    r3HexShape,
+    RECOGNIZED_HEX,
+    RECOGNIZED_PALETTES,
+    buildPaletteRegistry,
+    checkDefaultCalibri,
+    checkOfficeBlue,
+    checkStockPlaceholder,
+    checkDiversityViolation,
+    extractVariantMarkers,
+    extractHexValues,
+  },
 };
