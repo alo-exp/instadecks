@@ -70,9 +70,11 @@ test('validateBrief: key_claims must be array', () => {
   assert.throws(() => validateBrief(goodBrief({ key_claims: 'no' })), /key_claims: must be array/);
 });
 
-test('validateBrief: key_claims[i] must be object', () => {
+test('validateBrief: key_claims[i] non-string non-object → must be object', () => {
+  // Live E2E Iteration 2 Fix #12: bare strings auto-promote to
+  // {slide_idx:0, claim:<str>}; only non-string non-object items still throw.
   assert.throws(
-    () => validateBrief(goodBrief({ key_claims: ['notobj'] })),
+    () => validateBrief(goodBrief({ key_claims: [42] })),
     /key_claims\[0\]: must be object/,
   );
 });
