@@ -75,6 +75,64 @@ test('tools-lint-pptxgenjs-enums-branches', async (t) => {
     }
   });
 
+  await t.test('HARD-01: pres.shapes.<typo> emits violation with closest-match suggestion', () => {
+    const tmp = freshTmp('elint-typo');
+    try {
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      fs.writeFileSync(path.join(tmp, 'skills', 'bad.cjs'),
+        "slide.addShape(pres.shapes.RECT, { x: 0, y: 0 });\n");
+      const r = run(tmp);
+      assert.equal(r.status, 1, `expected exit 1, got ${r.status}, stderr=${r.stderr}`);
+      assert.match(r.stderr, /pres\.shapes\.RECT/);
+      assert.match(r.stderr, /not an exported pptxgenjs ShapeType/);
+      assert.match(r.stderr, /suggestion: RECTANGLE/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('HARD-01: pres.shapes.RECTANGLE (valid key) passes', () => {
+    const tmp = freshTmp('elint-valid-shape');
+    try {
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      fs.writeFileSync(path.join(tmp, 'skills', 'ok.cjs'),
+        "slide.addShape(pres.shapes.RECTANGLE, { x: 0, y: 0 });\n");
+      const r = run(tmp);
+      assert.equal(r.status, 0, `expected exit 0, got ${r.status}, stderr=${r.stderr}`);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('HARD-01: pres.shapes.<bizarre> emits violation WITHOUT suggestion (Levenshtein > 3)', () => {
+    const tmp = freshTmp('elint-bizarre');
+    try {
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      fs.writeFileSync(path.join(tmp, 'skills', 'bad.cjs'),
+        "slide.addShape(pres.shapes.SOMETHING_BIZARRE, { x: 0 });\n");
+      const r = run(tmp);
+      assert.equal(r.status, 1);
+      assert.match(r.stderr, /pres\.shapes\.SOMETHING_BIZARRE/);
+      assert.match(r.stderr, /not an exported pptxgenjs ShapeType/);
+      assert.doesNotMatch(r.stderr, /suggestion:/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  await t.test('HARD-01: ALLOW_MARKER on a typo line skips the violation', () => {
+    const tmp = freshTmp('elint-typo-allow');
+    try {
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      fs.writeFileSync(path.join(tmp, 'skills', 'doc.md'),
+        "Example: pres.shapes.RECT — anti-pattern. <!-- enum-lint-allow: anti-pattern doc -->\n");
+      const r = run(tmp);
+      assert.equal(r.status, 0, `expected exit 0, got ${r.status}, stderr=${r.stderr}`);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   await t.test('roots that do not exist on disk are silently skipped', () => {
     // Fresh tmp tree has no skills/ + no tests/fixtures/ → walk early-returns,
     // overall lint exits 0 with "0 files clean".
