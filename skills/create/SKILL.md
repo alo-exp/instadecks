@@ -212,6 +212,16 @@ If `result.warnings.length > 0`, surface them (e.g., "xmllint missing — OOXML 
 | render-deck.cjs (audit trail) | `${runDir}/render-deck.cjs` | yes |
 | brief.json (audit trail) | `${runDir}/brief.json` | yes |
 
+## Output contract for varied input shapes
+
+Regardless of input shape (structured JSON, markdown narrative, raw text, attached files), every `/instadecks:create` run produces the same artifacts under `.planning/instadecks/<run-id>/`:
+
+- `deck.pptx` — the rendered presentation
+- `deck.pdf` — PDF render via soffice
+- `design-rationale.md` — MUST include lines `Palette: <name>`, `Typography: <name>`, `Motif: <name>` so downstream tooling (review, annotate, diversity gate) can read the rolled design DNA. The richer `## Palette` / `## Typography` / `## Motif` markdown sections produced by `lib/render-rationale.js` remain the primary surface; the `Palette: <name>` / `Typography: <name>` / `Motif: <name>` shorthand lines MUST also appear (top of file or alongside the section headings) so regex-based tooling can extract the chosen DNA without parsing markdown sections.
+- `findings.json` — populated by `/instadecks:review` (empty until review runs)
+- `annotated.pptx` — populated by `/instadecks:annotate`
+
 ## Out of scope (deferred)
 
 - /content-review integration — **v2** (PROJECT.md).
