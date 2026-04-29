@@ -40,24 +40,18 @@ function looksLikeFilesArray(arr) {
 }
 
 function detectBriefShape(input) {
-  // files
+  // files (most-specific object shape — checked before generic json)
   if (isPlainObject(input) && Array.isArray(input.files)) return 'files';
   if (looksLikeFilesArray(input)) return 'files';
-  // json
-  if (isPlainObject(input)) {
-    const hasTopic =
-      typeof input.topic === 'string' || typeof input.title === 'string';
-    const hasSecondary =
-      typeof input.audience === 'string' ||
-      Array.isArray(input.narrative_arc) ||
-      Array.isArray(input.key_claims) ||
-      Array.isArray(input.key_messages);
-    if (hasTopic && hasSecondary) return 'json';
-    return 'raw';
-  }
+  // json — any other plain object. validateBrief downstream is responsible for
+  // catching structural problems (missing topic / audience / narrative_arc).
+  // Treating partial objects as 'json' preserves the legacy contract: callers
+  // who hand runCreate an object always saw validateBrief errors, never a
+  // surprise extractor call.
+  if (isPlainObject(input)) return 'json';
   // markdown
   if (typeof input === 'string' && /^#\s+/.test(input)) return 'markdown';
-  // raw
+  // raw (string fallthrough, plus null / undefined / other primitives)
   return 'raw';
 }
 
