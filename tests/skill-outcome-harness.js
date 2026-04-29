@@ -29,6 +29,10 @@ const os = require('node:os');
 const REPO_ROOT = path.join(__dirname, '..');
 
 function skillMdPath(skillName) {
+  // Skills were moved from skills/<name>/SKILL.md to commands/instadecks-<name>.md
+  const commandPath = path.join(REPO_ROOT, 'commands', `instadecks-${skillName}.md`);
+  if (fs.existsSync(commandPath)) return commandPath;
+  // Fallback to legacy path for any skill not yet migrated
   return path.join(REPO_ROOT, 'skills', skillName, 'SKILL.md');
 }
 
