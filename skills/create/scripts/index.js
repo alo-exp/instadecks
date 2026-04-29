@@ -13,6 +13,7 @@ const { execFile, spawn } = require('node:child_process');
 const { validateBrief } = require('./lib/deck-brief');
 const { lintCjs } = require('./lib/enum-lint');
 const { render: renderRationale } = require('./lib/render-rationale');
+const { normalizeBrief } = require('./lib/brief-normalizer');
 
 // Live E2E Round 3 MAJOR N1: best-effort static extraction of PALETTE / TYPE /
 // motif from a render-deck.cjs source string. Returns { palette, typography,
@@ -217,6 +218,11 @@ async function runCreate({
   if (mode !== 'standalone' && mode !== 'structured-handoff') {
     throw new Error(`runCreate: mode must be 'standalone' or 'structured-handoff' (got ${JSON.stringify(mode)})`);
   }
+
+  // Plan 9-04 (DV-06/DV-07): polymorphic brief intake. normalizeBrief is a
+  // passthrough for the legacy JSON shape (byte-identical canonical brief);
+  // markdown / raw / files inputs are routed through the LLM extractor DI.
+  brief = await normalizeBrief(brief);
 
   // 1. Validate brief — D-01 / CRT-01.
   validateBrief(brief);

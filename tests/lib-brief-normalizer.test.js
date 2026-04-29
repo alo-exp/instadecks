@@ -66,10 +66,11 @@ test('lib-brief-normalizer', async (t) => {
     assert.equal(detectBriefShape('plain prose with no heading'), 'raw');
   });
 
-  await t.test('detect: object without telltale fields → raw (string-coerced)', () => {
-    // An empty object isn't json (no topic/title), not files (no files key),
-    // not markdown — fall through to raw so the extractor can decide.
-    assert.equal(detectBriefShape({}), 'raw');
+  await t.test('detect: object without telltale fields → json (validateBrief catches)', () => {
+    // Any plain object that is NOT a files-shape gets 'json' — preserving the
+    // legacy contract that runCreate always passed objects through validateBrief.
+    assert.equal(detectBriefShape({}), 'json');
+    assert.equal(detectBriefShape({ topic: 'x' }), 'json');
   });
 
   await t.test('detect: empty array → raw', () => {
@@ -187,6 +188,29 @@ test('lib-brief-normalizer', async (t) => {
       assert.deepEqual(out, CANONICAL);
     } finally {
       _test_setLlm(null);
+    }
+  });
+
+  await t.test('default extractor: array-of-files (no wrapper) routes through extractor', async () => {
+    const path = require('node:path');
+    const fs = require('node:fs');
+    const os = require('node:os');
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'bn-arr-'));
+    const f1 = path.join(tmp, 'a.txt');
+    fs.writeFileSync(f1, 'gamma content', 'utf8');
+    let promptSeen = '';
+    _test_setExtractor(null);
+    _test_setLlm(async (prompt) => {
+      promptSeen = prompt;
+      return CANONICAL;
+    });
+    try {
+      const out = await normalizeBrief([{ path: f1, type: 'transcript' }]);
+      assert.deepEqual(out, CANONICAL);
+      assert.match(promptSeen, /gamma content/);
+    } finally {
+      _test_setLlm(null);
+      fs.rmSync(tmp, { recursive: true, force: true });
     }
   });
 

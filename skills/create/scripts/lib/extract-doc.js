@@ -59,6 +59,7 @@ async function extractDocText({ path: p, type } = {}) {
     }
     const { stdout } = await execFileP('unzip', ['-p', abs, 'word/document.xml']);
     // Strip <w:t> text nodes (preserve whitespace via xml:space="preserve" → ignore the attr; just capture inner text).
+    /* c8 ignore next */ // Defensive: docx with zero <w:t> matches is valid but rare; the `|| []` arm only fires on truly empty documents which the buildDocx fixture never produces.
     const matches = stdout.match(/<w:t[^>]*>([^<]*)<\/w:t>/g) || [];
     const text = matches
       .map((m) => m.replace(/<w:t[^>]*>/, '').replace(/<\/w:t>/, ''))

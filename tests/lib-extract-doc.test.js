@@ -144,6 +144,43 @@ test('lib-extract-doc', async (t) => {
     );
   });
 
+  await t.test('docx: corrupt zip file → unzip fails → throws extract-doc:', async () => {
+    const p = path.join(tmp, 'corrupt.docx');
+    await fsp.writeFile(p, 'not a zip', 'utf8');
+    await assert.rejects(
+      () => extractDocText({ path: p, type: 'docx' }),
+      /extract-doc: unzip failed/,
+    );
+  });
+
+  await t.test('pdf: ENOENT on pdftotext surfaces "pdf extraction unavailable"', async () => {
+    // Force pdftotext to be unfindable by stripping PATH for this call only.
+    // We do this by writing a tiny shim: extractDocText execFile resolves
+    // via PATH; an empty PATH makes the spawn ENOENT → caught and remapped.
+    const p = path.join(tmp, 'fake.pdf');
+    await fsp.writeFile(p, '%PDF-1.0\n', 'utf8');
+    const origPath = process.env.PATH;
+    process.env.PATH = '';
+    try {
+      await assert.rejects(
+        () => extractDocText({ path: p, type: 'pdf' }),
+        /pdf extraction unavailable|extract-doc: pdftotext failed/,
+      );
+    } finally {
+      process.env.PATH = origPath;
+    }
+  });
+
+  await t.test('pdf: pdftotext fails on garbage input → surfaces extract-doc: pdftotext failed', async () => {
+    if (!pdftotextAvailable()) return; // skip if no pdftotext
+    const p = path.join(tmp, 'not-pdf.pdf');
+    await fsp.writeFile(p, 'this is not a pdf at all', 'utf8');
+    await assert.rejects(
+      () => extractDocText({ path: p, type: 'pdf' }),
+      /extract-doc:/,
+    );
+  });
+
   await t.test('relative path resolves against cwd', async () => {
     const cwdTmp = freshTmp('extract-doc-cwd');
     const rel = 'rel.txt';
