@@ -84,6 +84,51 @@ function extractHeuristicDesign(cjsSrc) {
   return result;
 }
 
+// Live E2E Iter4-2: --diversity-history scanner. Accepts BOTH layouts:
+//   (a) flat: `<histDir>/<anything>.md` files containing rationale shorthand.
+//   (b) per-run subdir: `<histDir>/<run-id>/design-rationale.md` (legacy).
+// Pure-ish helper (does its own fs reads). Returns { histDir, priorRuns,
+// priorDnas } where priorRuns is the list of entry labels that contributed.
+async function scanDiversityHistory(diversityHistory) {
+  const histDir = path.resolve(diversityHistory);
+  const priorDnas = [];
+  const priorRuns = [];
+  const histEntries = await fsp.readdir(histDir).catch(() => []);
+  const parseRationale = (md, label) => {
+    const pal = md.match(/\*\*Palette:\*\*\s*(.+)/);
+    const typ = md.match(/\*\*Typography:\*\*\s*(.+)/);
+    const mot = md.match(/\*\*Motif:\*\*\s*(.+)/);
+    if (pal || typ || mot) {
+      priorRuns.push(label);
+      priorDnas.push({
+        palette: pal ? pal[1].trim() : '',
+        typography: typ ? typ[1].trim() : '',
+        motif: mot ? mot[1].trim() : '',
+      });
+    }
+  };
+  for (const ent of histEntries) {
+    const entPath = path.join(histDir, ent);
+    let stat;
+    try { stat = await fsp.stat(entPath); } catch (e) { continue; }
+    if (stat.isFile() && /\.md$/i.test(ent)) {
+      // Flat layout: read file directly.
+      try {
+        const md = await fsp.readFile(entPath, 'utf8');
+        parseRationale(md, ent);
+      } catch (e) { /* unreadable — skip */ }
+    } else if (stat.isDirectory()) {
+      // Per-run subdir layout (legacy): expect design-rationale.md inside.
+      const ratPath = path.join(entPath, 'design-rationale.md');
+      try {
+        const md = await fsp.readFile(ratPath, 'utf8');
+        parseRationale(md, ent);
+      } catch (e) { /* not a run dir */ }
+    }
+  }
+  return { histDir, priorRuns, priorDnas };
+}
+
 function generateRunId() {
   const d = new Date();
   const pad = n => String(n).padStart(2, '0');
@@ -298,39 +343,21 @@ async function runCreate({
   // Iter3-7: --diversity-history observability. When supplied, scan the path
   // for prior run dirs, parse their design-rationale shorthand DNA, and emit
   // a stderr line listing prior DNAs and whether the current run collides.
-  /* c8 ignore start */ // Observability path; covered by direct unit tests via runCreate stub spawn.
+  // Live E2E Iter4-2: also accept FLAT-DIR layout (sibling *.md rationale
+  // files directly under <histDir>) — earlier code only walked
+  // <histDir>/<run-id>/design-rationale.md, silently missing flat layouts.
   if (diversityHistory) {
     try {
-      const histDir = path.resolve(diversityHistory);
-      const priorDnas = [];
-      const priorRuns = [];
-      const histEntries = await fsp.readdir(histDir).catch(() => []);
-      for (const ent of histEntries) {
-        const ratPath = path.join(histDir, ent, 'design-rationale.md');
-        try {
-          const md = await fsp.readFile(ratPath, 'utf8');
-          const pal = md.match(/\*\*Palette:\*\*\s*(.+)/);
-          const typ = md.match(/\*\*Typography:\*\*\s*(.+)/);
-          const mot = md.match(/\*\*Motif:\*\*\s*(.+)/);
-          if (pal || typ || mot) {
-            priorRuns.push(ent);
-            priorDnas.push({
-              palette: pal ? pal[1].trim() : '',
-              typography: typ ? typ[1].trim() : '',
-              motif: mot ? mot[1].trim() : '',
-            });
-          }
-        } catch (e) { /* not a run dir */ }
-      }
+      const scan = await scanDiversityHistory(diversityHistory);
       process.stderr.write(
-        `Instadecks: diversity history scanning ${histDir} ` +
-        `(found ${priorRuns.length} prior runs${priorRuns.length ? ': ' + priorRuns.join(', ') : ''})\n`);
-      _diversityPriors = priorDnas;
+        `Instadecks: diversity history scanning ${scan.histDir} ` +
+        `(found ${scan.priorRuns.length} prior runs${scan.priorRuns.length ? ': ' + scan.priorRuns.join(', ') : ''})\n`);
+      _diversityPriors = scan.priorDnas;
     } catch (e) {
+      /* c8 ignore next */ // path.resolve is the only sync op outside scanDiversityHistory; any throw here is an unrecoverable env error.
       process.stderr.write(`Instadecks: diversity history scan failed: ${e.message}\n`);
     }
   }
-  /* c8 ignore stop */
 
   // 3. Read agent-authored render-deck.cjs.
   const cjsPath = path.join(resolvedOut, 'render-deck.cjs');
@@ -548,6 +575,7 @@ module.exports = {
   runCreate,
   generateRunId,
   resolveOutDir,
+  scanDiversityHistory,
   _test_setSpawn,
   _test_setRunReview,
   _test_setRunCreate,

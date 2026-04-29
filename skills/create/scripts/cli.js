@@ -4,6 +4,14 @@
 // Usage: cli.js [outDir] (--brief <path.json> | --brief-text <text> | --brief-md <path.md>
 //        | --brief-files <a.pdf,b.docx>) [--run-id <id>] [--out-dir <dir>]
 //        [--mode standalone|structured-handoff] [--soft-cap=<accept|stop|continue>]
+//        [--diversity-history <dir>]
+//
+// --diversity-history <dir>: directory containing prior design-rationale.md
+// files. Both layouts are supported (Live E2E Iter4-2):
+//   (a) flat — *.md files directly under <dir>
+//   (b) per-run subdirs — <dir>/<run-id>/design-rationale.md
+// Files that don't carry **Palette:** / **Typography:** / **Motif:** lines are
+// silently skipped.
 // Pure JSON to stdout in standalone mode (runCreate prints); errors to stderr.
 //
 // Plan 9-04 (DV-06/DV-07): polymorphic brief intake. The 4 brief flags are mutually
