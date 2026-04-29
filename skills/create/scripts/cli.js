@@ -66,7 +66,7 @@ function parseArgs(argv) {
   const args = {
     brief: null, briefText: null, briefMd: null, briefFiles: null,
     runId: null, outDir: null, mode: 'standalone', softCap: null, designChoices: null,
-    scaffold: null, diversityHistory: null,
+    scaffold: null, diversityHistory: null, clean: false,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -80,6 +80,7 @@ function parseArgs(argv) {
     else if (a === '--design-choices') { args.designChoices = argv[++i]; }
     else if (a === '--scaffold') { args.scaffold = argv[++i]; }
     else if (a === '--diversity-history') { args.diversityHistory = argv[++i]; }
+    else if (a === '--clean') { args.clean = true; }
     else if (typeof a === 'string' && a.startsWith('--soft-cap=')) {
       args.softCap = parseSoftCapFlag([a]);
     }
@@ -240,6 +241,7 @@ async function main() {
     mode: args.mode,
     designChoices,
     diversityHistory: args.diversityHistory || undefined,
+    clean: args.clean,
   });
 }
 

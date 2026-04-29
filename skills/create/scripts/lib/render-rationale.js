@@ -87,9 +87,14 @@ function renderShorthand(designChoices) {
     if (dc.motif.length === 0) {
       motif = '(unnamed)';
     } else {
-      // First sentence/phrase — split on period, semicolon, or em-dash.
-      const m = dc.motif.split(/[.;—]/)[0].trim();
-      motif = m.length > 0 ? m : dc.motif;
+      // Iter3-1 fix: do NOT truncate at sentence-internal punctuation (`.;—`).
+      // Decimals (e.g. `0.75pt`), multi-clause descriptions, and multi-line
+      // continuations were being silently dropped. Take the full string,
+      // collapsed onto a single line so it remains a valid markdown shorthand
+      // line (no embedded newlines), and trimmed.
+      const collapsed = dc.motif.replace(/\s*\n+\s*/g, ' ').trim();
+      /* c8 ignore next */ // Defensive: whitespace-only motifs are filtered upstream by validateBrief / agent authoring; the empty-after-trim fallback is a safety net.
+      motif = collapsed.length > 0 ? collapsed : '(unnamed)';
     }
   } else if (dc.motif && typeof dc.motif === 'object' && dc.motif.name) {
     motif = dc.motif.name;

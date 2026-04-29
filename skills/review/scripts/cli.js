@@ -56,7 +56,23 @@ async function main() {
     );
     process.exit(2);
   }
-  const findings = JSON.parse(fs.readFileSync(path.resolve(args.findings), 'utf8'));
+  let findings;
+  try {
+    findings = JSON.parse(fs.readFileSync(path.resolve(args.findings), 'utf8'));
+  } catch (e) {
+    console.error(
+      `Error: --findings <path> file not found or invalid JSON: ${args.findings}\n\n` +
+      'The reviewer step (LLM reading slide images, producing findings JSON) is an\n' +
+      'agent-mode operation only available when running through Claude Code\n' +
+      '(/instadecks:review).\n\n' +
+      'For standalone CLI usage:\n' +
+      '  1. Author findings JSON conforming to skills/review/references/findings-schema.md (v1.1)\n' +
+      '  2. Save as findings.json\n' +
+      '  3. Run: cli.js --findings findings.json <deck.pptx>\n\n' +
+      `Underlying error: ${e.message}`
+    );
+    process.exit(2);
+  }
   await runReview({
     deckPath: path.resolve(args.deckPath),
     runId: args.runId || undefined,
