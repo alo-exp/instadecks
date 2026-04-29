@@ -1,0 +1,35 @@
+Speaker A: So the question is whether we ship the migration in Q4 or punt to Q1.
+Speaker B: I think we have to be honest about what shipping in Q4 actually means. We have three weeks of dev work left, two weeks of staging soak, and we lose a week to the holiday freeze.
+Speaker A: That's six weeks. We have eight.
+Speaker B: We have eight if nothing slips. Have you ever shipped an eight-week plan with zero slip?
+Speaker A: Fair.
+Speaker C: Can I jump in here? The reason this matters is the SLA renewal with our top three accounts is in February. If we go into that conversation still on the legacy stack, we're handing them a reason to renegotiate.
+Speaker B: Or we're handing them a reason to wait for us to ship something stable.
+Speaker C: Stable on the legacy stack means slow. They have already raised the latency complaint twice this quarter.
+Speaker A: What does Q1 actually buy us?
+Speaker B: Q1 buys us proper load testing on the new stack. We have not run anything above 40% of production traffic through it. The dual-write path is unverified at peak.
+Speaker C: And what does shipping in Q4 cost us?
+Speaker B: One incident on launch night becomes a board-level conversation. We're already on the watchlist after the September outage.
+Speaker A: Okay let me try to frame this. The Q4 case is — we have a deadline driver, we have a customer reason, the team is tired of dual-maintenance, and the new stack is functionally complete.
+Speaker C: Right.
+Speaker A: The Q1 case is — we have not load-tested at scale, we have not done a full disaster-recovery drill on the new stack, and a launch failure right now is asymmetrically bad.
+Speaker B: Yes, and the holiday freeze means even if we ship in week five, we cannot patch in week six.
+Speaker C: That last point is the one that should decide it. Shipping into a freeze is malpractice.
+Speaker A: Even if we hit the deadline?
+Speaker C: Especially if we hit the deadline.
+Speaker B: I want to flag one more thing. The dual-write infrastructure has a known consistency edge case under sustained write spikes. We have a fix for it. The fix has not been merged.
+Speaker A: When does it merge?
+Speaker B: Two weeks if it gets reviewed promptly.
+Speaker A: That eats half our buffer.
+Speaker C: It eats all of our buffer.
+Speaker A: Okay. I think the call is Q1. But we owe Sales a story for the SLA conversations.
+Speaker C: Agreed. We can give them a credible January launch date with a load-test gate. That is a stronger story than a wobbly December launch.
+Speaker B: I can write the gate criteria today.
+Speaker A: Do that. Three things you need to commit to. One, gate criteria document by Friday. Two, dual-write fix merged within two weeks. Three, load test at 100% of peak traffic in week four of January.
+Speaker B: Yes to all three.
+Speaker C: I'll talk to Sales this afternoon and frame the January launch.
+Speaker A: Good. Let's reconvene next Monday and look at the gate criteria together.
+Speaker B: One last thing — what do we tell the team? They have been pushing for Q4.
+Speaker A: We tell them the truth. We tell them we are not shipping into a freeze, we are not shipping without a load test at peak, and we are not making February's SLA conversation harder by being on a broken launch.
+Speaker C: That's the right framing.
+Speaker A: Okay. We're done.

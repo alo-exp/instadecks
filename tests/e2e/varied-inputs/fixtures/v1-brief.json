@@ -1,0 +1,15 @@
+{
+  "title": "Q3 enterprise growth review",
+  "audience": "executive",
+  "purpose": "quarterly review",
+  "key_messages": [
+    "Net revenue up 23% YoY",
+    "Enterprise tier drove 67% of growth",
+    "Pipeline coverage at 3.2×"
+  ],
+  "data_points": [
+    { "label": "Q3 NRR", "value": "118%" },
+    { "label": "Enterprise ARR", "value": "$48M" }
+  ],
+  "tone": "executive-confident"
+}
