@@ -44,8 +44,8 @@ function capFor(relPath) {
   return 500;
 }
 
-function main() {
-  const { orphans, root } = parseArgs(process.argv.slice(2));
+function run(argv) {
+  const { orphans, root } = parseArgs(argv);
   const docsDir = path.join(root, 'docs');
   const allFiles = walk(docsDir);
   // Exclude out-of-scope subtrees (workflows/, sessions/) — see header comment.
@@ -78,12 +78,19 @@ function main() {
     }
   }
 
+  return { violations, fileCount: files.length };
+}
+
+function main(argv = process.argv.slice(2)) {
+  const { violations, fileCount } = run(argv);
   if (violations.length) {
     for (const v of violations) console.error(v);
     process.exit(1);
   }
-  console.log(`lint-doc-size: OK (${files.length} files clean)`);
+  console.log(`lint-doc-size: OK (${fileCount} files clean)`);
   process.exit(0);
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { run, parseArgs, walk, capFor, main };
