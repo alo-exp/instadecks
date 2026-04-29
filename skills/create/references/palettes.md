@@ -139,7 +139,7 @@
 
 **Use:** Long-form / research / academic briefs — warm paper ground and oxblood accent. Heavy serif headings carry the design.
 
-**Tone tags:** long-form, research, academic, scholarly, editorial, white-paper, foundation
+**Tone tags:** long-form, research, academic, scholarly, editorial, white-paper, foundation, executive, board, formal, manifesto
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -235,7 +235,7 @@
 
 **Use:** Sustainability / impact / heritage-brand briefs — forest ink with brass accent. Inherited earth-tone palette retained for backward compat.
 
-**Tone tags:** sustainability, impact, heritage, esg, earth-tone, foundation, conservation
+**Tone tags:** sustainability, impact, heritage, esg, earth-tone, foundation, conservation, executive, finance, consulting, b2b-enterprise
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -331,7 +331,7 @@
 
 **Use:** Manifesto / brand-statement / type-led briefs — pure black-on-white, no chromatic accent. Type and motif carry the design entirely.
 
-**Tone tags:** manifesto, brand-statement, type-led, monochrome, minimal, editorial, high-contrast
+**Tone tags:** manifesto, brand-statement, type-led, monochrome, minimal, editorial, high-contrast, executive, board, formal, corporate
 
 | ✅ DO | ❌ DON'T |
 |---|---|
