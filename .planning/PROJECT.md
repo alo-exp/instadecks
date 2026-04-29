@@ -95,6 +95,16 @@ A user can hand Claude Code arbitrary input material and end up with a polished,
 | alo-labs marketplace for distribution | Existing channel already trusted by users of Silver Bullet / Topgun | — Pending |
 | Apache-2.0 license | Permissive, explicit patent grant, fits open distribution intent | — Pending |
 
+### KD-09: v8 BluePrestige is one design DNA among many — invariant reversed (2026-04-28)
+
+**Decision:** The Phase 1-7 invariant "v8 BluePrestige output is the spec — match it" is RELAXED. Replacement: "v8 BluePrestige is one valid design DNA among many. Decks must vary palette / typography / motif / layout per brief — never default to the v8 visual register."
+
+**Trigger:** Phase 9 CONTEXT D-09 + 5 live E2E rounds where structurally-different domain briefs produced visually-similar decks.
+
+**Scope:** Applies to the deck-generation system (cookbook recipes + design-validator.js). Does NOT apply to annotate.js — its geometry/colors/transparency/fonts/SAMPLES contract continues to require visual-regression sign-off (Phase 8 ed12484 moved annotate.js to standard test discipline; this Key Decision does not alter that).
+
+**Recorded by:** Plan 09-05 (Phase 09 — Design Variety & Modern Aesthetics + Brief-Shape Polymorphism).
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.

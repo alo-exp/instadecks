@@ -22,6 +22,7 @@
 - **Severity collapse 4→3 happens at the `/annotate` adapter only.** Reviewers (`/review`, `/content-review`) keep the full 4-tier (Critical / Major / Minor / Nitpick) taxonomy in their JSON output. The collapse to MAJOR / MINOR / POLISH applies only when building the SAMPLES array passed to `annotate.js`.
 - **Auto-refine convergence rule (Phase 5):** `genuine_findings == 0 AND cycle ≥ 2`; cycle 1 with 0 findings forces one confirmation cycle; oscillation if cycle N's issue set ⊆ cycle N-2's; soft cap at cycle 5 surfaces user choice; user-interrupt via `.planning/instadecks/<run-id>/.interrupt` flag file.
 - **Content-vs-design boundary is hard.** `/review` does not flag argument structure; `/content-review` does not flag visual / typographic / layout issues. Crossover is a defect.
+- **v8 BluePrestige is one valid design DNA among many.** Decks must vary palette / typography / motif / layout per brief — never default to the v8 visual register. The annotate.js overlay system is the SOLE remaining locked-visual-baseline asset (see Phase 8 ed12484 + KD-09 in PROJECT.md).
 
 ### File layout (per ARCHITECTURE.md)
 
@@ -39,7 +40,7 @@
 
 ### Don't get cute
 
-- This project is a productization of existing, calibrated work. The v8 BluePrestige output is the spec — match it. Behavior changes to `annotate.js` geometry, colors, transparency, fonts, layout constants, or the SAMPLES contract require justification and visual-regression sign-off; refactors that preserve output (and are gated by tests + the visual-regression baseline) are allowed.
+- This project is a productization of existing, calibrated work. Behavior changes to `annotate.js` geometry, colors, transparency, fonts, layout constants, or the SAMPLES contract require justification and visual-regression sign-off; refactors that preserve output (and are gated by tests + the visual-regression baseline) are allowed. Note: per KD-09 (Phase 9), the v8 BluePrestige *deck-generation* output is no longer "the spec to match" — it is one valid design DNA among many. The annotate.js overlay system is the only remaining locked-visual-baseline asset.
 - Auto-refine "improvements" (clever convergence heuristics, alternate cap mechanisms, additional severity tiers) are also out of scope. The convergence rule above is locked.
 
 ### Reference docs
