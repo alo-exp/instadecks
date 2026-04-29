@@ -15,7 +15,10 @@ const {
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..');
 
 test('parseAllowedTools parses the create skill frontmatter list', () => {
-  const out = parseAllowedTools(path.join(REPO_ROOT, 'skills', 'create', 'SKILL.md'));
+  const p = fs.existsSync(path.join(REPO_ROOT, 'commands', 'instadecks-create.md'))
+    ? path.join(REPO_ROOT, 'commands', 'instadecks-create.md')
+    : path.join(REPO_ROOT, 'skills', 'create', 'SKILL.md');
+  const out = parseAllowedTools(p);
   assert.ok(out.includes('Bash(node:*)'), `expected Bash(node:*), got ${out.join(',')}`);
   assert.ok(out.includes('Bash(soffice:*)'));
   assert.ok(out.includes('Read'));
@@ -23,7 +26,10 @@ test('parseAllowedTools parses the create skill frontmatter list', () => {
 });
 
 test('parseAllowedTools on annotate returns at least Bash(node:*)', () => {
-  const out = parseAllowedTools(path.join(REPO_ROOT, 'skills', 'annotate', 'SKILL.md'));
+  const p = fs.existsSync(path.join(REPO_ROOT, 'commands', 'instadecks-annotate.md'))
+    ? path.join(REPO_ROOT, 'commands', 'instadecks-annotate.md')
+    : path.join(REPO_ROOT, 'skills', 'annotate', 'SKILL.md');
+  const out = parseAllowedTools(p);
   assert.ok(out.includes('Bash(node:*)'));
 });
 

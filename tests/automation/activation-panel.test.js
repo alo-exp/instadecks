@@ -18,7 +18,9 @@ const SKILLS = ['create', 'review', 'content-review', 'annotate'];
 const THRESHOLD = 8;
 
 function extractDescription(skillName) {
-  const p = path.join(REPO_ROOT, 'skills', skillName, 'SKILL.md');
+  const p = fs.existsSync(path.join(REPO_ROOT, 'commands', `instadecks-${skillName}.md`))
+    ? path.join(REPO_ROOT, 'commands', `instadecks-${skillName}.md`)
+    : path.join(REPO_ROOT, 'skills', skillName, 'SKILL.md');
   const text = fs.readFileSync(p, 'utf8');
   // Frontmatter is bounded by the first two `---` lines.
   const fm = text.match(/^---\n([\s\S]*?)\n---/);
