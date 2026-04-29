@@ -1,6 +1,6 @@
 ---
 name: annotate
-description: Annotate a presentation deck with design-review findings. This skill should be used when the user wants to mark up, overlay comments on, show issues on, or annotate findings on a deck — given a `.pptx` and a findings JSON in the locked schema, produces an overlaid `.annotated.pptx` + `.annotated.pdf`.
+description: Annotate a presentation deck by overlaying or stamping design-review findings on top of slides. This skill should be used when the user wants to mark up, markup, stamp, comment on, overlay flagged findings on, show issues on, or visualize annotations on a deck — given a `.pptx` and a findings JSON sidecar in the locked schema, produces an overlaid `.annotated.pptx` + `.annotated.pdf` with major and minor severity notes.
 allowed-tools:
   - Bash(node:*)
   - Bash(soffice:*)
