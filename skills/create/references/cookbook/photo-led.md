@@ -171,6 +171,30 @@ function renderPhotoLedC(slide, { title, image, supportingText, source, pageNum,
 | Use `safeAddImage` guard for every image — never raw `addImage({path})` | `pres.addImage({ path: '/some/path.jpg' })` without existence check |
 | Provide an `alt` string on every image-object so placeholder text reads sensibly | Leave `alt` undefined — placeholder renders bare `[image]` |
 | Pass `sizing: { type: 'cover', w, h }` so portrait/landscape images crop cleanly | Leave sizing implicit — pptxgenjs scales with letterbox bands |
+| Use small TL/BR corner ticks (2 short accent lines, ~0.3″ each) as a subtle "image missing" signal | Don't add diagonal-rule LINE shapes spanning the entire placeholder rect — they visually swamp full-bleed image rects (Live E2E Iteration 2 Fix #8) |
+
+### Optional corner-tick "image missing" signal
+
+When the placeholder needs a visual cue beyond alt text, prefer two SMALL
+corner ticks at the top-left and bottom-right (each ~0.3″) over a diagonal
+LINE that spans the full rect — the latter dominates the slide.
+
+```javascript
+// Inside the placeholder branch of safeAddImage, AFTER the rect + alt text:
+const TICK = 0.3;
+slide.addShape(pres.shapes.LINE, {
+  x: opts.x + 0.05, y: opts.y + 0.05, w: TICK, h: 0,
+  line: { color: PALETTE.accent, width: 1 },
+});
+slide.addShape(pres.shapes.LINE, {
+  x: opts.x + opts.w - 0.05 - TICK, y: opts.y + opts.h - 0.05, w: TICK, h: 0,
+  line: { color: PALETTE.accent, width: 1 },
+});
+```
+
+Avoid: a single diagonal LINE from `(opts.x, opts.y)` to
+`(opts.x+opts.w, opts.y+opts.h)` — that decoration overwhelms the
+full-bleed image rect and reads as design rather than placeholder.
 
 ## When to use
 
