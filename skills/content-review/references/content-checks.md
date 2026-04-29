@@ -1,8 +1,8 @@
 # Content-Review — The Eight Checks (Reference)
 
-Narrative reference for the eight checks `/instadecks:content-review` runs. Four are mechanical (code) and four are judgment (prompt). All eight emit findings honoring `findings-schema.md` v1.1 (`category: "content"` + `check_id`).
+Narrative reference for the eight checks `/instadecks-content-review` runs. Four are mechanical (code) and four are judgment (prompt). All eight emit findings honoring `findings-schema.md` v1.1 (`category: "content"` + `check_id`).
 
-> **Boundary:** This skill flags content / argument / narrative issues only. Visual / typographic / layout issues are `/instadecks:review`'s domain. If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/review`'s domain.
+> **Boundary:** This skill flags content / argument / narrative issues only. Visual / typographic / layout issues are `/instadecks-review`'s domain. If you catch yourself writing about color, font, alignment, or layout, DELETE the line — that is `/review`'s domain.
 
 ---
 
@@ -57,4 +57,4 @@ Per slide, mentally remove the presenter; ask if the on-slide claim and evidence
 | Minor | 🟡 | Unsourced number; hyperbolic claim; over-25-word bullet; near-redundant slide pair. |
 | Nitpick | ⚪ | Distant non-load-bearing backreference. |
 
-The 4→3 collapse to MAJOR / MINOR / POLISH happens ONLY at the `/instadecks:annotate` adapter. Pre-collapsing in this skill is a contract violation (P-01).
+The 4→3 collapse to MAJOR / MINOR / POLISH happens ONLY at the `/instadecks-annotate` adapter. Pre-collapsing in this skill is a contract violation (P-01).

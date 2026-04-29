@@ -17,5 +17,5 @@ Please report security issues privately rather than filing public GitHub issues.
 ## Known limitations
 
 - **No input sanitization beyond what pptxgenjs does.** User-provided text flows into PPTX XML via pptxgenjs's own escaping. Maliciously crafted input is the user's responsibility to vet — Instadecks does not pre-filter.
-- **The LLM-driven extractor trusts file contents.** `/instadecks:create` reads input files (markdown, PDF text, transcripts) and passes them to the LLM verbatim. Prompt-injection embedded in input files is a known limitation; the user should review generated decks before sharing.
+- **The LLM-driven extractor trusts file contents.** `/instadecks-create` reads input files (markdown, PDF text, transcripts) and passes them to the LLM verbatim. Prompt-injection embedded in input files is a known limitation; the user should review generated decks before sharing.
 - **No sandbox for soffice or subprocess execution.** `soffice` and `pdftoppm` run with the user's full process privileges. Open-source CVEs in LibreOffice or Poppler apply directly; keep host packages patched.

@@ -1,6 +1,6 @@
 # Motif Library
 
-> Curated visual motifs for `/instadecks:create`. Each motif has a Visual / When-it-works line and a working `pptxgenjs` 4.0.1 snippet. Snippets use only supported APIs — `slide.addShape`, `slide.addText`, `slide.background`. The `gradient-overlay` motif documents the stepped-solid-block workaround for pptxgenjs 4.0.1's limited gradient support.
+> Curated visual motifs for `/instadecks-create`. Each motif has a Visual / When-it-works line and a working `pptxgenjs` 4.0.1 snippet. Snippets use only supported APIs — `slide.addShape`, `slide.addText`, `slide.background`. The `gradient-overlay` motif documents the stepped-solid-block workaround for pptxgenjs 4.0.1's limited gradient support.
 
 ---
 

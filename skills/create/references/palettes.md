@@ -1,6 +1,6 @@
 # Palette Library
 
-> Curated modern palettes for `/instadecks:create`. Each palette block lists 4–6 hex colors with role labels (`bg`, `primary`, `secondary`, `accent`, `ink`, `muted`), a 1-line use-case, a DO/DON'T table, and an `AI-tells exemption` note. The design-validator (Plan 9-05) reads this file at lint time and recognizes these palettes as legitimate — saturated primaries, bold accents, and non-default-blue treatments are NOT to be flagged when the rendered deck draws colors from one of these palettes.
+> Curated modern palettes for `/instadecks-create`. Each palette block lists 4–6 hex colors with role labels (`bg`, `primary`, `secondary`, `accent`, `ink`, `muted`), a 1-line use-case, a DO/DON'T table, and an `AI-tells exemption` note. The design-validator (Plan 9-05) reads this file at lint time and recognizes these palettes as legitimate — saturated primaries, bold accents, and non-default-blue treatments are NOT to be flagged when the rendered deck draws colors from one of these palettes.
 >
 > Hex values are 6-char uppercase `#RRGGBB`. Agents copy values directly into `render-deck.cjs` `PALETTE` tokens. No JSON registry.
 

@@ -1,18 +1,25 @@
-## v0.1.0 — 2026-04-29
-
 ## [0.2.0] — 2026-04-30
 
-## Features
-- `feat(commands): add /instadecks-update skill` (5d7f291) — self-update command following the topgun-update pattern
+### Added
+- `/instadecks-update` command — self-update from GitHub releases, following topgun-update pattern; scoped `allowed-tools`, SHA security gate, stale registry pruning
+- `docs/pre-release-quality-gate.md` — adapted from topgun quality gate, 4-stage release process
+- `tools/audit-allowed-tools.js` now scans `commands/*.md` in addition to legacy `skills/*/SKILL.md`
 
-## Bug Fixes
-- `fix(create+tests): auto-refine always runs, /tmp mirror, clickable links` (5040e86) — loop was being skipped; outputs now mirrored to /tmp with clickable file:// links
-- `fix(tests): update remaining SKILL.md path refs to commands/instadecks-*.md` (62e3078) — CI ENOENT fix for skills→commands migration
+### Fixed
+- Auto-refine loop in `/instadecks-create` no longer skipped — removed "single-cycle" statement that caused agents to bypass the loop
+- Post-loop outputs mirrored to `/tmp/<project_slug>/` with clickable `file://` URIs for macOS terminal
+- CI ENOENT failures from `skills/*/SKILL.md` path refs after skills→commands migration (5 test files updated)
 
-## Refactoring
-- `refactor(commands): convert skills to commands/ for clean slash-menu names` (8624343) — skills now appear as /instadecks-create, /instadecks-review, etc.
+### Changed
+- All `/instadecks:name` colon-namespaced references updated to `/instadecks-name` hyphen style across docs and references
+- `plugin.json` version bumped to 0.2.0
+- README updated: version badge, 6-command table, architecture description
+- `docs/ARCHITECTURE.md` updated to reflect commands/ layout and 6 commands
 
 ---
+
+## [0.1.0] — 2026-04-29
+
 - First marketplace release; see .planning/RELEASE.md
 
 # Task Log

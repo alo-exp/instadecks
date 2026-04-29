@@ -1,6 +1,6 @@
 # Typography Library
 
-> Curated type pairings for `/instadecks:create`. Each pairing block has Headings / Body / Weights / Use-case lines plus a `pptxgenjs` assignment example. The bundled fonts are **IBM Plex Sans**, **IBM Plex Serif**, and **IBM Plex Mono** (shipped under SIL OFL in `assets/fonts/`). Pairings whose primary font is NOT bundled include a `**Fallback:** IBM Plex` note so renders degrade gracefully.
+> Curated type pairings for `/instadecks-create`. Each pairing block has Headings / Body / Weights / Use-case lines plus a `pptxgenjs` assignment example. The bundled fonts are **IBM Plex Sans**, **IBM Plex Serif**, and **IBM Plex Mono** (shipped under SIL OFL in `assets/fonts/`). Pairings whose primary font is NOT bundled include a `**Fallback:** IBM Plex` note so renders degrade gracefully.
 
 ---
 

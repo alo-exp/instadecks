@@ -3,7 +3,7 @@
 **Schema version:** 1.1
 **Required top-level field:** `schema_version`
 
-This file is THE canonical JSON contract for design/content findings produced by `/instadecks:review` and `/instadecks:content-review`, and consumed by `/instadecks:annotate` and `/instadecks:create`. All four skills read this file directly via `Read` — **do not duplicate this schema in code**. The schema is the single source of truth for the entire plugin.
+This file is THE canonical JSON contract for design/content findings produced by `/instadecks-review` and `/instadecks-content-review`, and consumed by `/instadecks-annotate` and `/instadecks-create`. All four skills read this file directly via `Read` — **do not duplicate this schema in code**. The schema is the single source of truth for the entire plugin.
 
 ---
 

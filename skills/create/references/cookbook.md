@@ -1,6 +1,6 @@
-# /instadecks:create — Cookbook
+# /instadecks-create — Cookbook
 
-This cookbook is the reference Claude reads at runtime to compose a per-run `render-deck.cjs` for `/instadecks:create`. Each recipe is a copy-pasteable building block — never a template. Per CRT-03, `render-deck.cjs` is authored fresh per run, content-tuned to the `DeckBrief`.
+This cookbook is the reference Claude reads at runtime to compose a per-run `render-deck.cjs` for `/instadecks-create`. Each recipe is a copy-pasteable building block — never a template. Per CRT-03, `render-deck.cjs` is authored fresh per run, content-tuned to the `DeckBrief`.
 
 > **Locked invariants (CRT-15 / D-05):**
 > - **ENUM-only shapes:** `slide.addShape(pres.shapes.OVAL, …)` ✅ — never `addShape('oval', …)` ❌. Same for charts: `pres.charts.BAR`. <!-- enum-lint-allow: anti-pattern doc -->
