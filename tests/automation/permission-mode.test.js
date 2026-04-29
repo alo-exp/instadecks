@@ -16,12 +16,18 @@ const {
   simulatePermissionMode,
 } = require('./lib/permission-walker.js');
 
+const fs = require('node:fs');
 const REPO_ROOT = path.resolve(__dirname, '..', '..');
 const SKILLS = ['create', 'review', 'content-review', 'annotate', 'doctor'];
 
+function skillMdPath(skill) {
+  const cmd = path.join(REPO_ROOT, 'commands', `instadecks-${skill}.md`);
+  return fs.existsSync(cmd) ? cmd : path.join(REPO_ROOT, 'skills', skill, 'SKILL.md');
+}
+
 for (const skill of SKILLS) {
   test(`permission-mode — /instadecks:${skill} default mode covers all subprocess calls`, () => {
-    const allowed = parseAllowedTools(path.join(REPO_ROOT, 'skills', skill, 'SKILL.md'));
+    const allowed = parseAllowedTools(skillMdPath(skill));
     const calls = extractSubprocessCalls(path.join(REPO_ROOT, 'skills', skill, 'scripts'));
     const r = simulatePermissionMode(allowed, calls, 'default');
     assert.ok(
@@ -33,7 +39,7 @@ for (const skill of SKILLS) {
   });
 
   test(`permission-mode — /instadecks:${skill} dontAsk mode covers all subprocess calls`, () => {
-    const allowed = parseAllowedTools(path.join(REPO_ROOT, 'skills', skill, 'SKILL.md'));
+    const allowed = parseAllowedTools(skillMdPath(skill));
     const calls = extractSubprocessCalls(path.join(REPO_ROOT, 'skills', skill, 'scripts'));
     const r = simulatePermissionMode(allowed, calls, 'dontAsk');
     assert.ok(

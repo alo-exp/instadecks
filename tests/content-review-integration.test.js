@@ -22,7 +22,8 @@ const path = require('node:path');
 const REPO_ROOT = path.join(__dirname, '..');
 const FIXTURE_DECK = path.join(REPO_ROOT, 'tests', 'fixtures', 'cross-domain-test-deck.pptx');
 const PROMPT_FIXTURE = path.join(REPO_ROOT, 'tests', 'fixtures', 'content-review', 'integration-prompt-findings.json');
-const SKILL_MD = path.join(REPO_ROOT, 'skills', 'content-review', 'SKILL.md');
+const _cmdMd = path.join(REPO_ROOT, 'commands', 'instadecks-content-review.md');
+const SKILL_MD = fs.existsSync(_cmdMd) ? _cmdMd : path.join(REPO_ROOT, 'skills', 'content-review', 'SKILL.md');
 
 const D06_ANCHORS = [
   'content review',
