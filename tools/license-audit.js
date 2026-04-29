@@ -26,6 +26,7 @@ const WHITELIST = {
 // NOTICE entries use display names; the licenses/ subdir uses slug form.
 const SLUG_MAP = {
   'IBM Plex Sans': 'IBM_Plex_Sans',
+  'IBM Plex family — Sans, Serif, Mono': 'IBM_Plex_Sans',
 };
 
 function classifyLicense(name, licenseStr) {
