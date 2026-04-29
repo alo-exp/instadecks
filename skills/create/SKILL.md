@@ -5,6 +5,7 @@ allowed-tools:
   - Bash(node:*)
   - Bash(soffice:*)
   - Bash(unzip:*)
+  - Bash(pdftotext:*)
   - Bash(xmllint:*)
   - Read
   - Write

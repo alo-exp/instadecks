@@ -19,7 +19,9 @@
     "lint:enums": "node tools/lint-pptxgenjs-enums.js",
     "lint:cookbook": "node tools/validate-cookbook.js",
     "audit:allowed-tools": "node tools/audit-allowed-tools.js",
-    "audit:licenses": "node tools/license-audit.js"
+    "audit:licenses": "node tools/license-audit.js",
+    "gate:activation-panel": "node --test tests/automation/activation-panel.test.js",
+    "gate:permission-mode": "node --test tests/automation/permission-mode.test.js"
   },
   "dependencies": {
     "pptxgenjs": "4.0.1"
