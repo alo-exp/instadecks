@@ -1,14 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 // cli.js — Standalone CLI for /instadecks:create. Mirrors skills/review/scripts/cli.js shape.
-// Usage: cli.js [outDir] --brief <path> [--run-id <id>] [--out-dir <dir>] [--mode standalone|structured-handoff]
-//        [--soft-cap=<accept|stop|continue>]
+// Usage: cli.js [outDir] (--brief <path.json> | --brief-text <text> | --brief-md <path.md>
+//        | --brief-files <a.pdf,b.docx>) [--run-id <id>] [--out-dir <dir>]
+//        [--mode standalone|structured-handoff] [--soft-cap=<accept|stop|continue>]
 // Pure JSON to stdout in standalone mode (runCreate prints); errors to stderr.
 //
-// Soft-cap helpers (Phase 5 D-05 / Q-5): the helpers below are exported for the agent-mode
-// SKILL.md playbook to consume AND for non-interactive standalone runs (CI). For v0.1.0 the
-// CLI does NOT drive a multi-cycle loop on its own; the helpers exist as a clean surface so
-// callers can resolve cycle-5 fallback behavior consistently.
+// Plan 9-04 (DV-06/DV-07): polymorphic brief intake. The 4 brief flags are mutually
+// exclusive — passing >1 exits with code 2.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -53,11 +52,27 @@ function resolveSoftCap(softCapFlag) {
   return 'accept';
 }
 
+// Plan 9-04: extension → extract-doc type inference.
+function inferTypeFromExt(p) {
+  const ext = path.extname(p).toLowerCase();
+  if (ext === '.pdf') return 'pdf';
+  if (ext === '.docx') return 'docx';
+  if (ext === '.md') return 'md';
+  if (ext === '.txt' || ext === '.transcript') return 'transcript';
+  throw new Error(`cli: cannot infer type for path: ${p}`);
+}
+
 function parseArgs(argv) {
-  const args = { brief: null, runId: null, outDir: null, mode: 'standalone', softCap: null, designChoices: null };
+  const args = {
+    brief: null, briefText: null, briefMd: null, briefFiles: null,
+    runId: null, outDir: null, mode: 'standalone', softCap: null, designChoices: null,
+  };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--brief') { args.brief = argv[++i]; }
+    else if (a === '--brief-text') { args.briefText = argv[++i]; }
+    else if (a === '--brief-md') { args.briefMd = argv[++i]; }
+    else if (a === '--brief-files') { args.briefFiles = argv[++i]; }
     else if (a === '--run-id') { args.runId = argv[++i]; }
     else if (a === '--out-dir') { args.outDir = argv[++i]; }
     else if (a === '--mode') { args.mode = argv[++i]; }
@@ -71,6 +86,15 @@ function parseArgs(argv) {
   return args;
 }
 
+function countBriefFlags(args) {
+  let n = 0;
+  if (args.brief) n++;
+  if (args.briefText !== null && args.briefText !== undefined) n++;
+  if (args.briefMd) n++;
+  if (args.briefFiles) n++;
+  return n;
+}
+
 async function main() {
   let args;
   try {
@@ -79,17 +103,51 @@ async function main() {
     console.error(e.message);
     process.exit(1);
   }
-  if (!args.brief) {
-    console.error('Usage: cli.js [outDir] --brief <path> [--run-id <id>] [--mode standalone|structured-handoff] [--soft-cap=<accept|stop|continue>]');
-    process.exit(1);
-  }
-  let brief;
-  try {
-    brief = JSON.parse(fs.readFileSync(path.resolve(args.brief), 'utf8'));
-  } catch (e) {
-    console.error(`cli.js: failed to read --brief: ${e.message}`);
+
+  // Plan 9-04: mutual exclusion across the 4 brief flags.
+  const briefCount = countBriefFlags(args);
+  if (briefCount > 1) {
+    process.stderr.write(
+      'cli: brief flags are mutually exclusive — pass exactly one of ' +
+      '--brief, --brief-text, --brief-md, --brief-files\n',
+    );
     process.exit(2);
   }
+  if (briefCount === 0) {
+    console.error('Usage: cli.js [outDir] (--brief <path.json> | --brief-text <text> | --brief-md <path.md> | --brief-files <a.pdf,b.docx>) [--run-id <id>] [--mode standalone|structured-handoff] [--soft-cap=<accept|stop|continue>]');
+    process.exit(1);
+  }
+
+  let briefInput;
+  if (args.brief) {
+    try {
+      briefInput = JSON.parse(fs.readFileSync(path.resolve(args.brief), 'utf8'));
+    } catch (e) {
+      console.error(`cli.js: failed to read --brief: ${e.message}`);
+      process.exit(2);
+    }
+  } else if (args.briefText !== null && args.briefText !== undefined) {
+    briefInput = String(args.briefText);
+  } else if (args.briefMd) {
+    try {
+      briefInput = fs.readFileSync(path.resolve(args.briefMd), 'utf8');
+    } catch (e) {
+      console.error(`cli.js: failed to read --brief-md: ${e.message}`);
+      process.exit(2);
+    }
+  } else {
+    // --brief-files
+    const paths = args.briefFiles.split(',').map((s) => s.trim()).filter(Boolean);
+    let files;
+    try {
+      files = paths.map((p) => ({ path: path.resolve(p), type: inferTypeFromExt(p) }));
+    } catch (e) {
+      process.stderr.write(`${e.message}\n`);
+      process.exit(2);
+    }
+    briefInput = { files };
+  }
+
   let designChoices = null;
   /* c8 ignore start */ // Defensive: --design-choices is opt-in (agent-driven path supplies designChoices via direct require, not the standalone CLI); covered by integration tests when invoked end-to-end.
   if (args.designChoices) {
@@ -102,7 +160,7 @@ async function main() {
   }
   /* c8 ignore stop */
   await runCreate({
-    brief,
+    brief: briefInput,
     runId: args.runId || undefined,
     /* c8 ignore next */ // Defensive: outDir-undefined branch covered indirectly when arg omitted in tests; resolve-path branch covered by --out-dir tests.
     outDir: args.outDir ? path.resolve(args.outDir) : undefined,
@@ -116,4 +174,4 @@ if (require.main === module) {
   main().catch(e => { console.error(e.stack || e.message); process.exit(3); });
 }
 
-module.exports = { isInteractive, parseSoftCapFlag, resolveSoftCap, parseArgs };
+module.exports = { isInteractive, parseSoftCapFlag, resolveSoftCap, parseArgs, inferTypeFromExt, countBriefFlags };
