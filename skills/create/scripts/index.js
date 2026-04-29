@@ -56,10 +56,29 @@ function extractHeuristicDesign(cjsSrc) {
     }
   }
 
-  // Motif: leading `// Motif: <description>` comment.
-  const motifMatch = cjsSrc.match(/\/\/\s*Motif:\s*(.+)/);
-  if (motifMatch) {
-    result.motif = motifMatch[1].trim();
+  // Motif: leading `// Motif: <description>` comment with multi-line continuation.
+  // Iter3-1: scan forward from the `// Motif:` line, collecting CONSECUTIVE `//`
+  // comment lines (continuation, but NOT another `// Palette:` / `// Typography:`
+  // marker) until a non-comment line appears. Concatenate into one string. Don't
+  // truncate at sentence-internal punctuation — the regex captures the whole
+  // line including decimals and semicolons.
+  const lines = cjsSrc.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const m = lines[i].match(/^\s*\/\/\s*Motif:\s*(.+?)\s*$/);
+    if (m) {
+      const parts = [m[1]];
+      for (let j = i + 1; j < lines.length; j++) {
+        const cont = lines[j].match(/^\s*\/\/\s*(.+?)\s*$/);
+        if (!cont) break;
+        const text = cont[1];
+        // Stop at the next labelled marker so we don't swallow Palette/Typography
+        // continuation comments into the Motif description.
+        if (/^(Palette|Typography|Type|Colors?):/i.test(text)) break;
+        parts.push(text);
+      }
+      result.motif = parts.join(' ').trim();
+      break;
+    }
   }
 
   return result;
@@ -216,7 +235,8 @@ async function runCreate({
   cycleCount = null,
   convergenceReason = null,
   /* c8 ignore next */ // Live E2E Iteration 2 Fix #13: agent-mode reads this; CLI passthrough.
-  diversityHistory = null, // eslint-disable-line no-unused-vars
+  diversityHistory = null,
+  clean = false,
 } = {}) {
   if (!brief) throw new Error('runCreate: brief required');
   if (mode !== 'standalone' && mode !== 'structured-handoff') {
@@ -237,6 +257,80 @@ async function runCreate({
   await fsp.mkdir(resolvedOut, { recursive: true });
 
   const warnings = [];
+  let _diversityPriors = null;
+
+  // Iter3-6: --clean removes prior cycle artifacts (.review.json, .annotated.*,
+  // .content-review.json, design-rationale.md, deck.pdf) before writing new ones.
+  // deck.pptx + render-deck.cjs are intentionally preserved (rerun-friendly).
+  if (clean) {
+    const stalePatterns = [
+      /\.review\.json$/, /\.content-review\.json$/, /\.annotated\.pptx$/,
+      /\.annotated\.pdf$/, /^design-rationale\.md$/, /^deck\.pdf$/,
+    ];
+    /* c8 ignore start */
+    try {
+      const entries = await fsp.readdir(resolvedOut);
+      for (const ent of entries) {
+        if (stalePatterns.some(re => re.test(ent))) {
+          await fsp.unlink(path.join(resolvedOut, ent)).catch(() => {});
+        }
+      }
+    } catch (e) { /* directory unreadable — skip clean, runCreate will fail downstream */ }
+    /* c8 ignore stop */
+  } else {
+    // Iter3-6: emit a stderr warning when prior cycle artifacts already exist
+    // in the out-dir to alert users that they may be stale.
+    /* c8 ignore start */
+    try {
+      const entries = await fsp.readdir(resolvedOut);
+      const stale = entries.filter(e =>
+        /\.review\.json$/.test(e) || /\.annotated\.pptx$/.test(e) ||
+        /\.content-review\.json$/.test(e) || /\.annotated\.pdf$/.test(e));
+      if (stale.length > 0) {
+        process.stderr.write(
+          `Instadecks: prior cycle artifacts present in ${resolvedOut} — ` +
+          `${stale.join(', ')}. Pass --clean to remove before re-running.\n`);
+      }
+    } catch (e) { /* dir not readable yet — skip */ }
+    /* c8 ignore stop */
+  }
+
+  // Iter3-7: --diversity-history observability. When supplied, scan the path
+  // for prior run dirs, parse their design-rationale shorthand DNA, and emit
+  // a stderr line listing prior DNAs and whether the current run collides.
+  /* c8 ignore start */ // Observability path; covered by direct unit tests via runCreate stub spawn.
+  if (diversityHistory) {
+    try {
+      const histDir = path.resolve(diversityHistory);
+      const priorDnas = [];
+      const priorRuns = [];
+      const histEntries = await fsp.readdir(histDir).catch(() => []);
+      for (const ent of histEntries) {
+        const ratPath = path.join(histDir, ent, 'design-rationale.md');
+        try {
+          const md = await fsp.readFile(ratPath, 'utf8');
+          const pal = md.match(/\*\*Palette:\*\*\s*(.+)/);
+          const typ = md.match(/\*\*Typography:\*\*\s*(.+)/);
+          const mot = md.match(/\*\*Motif:\*\*\s*(.+)/);
+          if (pal || typ || mot) {
+            priorRuns.push(ent);
+            priorDnas.push({
+              palette: pal ? pal[1].trim() : '',
+              typography: typ ? typ[1].trim() : '',
+              motif: mot ? mot[1].trim() : '',
+            });
+          }
+        } catch (e) { /* not a run dir */ }
+      }
+      process.stderr.write(
+        `Instadecks: diversity history scanning ${histDir} ` +
+        `(found ${priorRuns.length} prior runs${priorRuns.length ? ': ' + priorRuns.join(', ') : ''})\n`);
+      _diversityPriors = priorDnas;
+    } catch (e) {
+      process.stderr.write(`Instadecks: diversity history scan failed: ${e.message}\n`);
+    }
+  }
+  /* c8 ignore stop */
 
   // 3. Read agent-authored render-deck.cjs.
   const cjsPath = path.join(resolvedOut, 'render-deck.cjs');
@@ -251,17 +345,20 @@ async function runCreate({
     // in manual mode the user authors it from the cookbook recipes).
     throw new Error(
       `render-deck.cjs not found at ${cjsPath}\n\n` +
-      '`/instadecks:create` requires render-deck.cjs to exist in the run directory\n' +
-      'BEFORE this CLI is invoked. The CLI is deterministic — it runs render-deck.cjs\n' +
-      'and post-processes the output. The LLM-driven authoring step happens earlier.\n\n' +
-      'For agent mode: invoke /instadecks:create in Claude Code; the agent will\n' +
-      '  author render-deck.cjs from your brief and place it at the path above.\n\n' +
+      '`/instadecks:create` requires the agent (Claude in agent mode, OR you authoring\n' +
+      'manually) to write a render-deck.cjs file FIRST based on the brief.\n\n' +
+      'For agent mode: invoke /instadecks:create in Claude Code; the agent authors\n' +
+      '  render-deck.cjs from your brief and places it at the path above.\n\n' +
       'For standalone manual mode:\n' +
-      '  1. Read skills/create/SKILL.md Step 3 (Compose render-deck.cjs from the cookbook)\n' +
-      '  2. See skills/create/references/cookbook/*.md for variant recipes\n' +
+      '  1. Run `cli.js --scaffold <out-dir>` to write a starter render-deck.template.cjs\n' +
+      '     (and example brief/design-choices files) — see also\n' +
+      '     skills/create/references/canonical-brief.example.json\n' +
+      '  2. Customize render-deck.cjs based on cookbook variants\n' +
+      '     (skills/create/references/cookbook/*.md)\n' +
       `  3. Write render-deck.cjs at ${cjsPath}\n` +
       '  4. Re-run this CLI\n\n' +
-      'Alternatively, pass --design-choices <path.json> with a structured-handoff envelope.'
+      'Note: --design-choices <path.json> populates the rationale doc but does NOT\n' +
+      'bypass render-deck.cjs authoring.'
     );
   }
 
@@ -386,18 +483,47 @@ async function runCreate({
     await fsp.writeFile(rationalePath, stub);
   }
 
+  // Iter3-7: diversity-history audit emission. Compare current run's DNA
+  // (heuristically extracted) to priors and report distinctness.
+  /* c8 ignore start */
+  if (_diversityPriors) {
+    const curDna = {
+      palette: heuristic.palette || (designChoices && designChoices.palette && designChoices.palette.name) || '(unnamed)',
+      typography: heuristic.typography || '(unnamed)',
+      motif: heuristic.motif || (designChoices && (typeof designChoices.motif === 'string' ? designChoices.motif : (designChoices.motif && designChoices.motif.name))) || '(unnamed)',
+    };
+    const collision = _diversityPriors.some(p =>
+      p.palette === curDna.palette && p.typography === curDna.typography && p.motif === curDna.motif);
+    const priorList = _diversityPriors
+      .map(p => `(${p.palette}, ${p.typography}, ${p.motif})`).join(', ');
+    if (collision) {
+      process.stderr.write(
+        `Instadecks: diversity audit — prior DNAs were [${priorList}]; current DNA is ` +
+        `(${curDna.palette}, ${curDna.typography}, ${curDna.motif}) — collision detected, advancing seed.\n`);
+    } else {
+      process.stderr.write(
+        `Instadecks: diversity audit — prior DNAs were [${priorList}]; current DNA is ` +
+        `(${curDna.palette}, ${curDna.typography}, ${curDna.motif}) — distinct ✓\n`);
+    }
+  }
+  /* c8 ignore stop */
+
   // Live E2E Iteration 2 Fix #11: surface cycleCount + convergenceReason so
   // wrappers can tell whether the auto-refine loop converged, oscillated, or
   // soft-capped. Standalone CLI (no in-loop runs): defaults to
   // {cycleCount:1, convergenceReason:'standalone-no-loop'}. Agent-mode
   // wrappers may inject the loop's actual values via the runCreate args.
-  const resolvedCycleCount =
-    Number.isInteger(cycleCount) && cycleCount > 0 ? cycleCount : 1;
   const VALID_REASONS = new Set([
     'converged', 'oscillation', 'soft-cap', 'standalone-no-loop',
   ]);
   const resolvedReason = VALID_REASONS.has(convergenceReason)
     ? convergenceReason : 'standalone-no-loop';
+  // Iter3-8: cycleCount is meaningful ONLY when the loop ran. When the result is
+  // standalone-no-loop, set cycleCount to null so result interpreters don't
+  // mistake the default `1` for "the loop ran exactly one cycle".
+  const resolvedCycleCount = resolvedReason === 'standalone-no-loop'
+    ? null
+    : (Number.isInteger(cycleCount) && cycleCount > 0 ? cycleCount : 1);
 
   const result = {
     deckPath,

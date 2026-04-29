@@ -30,7 +30,9 @@ test('runCreate cold-user error: render-deck.cjs missing → actionable guidance
     const msg = caught.message;
     assert.match(msg, /render-deck\.cjs not found/);
     assert.match(msg, /agent mode|Claude Code/i);
-    assert.match(msg, /SKILL\.md/);
+    // Iter3-2: revised error mentions --scaffold + cookbook; --design-choices is
+    // explicitly clarified as NOT a bypass (still mentioned, not as alternative).
+    assert.match(msg, /--scaffold/);
     assert.match(msg, /cookbook/);
     assert.match(msg, /--design-choices/);
   } finally {

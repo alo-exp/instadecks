@@ -57,7 +57,7 @@ test('render-rationale: **Typography:** prefers explicit pairing field if presen
   assert.match(md, /\*\*Typography:\*\* Plex Serif Display \+ Plex Sans Body/);
 });
 
-test('render-rationale: emits **Motif:** shorthand line (first phrase)', () => {
+test('render-rationale: emits **Motif:** shorthand line with FULL description (Iter3-1)', () => {
   const md = render({
     brief: BRIEF,
     designChoices: {
@@ -66,8 +66,32 @@ test('render-rationale: emits **Motif:** shorthand line (first phrase)', () => {
       motif: 'Rule-of-thirds composition with generous whitespace; numerals foregrounded.',
     },
   });
-  // First phrase before semicolon.
-  assert.match(md, /\*\*Motif:\*\* Rule-of-thirds composition with generous whitespace/);
+  // Iter3-1: full description preserved — no truncation at sentence-internal `;` or `.`.
+  assert.match(md, /\*\*Motif:\*\* Rule-of-thirds composition with generous whitespace; numerals foregrounded\./);
+});
+
+test('render-rationale: motif preserves decimals (e.g. 0.75pt) — Iter3-1', () => {
+  const md = render({
+    brief: BRIEF,
+    designChoices: {
+      palette: { name: 'P' },
+      typography: { heading: 'A', body: 'B' },
+      motif: 'Thin horizontal hairline rules (0.75pt) framing each section.',
+    },
+  });
+  assert.match(md, /\*\*Motif:\*\* Thin horizontal hairline rules \(0\.75pt\) framing each section\./);
+});
+
+test('render-rationale: motif preserves multi-clause descriptions — Iter3-1', () => {
+  const md = render({
+    brief: BRIEF,
+    designChoices: {
+      palette: { name: 'P' },
+      typography: { heading: 'A', body: 'B' },
+      motif: 'Clause one; clause two; marginalia page-numbers.',
+    },
+  });
+  assert.match(md, /\*\*Motif:\*\* Clause one; clause two; marginalia page-numbers\./);
 });
 
 test('render-rationale: shorthand lines appear BEFORE ## Palette section', () => {

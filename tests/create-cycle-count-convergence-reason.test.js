@@ -27,7 +27,7 @@ function buildMinimalPptx() {
   return zip.generateAsync({ type: 'nodebuffer' });
 }
 
-test('runCreate default: cycleCount=1, convergenceReason=standalone-no-loop', async (t) => {
+test('runCreate default: cycleCount=null, convergenceReason=standalone-no-loop (Iter3-8)', async (t) => {
   t.after(() => _test_setSpawn(null));
   const out = freshTmp('crt-cyc');
   try {
@@ -38,7 +38,7 @@ test('runCreate default: cycleCount=1, convergenceReason=standalone-no-loop', as
       fs.writeFileSync(path.join(opts.cwd, 'deck.pptx'), deckBytes);
     });
     const r = await runCreate({ brief: loadBrief(), outDir: out, mode: 'structured-handoff' });
-    assert.equal(r.cycleCount, 1);
+    assert.equal(r.cycleCount, null);
     assert.equal(r.convergenceReason, 'standalone-no-loop');
   } finally {
     _test_setSpawn(null);
@@ -82,7 +82,8 @@ test('runCreate sanitizes invalid convergenceReason → standalone-no-loop', asy
       brief: loadBrief(), outDir: out, mode: 'structured-handoff',
       cycleCount: -1, convergenceReason: 'bogus',
     });
-    assert.equal(r.cycleCount, 1);
+    // Iter3-8: cycleCount is null when reason resolves to standalone-no-loop.
+    assert.equal(r.cycleCount, null);
     assert.equal(r.convergenceReason, 'standalone-no-loop');
   } finally {
     _test_setSpawn(null);

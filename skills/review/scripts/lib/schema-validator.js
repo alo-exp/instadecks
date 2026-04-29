@@ -77,7 +77,7 @@ function validate(doc) {
       }
       const normalizedCategory = normalizeCategoryForValidation(f.category);
       if (typeof f.category !== 'string' || !CATEGORIES.has(normalizedCategory)) {
-        throw new Error(`${where}.category: must be one of {defect,improvement,style,content} (got ${JSON.stringify(f.category)})`);
+        throw new Error(`${where}.category: must be one of {defect,improvement,style,content} (got ${JSON.stringify(f.category)}). See skills/review/references/findings-schema.md §category for valid values and definitions.`);
       }
       if (normalizedCategory === 'content') {
         if (typeof f.check_id !== 'string' || !VALID_CHECK_IDS.has(f.check_id)) {
