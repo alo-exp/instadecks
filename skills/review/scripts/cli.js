@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-// cli.js — Standalone CLI for /instadecks:review (RVW-07).
+// cli.js — Standalone CLI for /instadecks-review (RVW-07).
 // Usage: node cli.js <deckPath> [--findings <path>] [--run-id <id>] [--out-dir <dir>] [--annotate]
 // Reads findings JSON from --findings if supplied; calls runReview({mode:'standalone'}).
 // Pure JSON to stdout (runReview prints in standalone mode); logs/errors to stderr.
@@ -40,7 +40,7 @@ async function main() {
       'Error: --findings <path> required for standalone CLI\n\n' +
       'The reviewer step (LLM reading slide images, producing findings JSON) is an\n' +
       'agent-mode operation only available when running through Claude Code\n' +
-      '(/instadecks:review).\n\n' +
+      '(/instadecks-review).\n\n' +
       'For standalone CLI usage:\n' +
       '  1. Author findings JSON conforming to skills/review/references/findings-schema.md (v1.1)\n' +
       '  2. Save as findings.json\n' +
@@ -64,7 +64,7 @@ async function main() {
       `Error: --findings <path> file not found or invalid JSON: ${args.findings}\n\n` +
       'The reviewer step (LLM reading slide images, producing findings JSON) is an\n' +
       'agent-mode operation only available when running through Claude Code\n' +
-      '(/instadecks:review).\n\n' +
+      '(/instadecks-review).\n\n' +
       'For standalone CLI usage:\n' +
       '  1. Author findings JSON conforming to skills/review/references/findings-schema.md (v1.1)\n' +
       '  2. Save as findings.json\n' +

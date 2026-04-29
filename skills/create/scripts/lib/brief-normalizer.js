@@ -128,7 +128,7 @@ async function defaultExtractor(input, shape) {
       `brief-normalizer: no LLM configured for ${shape} brief input.\n\n` +
       'The polymorphic brief intake (--brief-md / --brief-text / --brief-files)\n' +
       'requires an LLM extractor, which is only available when running through\n' +
-      'Claude Code agent mode (invoke /instadecks:create — the agent normalizes\n' +
+      'Claude Code agent mode (invoke /instadecks-create — the agent normalizes\n' +
       'the brief in-context).\n\n' +
       'For standalone CLI usage:\n' +
       '  1. Convert your brief to canonical JSON shape: ' +
