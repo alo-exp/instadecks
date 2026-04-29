@@ -71,22 +71,23 @@ function canonicalizeJson(input) {
     out.narrative_arc = out.key_messages;
     delete out.key_messages;
   }
-  // Iter5-1: data_points → key_claims when key_claims absent. Each string
-  // becomes {slide_idx: null, claim}; object entries pass through unchanged.
-  // Mirrors deck-brief.js coerceLenientShapes pattern but at the alias layer
-  // so the natural orchestrator shape ({title, key_messages, data_points})
-  // canonicalizes cleanly before validateBrief runs.
+  // Iter5-1 / Iter6-1: data_points → key_claims when key_claims absent.
+  // Strings get auto-assigned 1-indexed slide_idx (Iter6-1 fix — null fails
+  // validateBrief integer check). Object entries preserve their slide_idx if
+  // present, else fall back to 1-indexed position. Result: natural shape
+  // canonicalizes into a fully validateBrief-compliant brief.
   if (
     (out.key_claims === undefined || out.key_claims === null) &&
     Array.isArray(out.data_points)
   ) {
-    out.key_claims = out.data_points.map((dp) => {
-      if (typeof dp === 'string') return { slide_idx: null, claim: dp };
+    out.key_claims = out.data_points.map((dp, i) => {
+      if (typeof dp === 'string') return { slide_idx: i + 1, claim: dp };
+      if (dp && typeof dp === 'object') {
+        const slide_idx = Number.isInteger(dp.slide_idx) ? dp.slide_idx : i + 1;
+        return { ...dp, slide_idx };
+      }
       return dp;
     });
-    // Note: slide_idx: null signals "orchestrator left assignment to agent".
-    // validateBrief downstream requires integer; the test contract calls out
-    // that callers/agents resolve null → integer before validateBrief runs.
     delete out.data_points;
   }
   // Iter5-1: default missing canonical fields so the natural shape passes

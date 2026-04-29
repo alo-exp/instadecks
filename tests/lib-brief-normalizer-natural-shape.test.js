@@ -28,11 +28,12 @@ test('Iter5-1: canonicalizeJson accepts natural orchestrator shape', async (t) =
     assert.equal(out.audience, 'Executive Board');
     assert.equal(out.tone, 'executive');
     assert.deepEqual(out.narrative_arc, ['Open with wins', 'Address risks', 'Propose Q4 plan']);
-    // data_points -> key_claims with slide_idx: null
+    // Iter6-1: data_points strings → key_claims with auto-assigned 1-indexed slide_idx.
     assert.ok(Array.isArray(out.key_claims));
     assert.equal(out.key_claims.length, 2);
     assert.equal(out.key_claims[0].claim, 'Revenue +18% YoY');
-    assert.equal(out.key_claims[0].slide_idx, null);
+    assert.equal(out.key_claims[0].slide_idx, 1);
+    assert.equal(out.key_claims[1].slide_idx, 2);
     // defaults
     assert.deepEqual(out.asset_hints, {});
     assert.deepEqual(out.source_files, []);
@@ -44,14 +45,10 @@ test('Iter5-1: canonicalizeJson accepts natural orchestrator shape', async (t) =
     assert.equal(out.data_points, undefined);
   });
 
-  await t.test('output passes validateBrief after slide_idx coercion', async () => {
-    // Note: validateBrief requires slide_idx integer >= 0. The mapping uses null
-    // which is intentional (orchestrator hasn't decided slide assignment); the
-    // agent prompt resolves this. For the strict validateBrief gate we coerce
-    // null -> 0 in caller. Verify shape compatibility by checking required keys.
+  await t.test('output passes validateBrief directly (Iter6-1 auto-assign)', async () => {
+    // Iter6-1: canonicalizeJson now auto-assigns integer slide_idx so the
+    // natural shape passes validateBrief without further coercion.
     const out = await normalizeBrief(natural);
-    // Coerce null slide_idx to 0 to satisfy validateBrief integer check.
-    out.key_claims = out.key_claims.map(kc => ({ ...kc, slide_idx: kc.slide_idx == null ? 0 : kc.slide_idx }));
     assert.doesNotThrow(() => validateBrief(out));
   });
 
@@ -86,6 +83,7 @@ test('Iter5-1: canonicalizeJson accepts natural orchestrator shape', async (t) =
     assert.equal(out.key_claims.length, 2);
     assert.deepEqual(out.key_claims[0], { slide_idx: 2, claim: 'pre-shaped' });
     assert.equal(out.key_claims[1].claim, 'string-claim');
-    assert.equal(out.key_claims[1].slide_idx, null);
+    // Iter6-1: string at index 1 → 1-indexed slide_idx = 2.
+    assert.equal(out.key_claims[1].slide_idx, 2);
   });
 });
