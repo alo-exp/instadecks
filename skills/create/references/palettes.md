@@ -19,6 +19,8 @@
 
 **Use:** Editorial / journalistic briefs — long-form narrative decks where typography carries the design and a single saturated accent (`#E5322D`) anchors visual hierarchy.
 
+**Tone tags:** editorial, journalistic, narrative, long-form, type-led
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use the red accent sparingly — one element per slide | Don't tint body type with the accent — keep it inkblack |
@@ -40,6 +42,8 @@
 | muted | `#8C8478` |
 
 **Use:** Brand / lifestyle / consumer briefs — magazine-feel decks with warm cream ground and an aggressive orange accent for headlines or pull-quotes.
+
+**Tone tags:** brand, lifestyle, consumer, magazine, retail, fashion
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -63,6 +67,8 @@
 
 **Use:** Dev-tools / infra / security briefs — high-contrast dark deck with a cyan accent. Terminal-aesthetic without being cosplay.
 
+**Tone tags:** dev-tools, infrastructure, security, technical, developer, devops, cli
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use cyan for stats and chart accents | Don't put cyan body text — eye fatigue at body sizes |
@@ -84,6 +90,8 @@
 | muted | `#9A91B0` |
 
 **Use:** Consumer-tech / wellness / UX-research briefs — gentle lavender ground with a violet accent. Friendly, modern, non-corporate.
+
+**Tone tags:** consumer-tech, wellness, ux-research, friendly, gentle, non-corporate, lifestyle-tech
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -107,6 +115,8 @@
 
 **Use:** SaaS / startup pitch / growth briefs — slate ink with an emerald accent. The "Stripe / Linear / Vercel" register without copying any one brand.
 
+**Tone tags:** saas, startup, pitch, growth, b2b-saas, modern-tech, fintech-tech
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use emerald for growth-rate stats | Don't pair with another saturated green |
@@ -128,6 +138,8 @@
 | muted | `#A89C88` |
 
 **Use:** Long-form / research / academic briefs — warm paper ground and oxblood accent. Heavy serif headings carry the design.
+
+**Tone tags:** long-form, research, academic, scholarly, editorial, white-paper, foundation
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -151,6 +163,8 @@
 
 **Use:** Hackathon / gaming / creative-tech briefs — black ground with a neon-green accent. Aggressive, energetic, NOT for executive audiences.
 
+**Tone tags:** hackathon, gaming, creative-tech, energetic, aggressive, indie, esports
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use neon green for one hero element per slide | Don't use for executive / financial briefs — too aggressive |
@@ -172,6 +186,8 @@
 | muted | `#8FA1C7` |
 
 **Use:** Financial / consulting / B2B-enterprise briefs — deep cobalt ink with a warm amber accent. Authoritative without defaulting to Office blue.
+
+**Tone tags:** executive, finance, financial, consulting, b2b-enterprise, authoritative, board, corporate
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -195,6 +211,8 @@
 
 **Use:** Architecture / design-studio / hospitality briefs — sand ground with a terracotta accent. Earthy, premium, modern-craft.
 
+**Tone tags:** architecture, design-studio, hospitality, earthy, premium, modern-craft, artisanal
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use terracotta for rule lines and accents | Don't add a second warm accent — palette is mono+1 |
@@ -216,6 +234,8 @@
 | muted | `#9CA89F` |
 
 **Use:** Sustainability / impact / heritage-brand briefs — forest ink with brass accent. Inherited earth-tone palette retained for backward compat.
+
+**Tone tags:** sustainability, impact, heritage, esg, earth-tone, foundation, conservation
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -239,6 +259,8 @@
 
 **Use:** Travel / hospitality / artisanal briefs — warm cream ground with sienna accent. Inherited earth-tone palette.
 
+**Tone tags:** travel, hospitality, artisanal, leisure, tourism, earth-tone, warm
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use sienna for pull-quotes and rules | Don't pair with terracotta — too similar |
@@ -260,6 +282,8 @@
 | muted | `#9CA38A` |
 
 **Use:** Outdoor / agriculture / conservation briefs — moss ink with olive accent. Inherited earth-tone palette.
+
+**Tone tags:** outdoor, agriculture, conservation, earth-tone, sustainability, agtech, environmental
 
 | ✅ DO | ❌ DON'T |
 |---|---|
@@ -283,6 +307,8 @@
 
 **Use:** Real-estate / hospitality / lifestyle briefs — driftwood neutrals with bronze accent. Inherited earth-tone palette.
 
+**Tone tags:** real-estate, hospitality, lifestyle, neutral, muted, premium, residential
+
 | ✅ DO | ❌ DON'T |
 |---|---|
 | Use bronze for understated callouts | Don't add a saturated accent — palette is intentionally muted |
@@ -304,6 +330,8 @@
 | muted | `#7A7A7A` |
 
 **Use:** Manifesto / brand-statement / type-led briefs — pure black-on-white, no chromatic accent. Type and motif carry the design entirely.
+
+**Tone tags:** manifesto, brand-statement, type-led, monochrome, minimal, editorial, high-contrast
 
 | ✅ DO | ❌ DON'T |
 |---|---|
