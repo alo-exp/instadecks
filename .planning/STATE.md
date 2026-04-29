@@ -13,7 +13,7 @@ See: .planning/PROJECT.md (updated 2026-04-27)
 Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 8 phases (incl. Phase 8 test-coverage closure), 67+ requirements
 Phase: 10 of 10 (Hardening, Documentation Compliance, and Release Automation) — COMPLETE (6/6 plans)
 Plan: 6 of 6 in Phase 10 (10-06 complete)
-Status: Phase 10 complete — every previously-human gate now automated (activation-panel, permission-mode, fresh-install via Docker); release-v0.1.0.sh + submit-marketplace-pr.sh shipped with `npm run release:dry-run` / `npm run release`; doc-scheme.md compliance achieved (knowledge/lessons populated, SECURITY.md + CONTRIBUTING.md scaffolded, lint-doc-size.js + CI Gate 7 live); backlog defects HARD-01/02/03 closed; release dry-run E2E test (RUN_RELEASE_E2E=1) green. v0.1.0 ready for `npm run release` — no human-only gate remains.
+Status: released
 Last activity: 2026-04-29 — Plan 10-06 sign-off (Phase 10 closer)
 
 Progress: [██████████] 100%

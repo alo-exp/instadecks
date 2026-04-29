@@ -1,3 +1,6 @@
+## v0.1.0 — 2026-04-29
+- First marketplace release; see .planning/RELEASE.md
+
 # Task Log
 
 > Rolling log of completed tasks. One entry per non-trivial task, written at step 15.
