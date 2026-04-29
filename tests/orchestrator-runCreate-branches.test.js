@@ -145,6 +145,76 @@ test('runCreate: designChoices supplied → design-rationale.md written', async 
   assert.ok(fs.statSync(r.rationalePath).size > 0);
 });
 
+test('runCreate HARD-02: serial calls against same outDir both succeed; lock removed after each', async (t) => {
+  const outDir = freshTmpDir('crc-lock-serial');
+  t.after(() => {
+    _test_setSpawn(null);
+    fs.rmSync(outDir, { recursive: true, force: true });
+  });
+  await fsp.writeFile(path.join(outDir, 'render-deck.cjs'), loadCjsSrc());
+  _test_setSpawn(async (cjsPath, opts) => {
+    await fsp.copyFile(TINY_DECK, path.join(opts.cwd, 'deck.pptx'));
+  });
+  const r1 = await runCreate({ brief: loadBrief(), outDir, mode: 'structured-handoff' });
+  assert.ok(r1.deckPath);
+  assert.equal(fs.existsSync(path.join(outDir, '.runCreate.lock')), false);
+  const r2 = await runCreate({ brief: loadBrief(), outDir, mode: 'structured-handoff' });
+  assert.ok(r2.deckPath);
+  assert.equal(fs.existsSync(path.join(outDir, '.runCreate.lock')), false);
+});
+
+test('runCreate HARD-02: parallel call blocks while lock held; proceeds after release', async (t) => {
+  const outDir = freshTmpDir('crc-lock-parallel');
+  t.after(() => {
+    _test_setSpawn(null);
+    fs.rmSync(outDir, { recursive: true, force: true });
+  });
+  await fsp.writeFile(path.join(outDir, 'render-deck.cjs'), loadCjsSrc());
+  _test_setSpawn(async (cjsPath, opts) => {
+    await fsp.copyFile(TINY_DECK, path.join(opts.cwd, 'deck.pptx'));
+  });
+  // Pre-create the lock to simulate a concurrent holder.
+  const lockPath = path.join(outDir, '.runCreate.lock');
+  fs.writeFileSync(lockPath, String(process.pid));
+  let resolved = false;
+  const p = runCreate({ brief: loadBrief(), outDir, mode: 'structured-handoff' })
+    .then((r) => { resolved = true; return r; });
+  // Wait 600ms — runCreate should still be retrying lock acquisition.
+  await new Promise((r) => setTimeout(r, 600));
+  assert.equal(resolved, false, 'runCreate should still be blocked on lock');
+  // Release the lock; runCreate should complete shortly after.
+  fs.unlinkSync(lockPath);
+  const r = await p;
+  assert.ok(r.deckPath);
+});
+
+test('runCreate HARD-02: lock timeout soft-fails with stderr message and proceeds', async (t) => {
+  const outDir = freshTmpDir('crc-lock-timeout');
+  t.after(() => {
+    _test_setSpawn(null);
+    delete process.env.INSTADECKS_LOCK_TIMEOUT_MS;
+    fs.rmSync(outDir, { recursive: true, force: true });
+  });
+  await fsp.writeFile(path.join(outDir, 'render-deck.cjs'), loadCjsSrc());
+  _test_setSpawn(async (cjsPath, opts) => {
+    await fsp.copyFile(TINY_DECK, path.join(opts.cwd, 'deck.pptx'));
+  });
+  // Pre-create the lock and never release it; rely on timeout soft-fail.
+  fs.writeFileSync(path.join(outDir, '.runCreate.lock'), 'held');
+  process.env.INSTADECKS_LOCK_TIMEOUT_MS = '300';
+  // Capture stderr.
+  const origWrite = process.stderr.write.bind(process.stderr);
+  let captured = '';
+  process.stderr.write = (chunk, ...rest) => { captured += String(chunk); return origWrite(chunk, ...rest); };
+  try {
+    const r = await runCreate({ brief: loadBrief(), outDir, mode: 'structured-handoff' });
+    assert.ok(r.deckPath);
+    assert.match(captured, /cwd lock timeout \(300ms\) on .* — soft-fail, proceeding without lock/);
+  } finally {
+    process.stderr.write = origWrite;
+  }
+});
+
 test('runCreate: bogus deck content → OOXML sanity check throws (xmllint hard-fail path)', async (t) => {
   // When xmllint IS present and the deck is not valid OOXML, runCreate throws (hard fail);
   // when xmllint is MISSING, runCreate pushes a warning and continues. Both branches are
