@@ -4,7 +4,7 @@ Generate, review, and annotate polished presentation decks from any input.
 
 [![CI](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml/badge.svg)](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](./tests/coverage-baseline.txt)
-![Version](https://img.shields.io/badge/version-0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.2.1-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
 ## Overview

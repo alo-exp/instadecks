@@ -1,3 +1,13 @@
+## [0.2.1] — 2026-04-30
+
+### Fixed
+- Replace all remaining `/instadecks:name` colon-namespaced refs with hyphen style in JS source files and tests
+- Link `docs/pre-release-quality-gate.md` in `docs/knowledge/INDEX.md` (Gate 7 orphan)
+- Update error-message regex in `tools-audit-allowed-tools-branches.test.js` to match new error text
+- Remove duplicate `### Marketplace PR` section in `.planning/RELEASE.md`
+
+---
+
 ## [0.2.0] — 2026-04-30
 
 ### Added
