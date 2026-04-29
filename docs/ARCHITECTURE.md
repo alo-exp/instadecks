@@ -51,3 +51,17 @@ Multi-skill, single-plugin layout (topgun pattern). One plugin shipping four use
 - **IBM Plex Sans (bundled, SIL OFL)** — the calibrated font for `annotate.js`'s text-width math; missing/substituted font destroys pixel alignment
 - **`node --test`** — zero-dep test runner matching silver-bullet/topgun in-house precedent
 - **Apache-2.0** with bundled-software section (pptxgenjs MIT, IBM Plex Sans OFL)
+
+## Release pipeline
+
+CI (`.github/workflows/ci.yml`) chains seven gates that must all pass on push and PR:
+
+1. **Gate 2 — Hardcoded-path lint** (`tools/lint-paths.sh`) — forbids `/Users/`, `~/.claude/`, `/home/`, `C:\`.
+2. **Gate 3 — pptxgenjs version pin** (`tools/assert-pptxgenjs-pin.js`) — exact `4.0.1` in `package.json`.
+3. **Gate 3b — Cookbook recipe links** (`tools/validate-cookbook.js`).
+4. **Gate 4 — License audit** (`license-checker --production --failOn 'GPL;AGPL;SSPL'`).
+5. **Gate 5 / 5b / 5c — Hook executability + bats install + bash script suite.**
+6. **Gate 7 — Doc size caps** (`tools/lint-doc-size.js [--orphans]`) — `docs/*.md` ≤ 500 lines, `docs/knowledge|lessons/*.md` ≤ 300, every in-scope doc linked from `INDEX.md`.
+7. **Gate 6 — c8 100% coverage gate** (`npm test`) — lines/branches/functions/statements at 100%, no exclusions.
+
+Plans 10-03 .. 10-06 forward-extend this chain with activation-panel, permission-mode, fresh-install, and release-automation gates (`npm run gate:*`, `npm run release:dry-run`, `npm run release`).
