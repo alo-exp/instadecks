@@ -21,7 +21,8 @@
     "audit:allowed-tools": "node tools/audit-allowed-tools.js",
     "audit:licenses": "node tools/license-audit.js",
     "gate:activation-panel": "node --test tests/automation/activation-panel.test.js",
-    "gate:permission-mode": "node --test tests/automation/permission-mode.test.js"
+    "gate:permission-mode": "node --test tests/automation/permission-mode.test.js",
+    "gate:fresh-install": "node --test tests/automation/fresh-install.test.js"
   },
   "dependencies": {
     "pptxgenjs": "4.0.1"
