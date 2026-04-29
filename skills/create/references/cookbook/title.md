@@ -89,7 +89,7 @@ function renderTitleC(slide, { title, subtitle, attribution, pageNum, total }) {
     x: MARGIN_X, y: 0.4, w: 4.5, h: 5.0,
     fontFace: TYPE.heading, fontSize: 280, bold: true,
     color: PALETTE.secondary, align: 'left', valign: 'top', margin: 0,
-    fit: 'shrink',
+    fit: 'shrink', autoFit: true,
   });
 
   slide.addText(title, {

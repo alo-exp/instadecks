@@ -49,12 +49,17 @@ function renderClosingA(slide, { headline, callToAction, contact, pageNum, total
 function renderClosingB(slide, { headline, callToAction, contact, pageNum, total }) {
   slide.background = { color: PALETTE.primary };
 
-  // Hero question mark glyph as visual anchor.
-  slide.addText('?', {
-    x: W - 2.4, y: 0.4, w: 2.0, h: 2.0,
+  // Hero question mark glyph as visual anchor. fontSize ≥ 120 → MUST include
+  // fit: 'shrink' AND autoFit: true (Live E2E Iteration 2 Fix #4). Width is
+  // computed from glyph count to avoid right-edge clip on wide glyph pairs
+  // (Live E2E Iteration 2 Fix #9): minimum 3.0", or 1.5" per glyph.
+  const heroGlyph = '?';
+  const heroW = Math.max(3.0, heroGlyph.length * 1.5);
+  slide.addText(heroGlyph, {
+    x: W - MARGIN_X - heroW, y: 0.4, w: heroW, h: 2.0,
     fontFace: TYPE.heading, fontSize: 220, bold: true,
     color: PALETTE.secondary, align: 'right', valign: 'top', margin: 0,
-    fit: 'shrink',
+    fit: 'shrink', autoFit: true,
   });
 
   slide.addText(headline, {

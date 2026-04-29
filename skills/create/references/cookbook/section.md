@@ -55,7 +55,7 @@ function renderSectionB(slide, { sectionNum, sectionTitle, pageNum, total }) {
     x: MARGIN_X, y: 1.4, w: 5.5, h: 3.6,
     fontFace: TYPE.heading, fontSize: 200, bold: true,
     color: PALETTE.secondary, align: 'left', valign: 'top', margin: 0,
-    fit: 'shrink',
+    fit: 'shrink', autoFit: true,
   });
 
   slide.addText(sectionTitle, {
