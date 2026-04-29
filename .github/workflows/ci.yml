@@ -98,6 +98,13 @@ jobs:
             exit 1
           }
 
+      - name: Gate 7 — Doc size caps
+        run: |
+          node tools/lint-doc-size.js && node tools/lint-doc-size.js --orphans || {
+            echo "::error::Doc size cap or orphan check failed (see tools/lint-doc-size.js output)"
+            exit 1
+          }
+
       - name: Gate 6 — Coverage 100% gate (c8 + node --test, per CONTEXT D-02)
         # `npm test` script body: c8 --100 --check-coverage --reporter text node --test 'tests/**/*.test.js'
         # CI fails on any regression below 100% lines/branches/functions/statements.
