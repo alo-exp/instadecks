@@ -1,5 +1,5 @@
 ---
-name: review
+name: instadecks-review
 description: Review and audit a presentation deck for visual design defects, score design maturity, and detect AI-tells. This skill should be used when the user asks to "review my deck", "critique my slides", "audit my slides", "find what's wrong visually with this deck", "score the design maturity", or "does this deck look AI-generated" — runs DECK-VDA 4-pass visual methodology (macro / typography / data-objects / micro) with R18 AI-tell detection on pitch decks, emits findings JSON + fixed-template Markdown + narrative report, and optionally pipelines into annotation.
 allowed-tools:
   - Bash(node:*)
@@ -12,24 +12,24 @@ user-invocable: true
 version: 0.1.0
 ---
 
-# /instadecks:review — Design Critique with DECK-VDA 4-Pass Methodology
+# /instadecks-review — Design Critique with DECK-VDA 4-Pass Methodology
 
-Review a presentation deck for design defects using DECK-VDA 4-pass methodology — produces a deterministic findings JSON, a fixed-template Markdown report, and an LLM-authored narrative report when given a `.pptx` deck, optionally piping into `/instadecks:annotate` for an overlaid PPTX + PDF.
+Review a presentation deck for design defects using DECK-VDA 4-pass methodology — produces a deterministic findings JSON, a fixed-template Markdown report, and an LLM-authored narrative report when given a `.pptx` deck, optionally piping into `/instadecks-annotate` for an overlaid PPTX + PDF.
 
 ## When to invoke
 
 Use this skill when:
 - The user supplies a `.pptx` (or `.pdf`) deck and asks for a design critique, design review, "review my deck", "find what's wrong with this deck", or similar natural-language framing.
-- Another skill pipelines findings: `/instadecks:create` (Phase 4-5) imports `runReview` directly per D-04 to score iterations.
+- Another skill pipelines findings: `/instadecks-create` (Phase 4-5) imports `runReview` directly per D-04 to score iterations.
 - The user explicitly asks for AI-tell detection, R18 audit, or "does this deck look AI-generated?".
 
-Do NOT use this skill for argument-structure / claim-evidence / narrative-arc critique — that is `/instadecks:content-review` (Phase 6) territory. See §"Content-vs-design boundary" below.
+Do NOT use this skill for argument-structure / claim-evidence / narrative-arc critique — that is `/instadecks-content-review` (Phase 6) territory. See §"Content-vs-design boundary" below.
 
 ## Inputs
 
 - **`deckPath`** (required) — path to `.pptx` or `.pdf` deck.
 - **Optional findings sidecar** — for re-review of an existing review pass; the agent reads it as the starting findings object instead of re-scanning from scratch.
-- **`--annotate` flag** — gates the pipeline into `/instadecks:annotate` per D-03. Default = standalone (no annotation). Natural-language synonyms (`annotate`, `overlay`, `markup`) also trigger.
+- **`--annotate` flag** — gates the pipeline into `/instadecks-annotate` per D-03. Default = standalone (no annotation). Natural-language synonyms (`annotate`, `overlay`, `markup`) also trigger.
 - **Optional `--run-id`** — override auto-generated run-id (`YYYYMMDD-HHMMSS-<6hex>`).
 - **Optional `--out-dir`** — override default `.planning/instadecks/<runId>/`.
 
@@ -40,7 +40,7 @@ Do NOT use this skill for argument-structure / claim-evidence / narrative-arc cr
 - `<deck>.review.md` — fixed-template DECK-VDA report rendered by `skills/review/scripts/render-fixed.js`. Deterministic; same input → byte-identical output.
 - `<deck>.review.narrative.md` — LLM-authored narrative report (≥200 words). Authored AFTER `runReview` returns; cites slide numbers and finding identifiers.
 
-**With `--annotate`** (5 files): adds `<deck>.annotated.pptx` and `<deck>.annotated.pdf` via `/instadecks:annotate`.
+**With `--annotate`** (5 files): adds `<deck>.annotated.pptx` and `<deck>.annotated.pdf` via `/instadecks-annotate`.
 
 A run-dir mirror at `.planning/instadecks/<runId>/` archives copies of the JSON + MD for audit.
 
@@ -53,7 +53,7 @@ node skills/review/scripts/cli.js <deckPath> --findings <doc.json> [--out-dir <d
 Prints the run summary as JSON to stdout.
 
 > **Important — the CLI is a findings post-processor / annotator dispatcher, NOT a reviewer.**
-> Producing findings from a deck (the LLM reading slide images and emitting the v1.x findings JSON via the DECK-VDA 4-pass methodology described below) is an **agent-mode** step. The CLI requires `--findings <doc.json>` and will exit non-zero without it; it then renders the fixed-template MD, optionally pipes into `/instadecks:annotate`, and archives outputs. To produce findings end-to-end from a `.pptx`, invoke `/instadecks:review` in agent mode and let Claude execute the 4-pass scan before calling the CLI.
+> Producing findings from a deck (the LLM reading slide images and emitting the v1.x findings JSON via the DECK-VDA 4-pass methodology described below) is an **agent-mode** step. The CLI requires `--findings <doc.json>` and will exit non-zero without it; it then renders the fixed-template MD, optionally pipes into `/instadecks-annotate`, and archives outputs. To produce findings end-to-end from a `.pptx`, invoke `/instadecks-review` in agent mode and let Claude execute the 4-pass scan before calling the CLI.
 
 **Structured handoff** (D-04) — for skills/scripts importing in-process:
 ```js
@@ -90,7 +90,7 @@ Run these passes in order. Each pass widens the lens on a specific layer of the 
 
 ### 4-tier severity grammar
 
-Findings are emitted at one of four tiers. **Producers (this skill, `/content-review`) ALWAYS emit the full 4-tier vocabulary. Pre-collapsing here is a contract violation — see §"Severity-collapse boundary" below.**
+Findings are emitted at one of four tiers. **Producers (this skill, `/instadecks-content-review`) ALWAYS emit the full 4-tier vocabulary. Pre-collapsing here is a contract violation — see §"Severity-collapse boundary" below.**
 
 | Tier | Glyph | When to use |
 |------|-------|-------------|
@@ -143,7 +143,7 @@ These seven rules constrain reviewer behavior. They have been re-expressed for f
 4. **Genuine ≠ severity.** A Nitpick can be `genuine: true`; a Critical can be `genuine: false` if the user's design rationale doc justifies it (P-08).
 5. **No Critical without a Fix.** Every Critical finding has a concrete actionable fix. "Reconsider" is not a fix.
 6. **Calibrate down on uncertainty.** If you are between Major and Minor, choose Minor. Reviewers add severity in pass 2, never subtract it.
-7. **Do NOT flag argument structure, claim-evidence balance, or narrative-arc problems. That is `/content-review`'s territory. When you catch yourself writing "the argument would be stronger if..." — DELETE the line.**
+7. **Do NOT flag argument structure, claim-evidence balance, or narrative-arc problems. That is `/instadecks-content-review`'s territory. When you catch yourself writing "the argument would be stronger if..." — DELETE the line.**
 
 ### Large-deck chunking
 
@@ -189,9 +189,9 @@ Triggers:
 - Explicit `--annotate` flag on the CLI.
 - Natural-language mention in the user's prompt: `annotate`, `overlay`, `markup`, "show me the issues on the slides", or similar.
 
-When triggered, the agent passes `annotate: true` to `runReview`, which lazy-loads `runAnnotate` from `/instadecks:annotate` and produces the two extra outputs.
+When triggered, the agent passes `annotate: true` to `runReview`, which lazy-loads `runAnnotate` from `/instadecks-annotate` and produces the two extra outputs.
 
-### Scoped Review Mode (cycle 2+ in `/instadecks:create` auto-refine loop)
+### Scoped Review Mode (cycle 2+ in `/instadecks-create` auto-refine loop)
 
 When the caller passes `slidesToReview: [3, 7, 9]`, scope the review to those
 slide indices only. Skip the per-slide §3 entries for any slideNum not in the
@@ -216,13 +216,13 @@ output the auto-refine loop writes per cycle (`findings.triaged.json`).
 
 ## Severity-collapse boundary (P-01 — locked invariant)
 
-**Producers (this skill, `/content-review`) emit FULL 4-tier severity (`Critical`, `Major`, `Minor`, `Nitpick`). The 4→3 collapse to `MAJOR` / `MINOR` / `POLISH` happens ONLY at the `/instadecks:annotate` adapter (Phase 2). Pre-collapsing here breaks `/content-review` and the future r18-only filter.**
+**Producers (this skill, `/instadecks-content-review`) emit FULL 4-tier severity (`Critical`, `Major`, `Minor`, `Nitpick`). The 4→3 collapse to `MAJOR` / `MINOR` / `POLISH` happens ONLY at the `/instadecks-annotate` adapter (Phase 2). Pre-collapsing here breaks `/instadecks-content-review` and the future r18-only filter.**
 
 The schema validator (`skills/review/scripts/lib/schema-validator.js`) rejects pre-collapsed severities at runtime; tests in Plan 03-02 assert this contract.
 
 ## Content-vs-design boundary
 
-This skill flags **visual / typographic / layout** issues only. Argument structure, claim/evidence balance, narrative-arc problems are `/instadecks:content-review`'s territory (Phase 6). When you catch yourself writing "the argument would be stronger if..." — DELETE the line.
+This skill flags **visual / typographic / layout** issues only. Argument structure, claim/evidence balance, narrative-arc problems are `/instadecks-content-review`'s territory (Phase 6). When you catch yourself writing "the argument would be stronger if..." — DELETE the line.
 
 ## Allowed tools
 
@@ -235,6 +235,6 @@ This skill flags **visual / typographic / layout** issues only. Argument structu
 ## Deferred (out of scope for this skill / this milestone)
 
 - **Phase 7 DIST-02** — activation tuning to ≥8/10 on the description string. This skill ships the Phase 1 description verbatim; final tuning lands at distribution time.
-- **Phase 5 auto-refine** — `/instadecks:create` will consume `runReview` in a convergence loop. The convergence rule (`genuine_findings == 0 AND cycle ≥ 2`) lives there, not here.
-- **Phase 6 `/instadecks:content-review`** — separate skill for argument-structure critique. Boundary above.
+- **Phase 5 auto-refine** — `/instadecks-create` will consume `runReview` in a convergence loop. The convergence rule (`genuine_findings == 0 AND cycle ≥ 2`) lives there, not here.
+- **Phase 6 `/instadecks-content-review`** — separate skill for argument-structure critique. Boundary above.
 - **Reviewer-of-reviewer evaluation** — out of v0.1.0 scope.

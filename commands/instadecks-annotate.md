@@ -1,5 +1,5 @@
 ---
-name: annotate
+name: instadecks-annotate
 description: Annotate a presentation deck by overlaying or stamping design-review findings on top of slides. This skill should be used when the user wants to mark up, markup, stamp, comment on, overlay flagged findings on, show issues on, or visualize annotations on a deck — given a `.pptx` and a findings JSON sidecar in the locked schema, produces an overlaid `.annotated.pptx` + `.annotated.pdf` with major and minor severity notes.
 allowed-tools:
   - Bash(node:*)
@@ -12,15 +12,15 @@ user-invocable: true
 version: 0.1.0
 ---
 
-# /instadecks:annotate — Overlay Design-Review Findings on a Deck
+# /instadecks-annotate — Overlay Design-Review Findings on a Deck
 
 Annotate a presentation deck with design-review findings — produces an annotated `<deck>.annotated.pptx` overlay and `<deck>.annotated.pdf` rendering when given a `.pptx` deck file and a findings JSON in the locked Instadecks v1.0 schema.
 
 ## When to invoke
 
 Use this skill when:
-- A user has a `.pptx` deck and a findings JSON sidecar (e.g. produced by `/instadecks:review` or hand-authored) and wants the findings visualized as overlay annotations.
-- Another skill (`/instadecks:review` in Phase 3, `/instadecks:create` in Phase 4-5) pipelines findings into annotation rendering — those skills import `runAnnotate` directly per D-06.
+- A user has a `.pptx` deck and a findings JSON sidecar (e.g. produced by `/instadecks-review` or hand-authored) and wants the findings visualized as overlay annotations.
+- Another skill (`/instadecks-review` in Phase 3, `/instadecks-create` in Phase 4-5) pipelines findings into annotation rendering — those skills import `runAnnotate` directly per D-06.
 
 ## Inputs
 
@@ -68,7 +68,7 @@ The findings adapter (`scripts/adapter.js`) validates the entire document up fro
 | Minor             | minor              |
 | Nitpick           | polish             |
 
-`/instadecks:review` and `/instadecks:content-review` continue to emit the full 4-tier vocabulary (CLAUDE.md "severity-collapse boundary").
+`/instadecks-review` and `/instadecks-content-review` continue to emit the full 4-tier vocabulary (CLAUDE.md "severity-collapse boundary").
 
 ## Allowed tools
 

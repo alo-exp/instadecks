@@ -1,5 +1,5 @@
 ---
-name: create
+name: instadecks-create
 description: Generate, build, make, author, or compose a polished slide deck (PPTX + PDF + design-rationale) from any input — including markdown, PDF whitepaper, PPTX, URL, image, interview transcript, outline, or freeform brief. This skill should be used when the user wants a fresh deck made and supplies markdown / PDF whitepaper / PPTX / URL / image / interview transcript / outline / brief and asks for a deck, slides, presentation, or pitch (turn this into a presentation, make slides from this) — including AI-generated-avoidance phrasings like "slides that don't look AI-generated". Composes a per-run render-deck.cjs from a curated pptxgenjs cookbook, picks palette and typography from author-original design guidance, and emits 8 slide types at 16:9 with action titles, page numbers, source lines, and speaker notes. Auto-refines via review-fix loop (triggers: 'auto-refine deck', 'iterate until clean', 'convergence loop') until zero genuine findings or user accepts soft cap at cycle 5.
 allowed-tools:
   - Bash(node:*)
@@ -14,7 +14,7 @@ user-invocable: true
 version: 0.1.0
 ---
 
-# /instadecks:create — Generate a Polished Deck from Any Input
+# /instadecks-create — Generate a Polished Deck from Any Input
 
 ## What this skill does
 
@@ -23,10 +23,10 @@ Generate a polished presentation deck (PPTX + PDF + design-rationale doc) from a
 ## When to use this skill
 
 - The user supplies a markdown / plain text / read-only PPTX / PDF / URL / image / transcript / freeform brief / multi-file bundle and asks for a "deck", "slides", "presentation", "pitch", or similar.
-- The user wants a fresh deck authored from scratch (not a review or annotation of an existing deck — those are `/instadecks:review` and `/instadecks:annotate`).
+- The user wants a fresh deck authored from scratch (not a review or annotation of an existing deck — those are `/instadecks-review` and `/instadecks-annotate`).
 - Another skill pipelines a brief into deck generation (Phase 5 auto-refine wraps `runCreate` in a convergence loop).
 
-Do NOT use this skill for design critique (`/instadecks:review`), annotation overlay (`/instadecks:annotate`), or argument-structure / claim-evidence critique (`/instadecks:content-review`).
+Do NOT use this skill for design critique (`/instadecks-review`), annotation overlay (`/instadecks-annotate`), or argument-structure / claim-evidence critique (`/instadecks-content-review`).
 
 ## Locked invariants (do not violate)
 
@@ -113,7 +113,7 @@ Persist the rolled DNA into `design-choices.json` so Step 4 (`runCreate`) writes
 
 ### Step 3 — Compose render-deck.cjs from the cookbook
 
-Read `references/cookbook.md` (master) and the per-recipe files in `references/cookbook/*.md`. For each beat in `narrative_arc`, pick the recipe that matches the beat's intent (cookbook recipe-index table maps slide types → "When to use"). **Vary recipe across beats** — repeating the same recipe more than 3 consecutive slides triggers R18 in `/instadecks:review`.
+Read `references/cookbook.md` (master) and the per-recipe files in `references/cookbook/*.md`. For each beat in `narrative_arc`, pick the recipe that matches the beat's intent (cookbook recipe-index table maps slide types → "When to use"). **Vary recipe across beats** — repeating the same recipe more than 3 consecutive slides triggers R18 in `/instadecks-review`.
 
 Compose render-deck.cjs:
 
@@ -219,13 +219,13 @@ If `result.warnings.length > 0`, surface them (e.g., "xmllint missing — OOXML 
 
 ## Output contract for varied input shapes
 
-Regardless of input shape (structured JSON, markdown narrative, raw text, attached files), every `/instadecks:create` run produces the same artifacts under `.planning/instadecks/<run-id>/`:
+Regardless of input shape (structured JSON, markdown narrative, raw text, attached files), every `/instadecks-create` run produces the same artifacts under `.planning/instadecks/<run-id>/`:
 
 - `deck.pptx` — the rendered presentation
 - `deck.pdf` — PDF render via soffice
 - `design-rationale.md` — MUST include lines `Palette: <name>`, `Typography: <name>`, `Motif: <name>` so downstream tooling (review, annotate, diversity gate) can read the rolled design DNA. The richer `## Palette` / `## Typography` / `## Motif` markdown sections produced by `lib/render-rationale.js` remain the primary surface; the `Palette: <name>` / `Typography: <name>` / `Motif: <name>` shorthand lines MUST also appear (top of file or alongside the section headings) so regex-based tooling can extract the chosen DNA without parsing markdown sections.
-- `findings.json` — populated by `/instadecks:review` (empty until review runs)
-- `annotated.pptx` — populated by `/instadecks:annotate`
+- `findings.json` — populated by `/instadecks-review` (empty until review runs)
+- `annotated.pptx` — populated by `/instadecks-annotate`
 
 ## Out of scope (deferred)
 
