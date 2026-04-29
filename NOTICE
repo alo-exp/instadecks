@@ -21,8 +21,11 @@ provided under the licenses/ directory at the project root.
 - pptxgenjs (MIT) — https://github.com/gitbrent/PptxGenJS
   Copyright (c) Brent Ely and contributors.
 
-- IBM Plex Sans (SIL Open Font License 1.1) — https://github.com/IBM/plex
+- IBM Plex family — Sans, Serif, Mono (SIL Open Font License 1.1) — https://github.com/IBM/plex
   Copyright © 2017 IBM Corp. with Reserved Font Name "Plex".
+  Bundled families: IBM Plex Sans, IBM Plex Serif, IBM Plex Mono. Each ships
+  4 weights (Regular, Italic, Bold, BoldItalic) under assets/fonts/<family>/
+  with a per-family OFL.txt license copy.
 
 - jszip (MIT or GPL-3.0; used under MIT) — https://github.com/Stuk/jszip
   Transitive dependency of pptxgenjs.

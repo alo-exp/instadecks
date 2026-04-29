@@ -61,15 +61,20 @@ else
   miss "pptxgenjs not installed at $PPTX_PKG — run: npm ci --omit=dev (or wait for SessionStart hook)"
 fi
 
-# --- IBM Plex Sans (soft check) ---
+# --- IBM Plex family (soft check) ---
+# Iter4-1: probe Sans, Serif, Mono. Cookbook recipes reference all three;
+# a missing family causes soffice to silently fall back to system fonts
+# with different metrics, producing visible letter-spacing artifacts.
 if command -v fc-list >/dev/null 2>&1; then
-  if fc-list 2>/dev/null | grep -i "IBM Plex Sans" >/dev/null; then
-    ok "IBM Plex Sans — discoverable via fc-list"
-  else
-    warn "IBM Plex Sans not found via fc-list — install bundled fonts from \$CLAUDE_PLUGIN_ROOT/assets/fonts/IBM_Plex_Sans/"
-  fi
+  for fam in "IBM Plex Sans" "IBM Plex Serif" "IBM Plex Mono"; do
+    if fc-list 2>/dev/null | grep -i "$fam" >/dev/null; then
+      ok "$fam — discoverable via fc-list"
+    else
+      warn "$fam not found via fc-list — install bundled fonts from \$CLAUDE_PLUGIN_ROOT/assets/fonts/"
+    fi
+  done
 else
-  warn "fc-list not installed; cannot verify IBM Plex Sans presence — install fontconfig if you want this probe to run"
+  warn "fc-list not installed; cannot verify IBM Plex family presence — install fontconfig if you want this probe to run"
 fi
 
 if [ "$FAIL" -eq 0 ]; then
