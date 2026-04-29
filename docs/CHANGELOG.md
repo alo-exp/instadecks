@@ -1,4 +1,18 @@
 ## v0.1.0 — 2026-04-29
+
+## [0.2.0] — 2026-04-30
+
+## Features
+- `feat(commands): add /instadecks-update skill` (5d7f291) — self-update command following the topgun-update pattern
+
+## Bug Fixes
+- `fix(create+tests): auto-refine always runs, /tmp mirror, clickable links` (5040e86) — loop was being skipped; outputs now mirrored to /tmp with clickable file:// links
+- `fix(tests): update remaining SKILL.md path refs to commands/instadecks-*.md` (62e3078) — CI ENOENT fix for skills→commands migration
+
+## Refactoring
+- `refactor(commands): convert skills to commands/ for clean slash-menu names` (8624343) — skills now appear as /instadecks-create, /instadecks-review, etc.
+
+---
 - First marketplace release; see .planning/RELEASE.md
 
 # Task Log
