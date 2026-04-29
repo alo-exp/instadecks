@@ -29,7 +29,7 @@ function render2ColA(slide, { title, leftHeader, leftBody, rightHeader, rightBod
     text: s, options: { bullet: true, breakLine: i < leftBody.length - 1 },
   })), {
     x: MARGIN_X, y: 1.9, w: COL_W, h: H - 2.6,
-    fontFace: TYPE.body, fontSize: 14, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0,
+    fontFace: TYPE.body, fontSize: 14, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0, valign: 'top',
   });
   // Right column
   const RIGHT_X = MARGIN_X + COL_W + 0.4;
@@ -41,7 +41,7 @@ function render2ColA(slide, { title, leftHeader, leftBody, rightHeader, rightBod
     text: s, options: { bullet: true, breakLine: i < rightBody.length - 1 },
   })), {
     x: RIGHT_X, y: 1.9, w: COL_W, h: H - 2.6,
-    fontFace: TYPE.body, fontSize: 14, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0,
+    fontFace: TYPE.body, fontSize: 14, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0, valign: 'top',
   });
   addFooter(slide, { pageNum, total, source });
   slide.addNotes(`Two-column comparison.`);
@@ -78,7 +78,7 @@ function render2ColB(slide, { title, leftHeader, leftBody, rightHeader, rightBod
     text: s, options: { bullet: true, breakLine: i < leftBody.length - 1 },
   })), {
     x: MARGIN_X, y: 1.9, w: LEFT_W, h: H - 2.6,
-    fontFace: TYPE.body, fontSize: 14, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0,
+    fontFace: TYPE.body, fontSize: 14, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0, valign: 'top',
   });
 
   // Sidebar — narrow, with a thin left rule (editorial-rule motif).
@@ -94,7 +94,7 @@ function render2ColB(slide, { title, leftHeader, leftBody, rightHeader, rightBod
     text: s, options: { bullet: false, breakLine: i < rightBody.length - 1 },
   })), {
     x: RIGHT_X, y: 1.9, w: RIGHT_W, h: H - 2.6,
-    fontFace: TYPE.body, fontSize: 12, color: PALETTE.muted, paraSpaceAfter: 6, margin: 0,
+    fontFace: TYPE.body, fontSize: 12, color: PALETTE.muted, paraSpaceAfter: 6, margin: 0, valign: 'top',
   });
 
   addFooter(slide, { pageNum, total, source });
@@ -149,13 +149,13 @@ function render2ColC(slide, { title, leftHeader, leftBody, rightHeader, rightBod
     text: s, options: { bullet: true, breakLine: i < leftBody.length - 1 },
   })), {
     x: MARGIN_X, y: 2.1, w: COL_W, h: H - 2.8,
-    fontFace: TYPE.body, fontSize: 13, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0,
+    fontFace: TYPE.body, fontSize: 13, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0, valign: 'top',
   });
   slide.addText(rightBody.map((s, i) => ({
     text: s, options: { bullet: true, breakLine: i < rightBody.length - 1 },
   })), {
     x: RIGHT_X, y: 2.1, w: COL_W, h: H - 2.8,
-    fontFace: TYPE.body, fontSize: 13, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0,
+    fontFace: TYPE.body, fontSize: 13, color: PALETTE.ink, paraSpaceAfter: 6, margin: 0, valign: 'top',
   });
 
   addFooter(slide, { pageNum, total, source });
