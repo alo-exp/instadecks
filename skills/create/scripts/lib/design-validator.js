@@ -66,7 +66,7 @@ function r3HexShape(palette) {
     return [{ rule: 'R3-hex-shape', message: 'palette must be object' }];
   }
   for (const [k, v] of Object.entries(palette)) {
-    if (k === 'name' || k === 'rationale') continue;
+    if (k === 'name' || k === 'rationale' || k === 'tone_tags') continue;
     if (typeof v !== 'string' || !HEX6.test(v)) {
       out.push({
         rule: 'R3-hex-shape',
@@ -208,9 +208,31 @@ function validateRenderSource(src) {
   return { ok: findings.length === 0, findings };
 }
 
+// Live E2E Iteration 2 Fix #3: helper for mechanical pickers reading
+// design-ideas.json. Returns the first palette whose tone_tags intersect with
+// any keyword in toneKeywords; if none match, returns the seeded fallback.
+// Pure function — no I/O. designIdeas.palettes shape: [{name, ..., tone_tags}].
+function pickPaletteByTone(designIdeas, toneKeywords, seed = 0) {
+  const palettes = (designIdeas && Array.isArray(designIdeas.palettes))
+    ? designIdeas.palettes : [];
+  if (palettes.length === 0) return null;
+  const wanted = new Set((toneKeywords || []).map(s => String(s).toLowerCase()));
+  if (wanted.size > 0) {
+    for (let i = 0; i < palettes.length; i++) {
+      const idx = (seed + i) % palettes.length;
+      const p = palettes[idx];
+      const tags = Array.isArray(p && p.tone_tags) ? p.tone_tags : [];
+      if (tags.some(t => wanted.has(String(t).toLowerCase()))) return p;
+    }
+  }
+  // No match — return seeded fallback (deterministic).
+  return palettes[seed % palettes.length];
+}
+
 module.exports = {
   validateDesignChoice,
   validateRenderSource,
+  pickPaletteByTone,
   _internal: {
     DEFAULT_BLUE_HEXES,
     BLUE_OVERRIDE_KEYWORDS,
