@@ -76,8 +76,10 @@ test('adapter validates and transforms findings', async (t) => {
 
   await t.test('rejects category not in allow-set', () => {
     const doc = validDoc();
-    doc.slides[0].findings[0].category = 'cosmetic';
-    assert.throws(() => adaptFindings(doc), /category: cosmetic not in/);
+    // Live E2E Iteration 1 Fix #4: `cosmetic` is now a recognized synonym for `style`.
+    // Use a truly bogus category that isn't synonym-mapped.
+    doc.slides[0].findings[0].category = 'totally-bogus';
+    assert.throws(() => adaptFindings(doc), /category: totally-bogus not in/);
   });
 
   await t.test('rejects nx out of [0,1]', () => {
