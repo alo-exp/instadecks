@@ -240,9 +240,24 @@ async function runCreate({
   try {
     cjsSrc = await fsp.readFile(cjsPath, 'utf8');
   } catch (e) {
+    // Live E2E Iteration 1 — Fix #3: actionable cold-user guidance.
+    // The CLI is deterministic — it RUNS render-deck.cjs and post-processes
+    // the output. The LLM-driven authoring step happens BEFORE this CLI is
+    // invoked (in agent mode the agent writes render-deck.cjs from the brief;
+    // in manual mode the user authors it from the cookbook recipes).
     throw new Error(
-      `render-deck.cjs not found at ${cjsPath} — agent must author it before calling ` +
-      `runCreate(mode:standalone) or pass via designChoices for structured-handoff`
+      `render-deck.cjs not found at ${cjsPath}\n\n` +
+      '`/instadecks:create` requires render-deck.cjs to exist in the run directory\n' +
+      'BEFORE this CLI is invoked. The CLI is deterministic — it runs render-deck.cjs\n' +
+      'and post-processes the output. The LLM-driven authoring step happens earlier.\n\n' +
+      'For agent mode: invoke /instadecks:create in Claude Code; the agent will\n' +
+      '  author render-deck.cjs from your brief and place it at the path above.\n\n' +
+      'For standalone manual mode:\n' +
+      '  1. Read skills/create/SKILL.md Step 3 (Compose render-deck.cjs from the cookbook)\n' +
+      '  2. See skills/create/references/cookbook/*.md for variant recipes\n' +
+      `  3. Write render-deck.cjs at ${cjsPath}\n` +
+      '  4. Re-run this CLI\n\n' +
+      'Alternatively, pass --design-choices <path.json> with a structured-handoff envelope.'
     );
   }
 
