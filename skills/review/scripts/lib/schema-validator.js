@@ -6,6 +6,16 @@
 
 const SEVERITIES = new Set(['Critical', 'Major', 'Minor', 'Nitpick']);
 const CATEGORIES = new Set(['defect', 'improvement', 'style', 'content']);
+// Live E2E Iteration 2 Fix #2: producer-side validator silently normalizes
+// nitpick-tier synonyms (polish/nit/cosmetic → style) before checking against
+// the canonical CATEGORIES set, mirroring the /annotate adapter behavior so
+// reviewers can emit either form. Documented in findings-schema.md §3.
+const CATEGORY_SYNONYMS = { polish: 'style', nit: 'style', cosmetic: 'style' };
+function normalizeCategoryForValidation(c) {
+  if (typeof c !== 'string') return c;
+  return Object.prototype.hasOwnProperty.call(CATEGORY_SYNONYMS, c)
+    ? CATEGORY_SYNONYMS[c] : c;
+}
 const VALID_CHECK_IDS = new Set([
   'action-title', 'redundancy', 'jargon', 'length',
   'pyramid-mece', 'narrative-arc', 'claim-evidence', 'standalone-readability',
@@ -65,10 +75,11 @@ function validate(doc) {
       if (typeof f.severity_reviewer !== 'string' || !SEVERITIES.has(f.severity_reviewer)) {
         throw new Error(`${where}.severity_reviewer: must be one of {Critical,Major,Minor,Nitpick} (got ${JSON.stringify(f.severity_reviewer)})`);
       }
-      if (typeof f.category !== 'string' || !CATEGORIES.has(f.category)) {
+      const normalizedCategory = normalizeCategoryForValidation(f.category);
+      if (typeof f.category !== 'string' || !CATEGORIES.has(normalizedCategory)) {
         throw new Error(`${where}.category: must be one of {defect,improvement,style,content} (got ${JSON.stringify(f.category)})`);
       }
-      if (f.category === 'content') {
+      if (normalizedCategory === 'content') {
         if (typeof f.check_id !== 'string' || !VALID_CHECK_IDS.has(f.check_id)) {
           throw new Error(`${where}.check_id: required for category="content", must be one of {action-title,redundancy,jargon,length,pyramid-mece,narrative-arc,claim-evidence,standalone-readability} (got ${JSON.stringify(f.check_id)})`);
         }
@@ -98,5 +109,6 @@ function validate(doc) {
 
 module.exports = {
   validate,
-  _internal: { SEVERITIES, CATEGORIES, VALID_CHECK_IDS, REQUIRED_FINDING_FIELDS },
+  normalizeCategoryForValidation,
+  _internal: { SEVERITIES, CATEGORIES, VALID_CHECK_IDS, REQUIRED_FINDING_FIELDS, CATEGORY_SYNONYMS },
 };
