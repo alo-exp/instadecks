@@ -120,6 +120,21 @@ test('tools-lint-pptxgenjs-enums-branches', async (t) => {
     }
   });
 
+  await t.test('HARD-01: non-prefix typo (OVALL) falls back to Levenshtein suggestion (OVAL)', () => {
+    const tmp = freshTmp('elint-lev');
+    try {
+      fs.mkdirSync(path.join(tmp, 'skills'), { recursive: true });
+      fs.writeFileSync(path.join(tmp, 'skills', 'bad.cjs'),
+        "slide.addShape(pres.shapes.OVALL, { x: 0 });\n");
+      const r = run(tmp);
+      assert.equal(r.status, 1);
+      assert.match(r.stderr, /pres\.shapes\.OVALL/);
+      assert.match(r.stderr, /suggestion: OVAL/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   await t.test('HARD-01: ALLOW_MARKER on a typo line skips the violation', () => {
     const tmp = freshTmp('elint-typo-allow');
     try {

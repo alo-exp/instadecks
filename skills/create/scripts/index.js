@@ -281,7 +281,11 @@ async function acquireCwdLock(dir) {
       const fd = fs.openSync(lockPath, 'wx');
       fs.writeSync(fd, String(process.pid));
       fs.closeSync(fd);
-      return () => { try { fs.unlinkSync(lockPath); } catch { /* lock already gone */ } };
+      return () => {
+        try { fs.unlinkSync(lockPath); }
+        /* c8 ignore next */ // Defensive: lock removed by external actor between owner-check and unlink; treated as already-released.
+        catch { /* lock already gone */ }
+      };
     } catch (e) {
       /* c8 ignore next */ // Defensive: openSync only throws EEXIST in this code path; non-EEXIST errors imply fs corruption.
       if (e.code !== 'EEXIST') throw e;

@@ -27,10 +27,11 @@ function deriveShapeKeys() {
   try {
     const Pptx = require('pptxgenjs');
     const inst = new Pptx();
+    /* c8 ignore next */ // Defensive: pptxgenjs 4.0.1 always exposes inst.shapes; the `|| {}` is a safety net for future major bumps.
     const all = Object.keys(inst.shapes || {});
     return new Set(all.filter((k) => /^[A-Z][A-Z0-9_]*$/.test(k)));
+  /* c8 ignore next 3 */ // Defensive: pptxgenjs is a hard prod dep; require() only fails in pre-install bootstrap.
   } catch (e) {
-    /* c8 ignore next 2 */ // Defensive: pptxgenjs is a hard prod dep; require() only fails in pre-install bootstrap.
     return new Set();
   }
 }
@@ -38,6 +39,7 @@ const VALID_SHAPE_KEYS = deriveShapeKeys();
 
 // Levenshtein distance — small DP, used for suggesting the closest valid key.
 function lev(a, b) {
+  /* c8 ignore next 3 */ // Defensive: callers always pass distinct non-empty strings (bad token vs valid key); these short-circuits cover edge inputs.
   if (a === b) return 0;
   if (a.length === 0) return b.length;
   if (b.length === 0) return a.length;
@@ -61,6 +63,7 @@ function lev(a, b) {
 }
 
 function suggestKey(bad) {
+  /* c8 ignore next */ // Defensive: lint flow checks size===0 before calling suggestKey; this guard covers direct callers.
   if (VALID_SHAPE_KEYS.size === 0) return null;
   // Prefer keys that START WITH the bad token (typical truncation typos like
   // RECT→RECTANGLE, RECT_ROUND→ROUND_RECT). Fall back to global Levenshtein.
@@ -131,7 +134,8 @@ function main() {
       let sm;
       while ((sm = SHAPES_RE.exec(line)) !== null) {
         const key = sm[1];
-        if (VALID_SHAPE_KEYS.size === 0) break; // pptxgenjs unavailable — skip
+        /* c8 ignore next */ // Defensive: pptxgenjs is a hard prod dep so VALID_SHAPE_KEYS is always non-empty in CI; this break covers pre-install bootstrap.
+        if (VALID_SHAPE_KEYS.size === 0) break;
         if (VALID_SHAPE_KEYS.has(key)) continue;
         const sug = suggestKey(key);
         if (sug) {
