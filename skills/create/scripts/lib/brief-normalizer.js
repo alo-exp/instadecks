@@ -78,11 +78,25 @@ function canonicalizeJson(input) {
 
 async function defaultExtractor(input, shape) {
   if (typeof _llmStub !== 'function') {
-    throw new Error(
-      'brief-normalizer: no LLM configured — set _test_setLlm(fn) in tests ' +
-        'or wire an LLM accessor before calling normalizeBrief on ' +
-        `${shape} input`,
+    // Live E2E Iteration 1 — Fix #1: clear actionable guidance for cold CLI users.
+    // The polymorphic intake (markdown / raw / files) requires an LLM extractor,
+    // which only exists when running through Claude Code agent mode (the agent
+    // itself IS the LLM). Standalone CLI usage requires canonical JSON.
+    const err = new Error(
+      `brief-normalizer: no LLM configured for ${shape} brief input.\n\n` +
+      'The polymorphic brief intake (--brief-md / --brief-text / --brief-files)\n' +
+      'requires an LLM extractor, which is only available when running through\n' +
+      'Claude Code agent mode (invoke /instadecks:create — the agent normalizes\n' +
+      'the brief in-context).\n\n' +
+      'For standalone CLI usage:\n' +
+      '  1. Convert your brief to canonical JSON shape: ' +
+      '{topic, audience, tone, narrative_arc[], key_claims[], asset_hints, source_files}\n' +
+      '  2. Save as brief.json\n' +
+      '  3. Run: cli.js --brief brief.json --out-dir .\n\n' +
+      'See skills/create/SKILL.md "Brief intake" for the canonical shape.\n' +
+      '(Test mode: set INSTADECKS_LLM_STUB or call _test_setLlm(fn) in tests.)'
     );
+    throw err;
   }
   let payload;
   if (shape === 'files') {
