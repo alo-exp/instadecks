@@ -219,4 +219,3 @@ None — coverage is hard 100% across all in-scope files. v0.1.0 release readine
 ### Iteration 8 + Phase 10 closeout
 
 Sign-off log: 2 consecutive clean live-E2E iterations (Iterations 7 + 8) confirmed varied-input handling and design-DNA rotation across structurally-distinct briefs (Phase 9 carryover). Phase 10 backlog/doc/automation completion closes HARD-01..HARD-15. Dry-run green. Ready-to-tag.
-
