@@ -51,6 +51,32 @@ function addFooter(slide, { pageNum, total, source }) {
 }
 ```
 
+## Variant IDs
+
+Each recipe in this cookbook ships ≥3 variants. Variant IDs follow `{recipe}-[A-E]-{shorthand}`.
+
+| Recipe | Variant count | Examples |
+|---|---|---|
+| title | ≥3 | `title-A-centered-classic`, `title-B-asymmetric-block`, `title-C-oversized-numeral` |
+| section | ≥3 | `section-A-…`, `section-B-…`, `section-C-…` |
+| 2col | ≥3 | `2col-A-…`, `2col-B-…`, `2col-C-…` |
+| comparison | ≥3 | `comparison-A-…`, `comparison-B-…`, `comparison-C-…` |
+| data-chart | ≥3 | `data-chart-A-…`, `data-chart-B-…`, `data-chart-C-…` |
+| data-table | ≥3 | `data-table-A-…`, `data-table-B-…`, `data-table-C-…` |
+| quote | ≥3 | `quote-A-…`, `quote-B-…`, `quote-C-…` |
+| closing | ≥3 | `closing-A-…`, `closing-B-…`, `closing-C-…` |
+| stat-callout | ≥5 | `stat-callout-A-centered-hero`, `stat-callout-B-asymmetric-grid`, `stat-callout-C-vertical-stack`, `stat-callout-D-full-bleed-numeral`, `stat-callout-E-side-by-side` |
+
+When composing `render-deck.cjs`, vary variant choice across slides so 3+ slides do not share the same `{recipe}-[A-E]-{shorthand}` ID (design-validator flags diversity violations).
+
+## Reference Libraries
+
+The design-DNA picker (SKILL.md Step 2.5) draws from three curated libraries. Copy hex values, font names, and motif treatments verbatim — do not invent new ones.
+
+- [Palette Library](palettes.md) — colors. ≥14 named palettes; each block lists 4-6 hex values with role labels (bg/primary/secondary/accent/ink/muted) plus DO/DON'T use-case notes.
+- [Typography Library](typography.md) — type pairings. ≥8 heading+body pairings anchored on bundled IBM Plex; non-Plex pairings fall back to Plex when the user's system lacks the font.
+- [Motif Library](motifs.md) — visual treatments. ≥8 motifs (underline-accent, geometric-block, asymmetric-grid, number-as-design, diagonal-split, editorial-rule, minimalist-void, gradient-overlay, type-as-image) with 1-line descriptions and code snippets.
+
 ## Recipe index
 
 | # | Slide type | Recipe file | When to use |
