@@ -36,7 +36,24 @@ async function main() {
     process.exit(1);
   }
   if (!args.findings) {
-    console.error('cli.js: --findings <path> required for standalone CLI (agent-driven mode reads in-process)');
+    console.error(
+      'Error: --findings <path> required for standalone CLI\n\n' +
+      'The reviewer step (LLM reading slide images, producing findings JSON) is an\n' +
+      'agent-mode operation only available when running through Claude Code\n' +
+      '(/instadecks:review).\n\n' +
+      'For standalone CLI usage:\n' +
+      '  1. Author findings JSON conforming to skills/review/references/findings-schema.md (v1.1)\n' +
+      '  2. Save as findings.json\n' +
+      '  3. Run: cli.js --findings findings.json <deck.pptx>\n\n' +
+      'Minimal example:\n' +
+      '  {\n' +
+      '    "schema_version": "1.1",\n' +
+      '    "deck": "deck.pptx",\n' +
+      '    "generated_at": "<ISO8601>",\n' +
+      '    "slides": [{"slideNum": 1, "title": "...", "findings": []}]\n' +
+      '  }\n\n' +
+      'See skills/review/references/findings-schema.md for the full schema.'
+    );
     process.exit(2);
   }
   const findings = JSON.parse(fs.readFileSync(path.resolve(args.findings), 'utf8'));
