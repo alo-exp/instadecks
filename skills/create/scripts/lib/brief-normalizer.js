@@ -71,6 +71,30 @@ function canonicalizeJson(input) {
     out.narrative_arc = out.key_messages;
     delete out.key_messages;
   }
+  // Iter5-1: data_points → key_claims when key_claims absent. Each string
+  // becomes {slide_idx: null, claim}; object entries pass through unchanged.
+  // Mirrors deck-brief.js coerceLenientShapes pattern but at the alias layer
+  // so the natural orchestrator shape ({title, key_messages, data_points})
+  // canonicalizes cleanly before validateBrief runs.
+  if (
+    (out.key_claims === undefined || out.key_claims === null) &&
+    Array.isArray(out.data_points)
+  ) {
+    out.key_claims = out.data_points.map((dp) => {
+      if (typeof dp === 'string') return { slide_idx: null, claim: dp };
+      return dp;
+    });
+    // Note: slide_idx: null signals "orchestrator left assignment to agent".
+    // validateBrief downstream requires integer; the test contract calls out
+    // that callers/agents resolve null → integer before validateBrief runs.
+    delete out.data_points;
+  }
+  // Iter5-1: default missing canonical fields so the natural shape passes
+  // validateBrief without forcing callers to hand-fill empties.
+  if (out.key_claims === undefined || out.key_claims === null) out.key_claims = [];
+  if (out.asset_hints === undefined || out.asset_hints === null) out.asset_hints = {};
+  if (out.source_files === undefined || out.source_files === null) out.source_files = [];
+  // `purpose` is intentionally retained — flows to agent prompt + rationale.
   return out;
 }
 
