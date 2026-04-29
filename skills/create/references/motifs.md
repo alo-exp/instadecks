@@ -14,7 +14,7 @@ slide.addText('Q3 grew 23%', {
   x: 0.5, y: 0.6, w: 9, h: 0.9,
   fontFace: 'IBM Plex Serif', fontSize: 36, bold: true, color: '#1F3A2E',
 });
-slide.addShape(pres.shapes.RECT, {
+slide.addShape(pres.shapes.RECTANGLE, {
   x: 0.5, y: 1.55, w: 1.2, h: 0.06, fill: { color: '#C8A24A' }, line: { color: '#C8A24A' },
 });
 ```
@@ -27,7 +27,7 @@ slide.addShape(pres.shapes.RECT, {
 **When it works:** Section openers and stat callouts where you want to chunk content visually without a chart.
 
 ```javascript
-slide.addShape(pres.shapes.RECT, {
+slide.addShape(pres.shapes.RECTANGLE, {
   x: 0, y: 0, w: 10, h: 1.4, fill: { color: '#0B2A6B' }, line: { color: '#0B2A6B' },
 });
 slide.addText('Pipeline · Q3 outlook', {
@@ -81,7 +81,7 @@ slide.addText('Context', {
 **When it works:** Cover slides, transitions, hero claims. Avoid on dense content slides — the diagonal competes with body text.
 
 ```javascript
-slide.addShape(pres.shapes.RECT, {
+slide.addShape(pres.shapes.RECTANGLE, {
   x: -1.0, y: 3.5, w: 14, h: 4, rotate: 18,
   fill: { color: '#E5322D' }, line: { color: '#E5322D' },
 });
@@ -100,11 +100,11 @@ slide.addText('Kinetic.', {
 
 ```javascript
 // Thick rule
-slide.addShape(pres.shapes.RECT, {
+slide.addShape(pres.shapes.RECTANGLE, {
   x: 0.5, y: 0.7, w: 0.6, h: 0.08, fill: { color: '#8C2A2A' }, line: { color: '#8C2A2A' },
 });
 // Thin rule
-slide.addShape(pres.shapes.RECT, {
+slide.addShape(pres.shapes.RECTANGLE, {
   x: 0.5, y: 0.86, w: 9.0, h: 0.015, fill: { color: '#544A3D' }, line: { color: '#544A3D' },
 });
 slide.addText('Field Notes — Logistics', {
@@ -154,7 +154,7 @@ function lerp(aHex, bHex, t) {
 }
 for (let i = 0; i < STEPS; i++) {
   const color = lerp(top, bottom, i / (STEPS - 1));
-  slide.addShape(pres.shapes.RECT, {
+  slide.addShape(pres.shapes.RECTANGLE, {
     x: 0, y: i * (5.625 / STEPS), w: 10, h: 5.625 / STEPS,
     fill: { color }, line: { color },
   });
