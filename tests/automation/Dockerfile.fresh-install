@@ -1,0 +1,43 @@
+# tests/automation/Dockerfile.fresh-install — Plan 10-04 (HARD-12)
+# Reproducible Linux container for the fresh-install integration gate.
+# Mirrors the SessionStart hook's prerequisite list: soffice, pdftoppm, IBM Plex
+# Sans, Node 18+. Replaces the Mac+Windows manual checklist in
+# tests/FRESH-INSTALL.md (Mac/Windows variants OUT OF SCOPE per SPEC §Out of Scope).
+
+FROM node:22-bookworm-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# System prerequisites: LibreOffice Impress (soffice), Poppler (pdftoppm), fontconfig.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+       libreoffice-impress \
+       poppler-utils \
+       fontconfig \
+       ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /instadecks
+
+# Bundled IBM Plex Sans → system fonts dir + refresh fontconfig cache.
+COPY assets/fonts/IBM_Plex_Sans/ /usr/share/fonts/truetype/IBMPlex/
+RUN fc-cache -fv
+
+# Production install — mirrors the first-run behavior of hooks/check-deps.sh.
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+# Copy the rest of the plugin tree (after npm ci so dep layer is cached).
+COPY . .
+
+# Ensure the in-container harness is executable inside the image
+# (host-side chmod is preserved by COPY but this guards against odd build contexts).
+RUN chmod +x tests/automation/scripts/run-fresh-install.sh
+
+# CLAUDE_PLUGIN_ROOT/DATA both resolve to the workdir so plugin-relative paths work.
+ENV CLAUDE_PLUGIN_ROOT=/instadecks
+ENV CLAUDE_PLUGIN_DATA=/instadecks
+ENV CI=true
+ENV NON_INTERACTIVE=1
+
+CMD ["bash", "tests/automation/scripts/run-fresh-install.sh"]
