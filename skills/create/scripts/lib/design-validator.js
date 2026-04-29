@@ -252,8 +252,8 @@ function pickPaletteByTone(designIdeas, toneKeywords, seedOrOpts = 0, opts) {
      : excludeNames instanceof Set ? Array.from(excludeNames)
      : []).map(s => String(s)));
 
+  // Caller guards on wanted.size > 0 before invoking; no internal guard needed.
   const matches = (p) => {
-    if (wanted.size === 0) return false;
     const tags = Array.isArray(p && p.tone_tags) ? p.tone_tags : [];
     return tags.some(t => wanted.has(String(t).toLowerCase()));
   };
