@@ -22,7 +22,9 @@
     "audit:licenses": "node tools/license-audit.js",
     "gate:activation-panel": "node --test tests/automation/activation-panel.test.js",
     "gate:permission-mode": "node --test tests/automation/permission-mode.test.js",
-    "gate:fresh-install": "node --test tests/automation/fresh-install.test.js"
+    "gate:fresh-install": "node --test tests/automation/fresh-install.test.js",
+    "release:dry-run": "bash tools/release-v0.1.0.sh --dry-run",
+    "release": "bash tools/release-v0.1.0.sh"
   },
   "dependencies": {
     "pptxgenjs": "4.0.1"
