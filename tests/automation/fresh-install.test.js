@@ -8,10 +8,11 @@
 // against tests/automation/lib/canonical-brief.json, and assert byte-size
 // thresholds on the 5 produced artifacts.
 //
-// Gating:
+// Gating (CONTEXT D-08 — fresh-install is local-only, never in CI):
+//   - In CI (CI=true) without explicit RUN_DOCKER_TESTS=1: test skipped.
 //   - On hosts without docker binary: test skipped silently.
-//   - On hosts without CI=true and without RUN_DOCKER_TESTS=1: test skipped.
-//   - Otherwise: full docker build + run + parse + assertions.
+//   - On hosts without RUN_DOCKER_TESTS=1: test skipped.
+//   - Otherwise (RUN_DOCKER_TESTS=1 + docker present): full docker build + run.
 //
 // Mac and Windows runner variants are explicitly OUT OF SCOPE per SPEC §Out of
 // Scope and deferred to v1.x; native Mac install remains verified via prior
@@ -31,12 +32,17 @@ function hasDocker() {
   return r.status === 0 && (r.stdout || '').trim().length > 0;
 }
 
-const optedIn = process.env.CI === 'true' || process.env.RUN_DOCKER_TESTS === '1';
+// CONTEXT D-08: fresh-install is local-only. Skip in CI unless RUN_DOCKER_TESTS=1
+// is explicitly set. This prevents flaky/slow docker builds on shared runners.
+const optedIn = process.env.RUN_DOCKER_TESTS === '1';
 const dockerPresent = hasDocker();
 const enabled = optedIn && dockerPresent;
 
 function skipReason() {
-  if (!optedIn) return 'fresh-install docker harness skipped: set CI=true or RUN_DOCKER_TESTS=1 to opt in';
+  if (process.env.CI === 'true' && !optedIn) {
+    return 'fresh-install docker harness skipped: CI run without RUN_DOCKER_TESTS=1 (CONTEXT D-08 — local-only)';
+  }
+  if (!optedIn) return 'fresh-install docker harness skipped: set RUN_DOCKER_TESTS=1 to opt in';
   if (!dockerPresent) return 'fresh-install docker harness skipped: docker binary not found on PATH';
   return '';
 }
