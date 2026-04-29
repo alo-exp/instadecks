@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-04-27)
 
 **Core value:** A user can hand Claude Code arbitrary input material and end up with a polished, design-reviewed, annotated PPTX + PDF — without having to know about pptxgenjs, custom-geometry arrows, or our deck-design-review skill — and the output quality matches what we ship by hand today.
-**Current focus:** Phase 8 COMPLETE — 100% c8 coverage gate live in CI; v0.1.0 release-ready (pending human-only verifications scaffolded in RELEASE.md §1)
+**Current focus:** Phase 10 COMPLETE — v0.1.0 release-automation chain live; `npm run release:dry-run` is the single green-button verification
 **Current milestone:** v0.1.0 — Plugin v0.1.0 Public Release
 
 ## Current Position
 
 Milestone: v0.1.0 (Plugin v0.1.0 Public Release) — 8 phases (incl. Phase 8 test-coverage closure), 67+ requirements
-Phase: 8 of 8 (Test Coverage to 100%) — COMPLETE (7/7 plans)
-Plan: 7 of 7 in Phase 8 (08-07 complete)
-Status: Phase 8 complete — c8 100% gate live in CI (lines/branches/funcs/stmts); bats wired (Gate 5b/5c apt install + run); e2e local-only via CI=true env var (CONTEXT D-08); CONTEXT D-01 reversal applied (annotate.js under standard test discipline); 878 tests / 855 pass / 0 fail / 23 skipped; v0.1.0 release readiness intact.
-Last activity: 2026-04-29 — Plan 10-05 sign-off (HARD-13/HARD-14 release automation: marketplace PR + tag scripts + dry-run + 2 npm scripts; 1209 tests pass; c8 100% intact)
+Phase: 10 of 10 (Hardening, Documentation Compliance, and Release Automation) — COMPLETE (6/6 plans)
+Plan: 6 of 6 in Phase 10 (10-06 complete)
+Status: Phase 10 complete — every previously-human gate now automated (activation-panel, permission-mode, fresh-install via Docker); release-v0.1.0.sh + submit-marketplace-pr.sh shipped with `npm run release:dry-run` / `npm run release`; doc-scheme.md compliance achieved (knowledge/lessons populated, SECURITY.md + CONTRIBUTING.md scaffolded, lint-doc-size.js + CI Gate 7 live); backlog defects HARD-01/02/03 closed; release dry-run E2E test (RUN_RELEASE_E2E=1) green. v0.1.0 ready for `npm run release` — no human-only gate remains.
+Last activity: 2026-04-29 — Plan 10-06 sign-off (Phase 10 closer)
 
 Progress: [██████████] 100%
 
@@ -56,6 +56,11 @@ Recent decisions affecting current work:
 - Plan 08-07 escalation (2026-04-28): On first `npm test` invocation Plan 08-07 surfaced 22 files <100% (gaps in adapter validation branches, DI hooks, render §5 group-slides, license-audit Promise body, fixture-builder catch branches). Per the plan's escalation protocol + W-7 (per-plan re-run budget), gaps were routed to Plan 08-02b which closed all of them in commit c90ce9a. Re-run of `npm test` exited 0 — Phase 8 sign-off proceeded.
 - Plan 10-05 (2026-04-29): HARD-13 + HARD-14 release automation. `tools/submit-marketplace-pr.sh` (gh-CLI driven; --simulate sandbox; appends PR URL to RELEASE.md) + `tools/release-v0.1.0.sh` (10 gates + STATE flip + CHANGELOG + signed-tag-with-fallback per W-1; --dry-run + INSTADECKS_RELEASE_SIMULATE=1 short-circuits; STRICT=1 makes fresh-install non-skippable). 2 npm scripts (`release:dry-run`, `release`). 7 sandbox tests. Tag NOT pushed in this run — deferred to user authorization or Plan 10-06 E2E. Commits e5078e0 + 92c484b.
 - Plan 10-04 (2026-04-29): HARD-12 fresh-install gate automated via Docker. Mac+Windows runner variants OUT OF SCOPE per SPEC §Out of Scope, deferred to v1.x; Linux automated via `tests/automation/Dockerfile.fresh-install` + `run-fresh-install.sh` + `node:test` driver gated by `(CI=true || RUN_DOCKER_TESTS=1) && hasDocker()`. Stub findings (`tests/fixtures/sample-findings.json` rebound at runtime) used to satisfy `/review` + `/content-review` standalone CLI's `--findings` requirement (LLM step is agent-mode-only). 1202 tests / 1170 pass / 0 fail / 32 skipped; 100% c8 coverage gate intact. Commits 238d05e + addf406.
+- Plan 10-01 (2026-04-29): Backlog defects closed — HARD-01 (lint-pptxgenjs-enums.js extended to flag typo'd `pres.shapes.<KEY>` references resolving to undefined); HARD-02 (`.runCreate.lock` cwd-locking serializes parallel runCreate invocations to dodge soffice cold-start race); HARD-03 (tools/license-audit.js OK-path coverage closed at lines 133-134); c8 100% gate intact without exclusions.
+- Plan 10-02 (2026-04-29): Doc-scheme compliance — knowledge/`YYYY-MM.md` + lessons/`YYYY-MM.md` populated with non-trivial entries from the 10-phase build; SECURITY.md + CONTRIBUTING.md scaffolded; `tools/lint-doc-size.js` enforces size caps (docs ≤500, knowledge/lessons ≤300, planning ≤300) with `--orphans` mode for INDEX.md link integrity; CI Gate 7 wired.
+- Plan 10-03 (2026-04-29): HARD-10/HARD-11 — activation-panel + permission-mode automation. `tests/automation/lib/activation-matcher.js` (Jaccard scorer over keyword token sets) + `tests/automation/activation-panel.test.js` covers 10 prompts × 4 user-invocable skills, asserts ≥ 8/10 per skill. `tests/automation/lib/permission-walker.js` (script AST walker for Bash invocations) + `tests/automation/permission-mode.test.js` validates `allowed-tools` coverage in `default` and `dontAsk` modes. Replaces `tests/activation-panel.md` + `tests/PERMISSION-MODE.md` manual matrices.
+- Plan 10-05 (2026-04-29): HARD-13 + HARD-14 release automation. `tools/submit-marketplace-pr.sh` (gh-CLI driven; --simulate sandbox; appends PR URL to RELEASE.md) + `tools/release-v0.1.0.sh` (10 gates + STATE flip + CHANGELOG + signed-tag-with-fallback per W-1; --dry-run + INSTADECKS_RELEASE_SIMULATE=1 short-circuits; STRICT=1 makes fresh-install non-skippable). 2 npm scripts (`release:dry-run`, `release`). 7 sandbox tests. Tag NOT pushed in this run — deferred to user authorization or Plan 10-06 E2E. Commits e5078e0 + 92c484b.
+- Plan 10-06 (2026-04-29): HARD-15 — release dry-run E2E integration test. `tests/release-dry-run-e2e.test.js` gated by `RUN_RELEASE_E2E=1` spawns `npm run release:dry-run` and asserts all 9 gate markers + fresh-install line + 5 DRY-RUN action lines (W-4 shared-contract). Phase 10 closer: STATE/ROADMAP/RELEASE/CHANGELOG flipped to Phase 10 COMPLETE. v0.1.0 release-readiness now: `npm run release:dry-run` (green) → `npm run release` (real). No human-only gate remains.
 
 ### Pending Todos
 

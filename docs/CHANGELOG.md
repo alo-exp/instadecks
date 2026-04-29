@@ -17,6 +17,15 @@
 
 <!-- ENTRIES BELOW — newest first -->
 
+## 2026-04-29 — Phase 10 closed: v0.1.0 release-automation chain live
+
+- 10-01: backlog defects HARD-01/02/03 closed (enum-lint typo detection, runCreate cwd lock, license-audit OK-path coverage)
+- 10-02: doc-scheme.md compliance — knowledge/lessons populated, SECURITY.md + CONTRIBUTING.md scaffolded, lint-doc-size.js + CI Gate 7 wired
+- 10-03: activation-panel + permission-mode automation (Jaccard scorer + script walker)
+- 10-04: fresh-install Docker harness (Linux runner; Mac+Win deferred to v1.x)
+- 10-05: marketplace-PR + release-v0.1.0 scripts + npm release/release:dry-run
+- 10-06: release dry-run E2E integration test (opt-in via RUN_RELEASE_E2E=1)
+
 ## 2026-04-29 — Phase 10: Hardening, Documentation Compliance, and Release Automation
 
 **What**: Closes the v0.1.0 release-readiness gate by hardening the build, bringing documentation to 100% compliance with `docs/doc-scheme.md`, and wiring release automation.
