@@ -81,17 +81,31 @@ case "$(uname -s)" in
   *)                    FONT_DIR="" ;;
 esac
 if command -v fc-list >/dev/null 2>&1; then
-  if ! fc-list 2>/dev/null | grep -qi "IBM Plex Sans"; then
+  # Iter4-1: probe Sans, Serif, Mono. If ANY of the three is missing, copy
+  # all bundled families. Cookbook recipes reference all three (typography.md
+  # heading pairings include Plex Serif and Plex Mono); a missing family
+  # silently falls back to a system serif/mono with different metrics, which
+  # produces visible letter-spacing artifacts.
+  MISSING_FAMILY=""
+  for fam in "IBM Plex Sans" "IBM Plex Serif" "IBM Plex Mono"; do
+    if ! fc-list 2>/dev/null | grep -qi "$fam"; then
+      MISSING_FAMILY="$fam"
+      break
+    fi
+  done
+  if [ -n "$MISSING_FAMILY" ]; then
     if [ -n "$FONT_DIR" ]; then
       if mkdir -p "$FONT_DIR" 2>/dev/null \
          && cp "$PLUGIN_ROOT/assets/fonts/IBM_Plex_Sans/"*.ttf "$FONT_DIR/" 2>/dev/null \
+         && cp "$PLUGIN_ROOT/assets/fonts/IBM_Plex_Serif/"*.ttf "$FONT_DIR/" 2>/dev/null \
+         && cp "$PLUGIN_ROOT/assets/fonts/IBM_Plex_Mono/"*.ttf "$FONT_DIR/" 2>/dev/null \
          && fc-cache -f >/dev/null 2>&1; then
-        INFO+=("fonts installed")
+        INFO+=("fonts installed (Plex Sans/Serif/Mono)")
       else
         WARN+=("font install failed; see assets/fonts/IBM_Plex_Sans/README.md")
       fi
     else
-      WARN+=("install IBM Plex Sans manually: see \${CLAUDE_PLUGIN_ROOT}/assets/fonts/IBM_Plex_Sans/README.md")
+      WARN+=("install IBM Plex family manually: see \${CLAUDE_PLUGIN_ROOT}/assets/fonts/")
     fi
   fi
 fi
