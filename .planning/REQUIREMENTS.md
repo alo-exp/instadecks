@@ -95,6 +95,21 @@
 - [ ] **TEST-07**: `npm run test:e2e` runs real-soffice E2E locally if `soffice` is on PATH; skipped silently when absent; never runs in CI; FRESH-INSTALL.md remains the human E2E gate for v0.1.0
 - [ ] **TEST-08**: Coverage gate added to CI workflow: `npm test` (c8 --100 --check-coverage per D-02) fails the build on any regression below 100%
 
+### Design Variety & Brief Polymorphism (DV)
+
+- [ ] **DV-01**: Cookbook offers ≥3 variants per slide type with VARIANT_IDs and working code
+- [ ] **DV-02**: `references/palettes.md` exists with ≥14 named modern palettes
+- [ ] **DV-03**: `references/typography.md` exists with ≥8 type pairings
+- [ ] **DV-04**: `references/motifs.md` exists with ≥8 motifs
+- [ ] **DV-05**: SKILL.md instructs agent to roll design DNA + diversity audit
+- [ ] **DV-06**: `lib/brief-normalizer.js` accepts 4 brief shapes (json, markdown, raw, files)
+- [ ] **DV-07**: `runCreate` accepts polymorphic brief; CLI gains `--brief-text`, `--brief-md`, `--brief-files`
+- [ ] **DV-08**: `design-validator.js` recognizes palette library; doesn't false-positive on bold modern
+- [ ] **DV-09**: CLAUDE.md "match v8" invariant reversed; PROJECT.md Key Decision recorded
+- [ ] **DV-10**: 6 live E2E rounds with structurally-varied inputs; ≥80% pairwise visual diversity
+- [ ] **DV-11**: 2 consecutive clean live E2E rounds (no new defects)
+- [ ] **DV-12**: 100% c8 coverage maintained; all 909+ existing tests pass
+
 ### Marketplace & Distribution (DIST)
 
 - [ ] **DIST-01**: All four user-invocable skill descriptions follow the imperative-voice keyword-front-loaded pattern, ≤ 1024 chars, third-person voice, with embedded examples
@@ -156,6 +171,7 @@ Phase ↔ requirement mapping (filled by roadmap, updated as phases ship):
 | 5 | `/instadecks:create` Auto-Refine Loop | CRT-07, CRT-08, CRT-09, CRT-10, CRT-11, CRT-12, CRT-13, CRT-14 | Pending |
 | 6 | `/instadecks:content-review` | CRV-01, CRV-02, CRV-03, CRV-04, CRV-05, CRV-06, CRV-07, CRV-08, CRV-09, CRV-10, CRV-11 | Pending |
 | 7 | Marketplace Publication & Release Polish | DIST-01, DIST-02, DIST-03, DIST-04, DIST-05, DIST-06, DIST-07, DIST-08 | Pending |
+| 9 | Design Variety & Brief Polymorphism | DV-01, DV-02, DV-03, DV-04, DV-05, DV-06, DV-07, DV-08, DV-09, DV-10, DV-11, DV-12 | In Progress |
 
 **Coverage:** 67/67 v1 requirements mapped (FOUND × 11 + ANNO × 11 + RVW × 11 + CRT × 15 + CRV × 11 + DIST × 8). No orphans, no duplicates.
 
