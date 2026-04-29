@@ -4,6 +4,8 @@ description: Annotate a presentation deck by overlaying or stamping design-revie
 allowed-tools:
   - Bash(node:*)
   - Bash(soffice:*)
+  - Bash(unzip:*)
+  - Bash(bash:*)
   - Read
   - Write
 user-invocable: true

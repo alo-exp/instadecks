@@ -92,9 +92,12 @@ function extractFromSh(src) {
       found.add(m[1]);
     }
   }
-  // Bare-command detection over a known allowlist.
-  // Pattern: at start of line (allowing $(, "$( prefixes), the command name.
-  const bareRe = /(?:^|\s|\$\(|`)([\w-]+)\s/gm;
+  // Bare-command detection over a known allowlist. Only match when the
+  // candidate is in a true command position — start of line (with optional
+  // leading whitespace / `then ` / `else ` / `do ` / `; `) or directly after
+  // a `$(` / backtick command-substitution opener. This avoids matching
+  // command-name-shaped tokens inside double-quoted echo strings.
+  const bareRe = /(?:^|^\s+|;\s*|then\s+|else\s+|do\s+|\$\(|`)([a-z][\w-]*)\b/gm;
   let m;
   while ((m = bareRe.exec(src)) !== null) {
     const cmd = m[1];
