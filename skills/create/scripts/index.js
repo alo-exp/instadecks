@@ -56,6 +56,39 @@ function extractHeuristicDesign(cjsSrc) {
     }
   }
 
+  // Iter5-2: also accept `// TYPE:` / `// TYPOGRAPHY:` comment headers and
+  // bare-const string declarations like `const SERIF = 'IBM Plex Serif'`.
+  // Apply only when the object-literal match above did not populate.
+  if (!result.typography) {
+    // (a) Comment header — single line is sufficient. Match anywhere in source.
+    const commentMatch = cjsSrc.match(/^\s*\/\/\s*(?:TYPE|TYPOGRAPHY):\s*(.+?)\s*$/m);
+    if (commentMatch) {
+      result.typography = commentMatch[1];
+    }
+  }
+  if (!result.typography) {
+    // (b) Bare-const string declarations. Look for HEAD/HEADING/SERIF (heading
+    // role) and BODY/SANS/MONO (body role). If both found → "<heading> + <body>".
+    // Otherwise fall back to the first matched font name.
+    const bareRe = /const\s+(HEAD|HEADING|HEADINGS|SERIF|SANS|MONO|BODY|TEXT|DISPLAY)\s*=\s*['"]([^'"]+)['"]/gi;
+    const HEADING_KEYS = new Set(['HEAD', 'HEADING', 'HEADINGS', 'SERIF', 'DISPLAY']);
+    const BODY_KEYS = new Set(['BODY', 'SANS', 'MONO', 'TEXT']);
+    let heading = null, body = null, first = null;
+    let bm;
+    while ((bm = bareRe.exec(cjsSrc)) !== null) {
+      const key = bm[1].toUpperCase();
+      const val = bm[2];
+      if (first === null) first = val;
+      if (heading === null && HEADING_KEYS.has(key)) heading = val;
+      else if (body === null && BODY_KEYS.has(key)) body = val;
+    }
+    if (heading && body) {
+      result.typography = `${heading} + ${body}`;
+    } else if (first) {
+      result.typography = first;
+    }
+  }
+
   // Motif: leading `// Motif: <description>` comment with multi-line continuation.
   // Iter3-1: scan forward from the `// Motif:` line, collecting CONSECUTIVE `//`
   // comment lines (continuation, but NOT another `// Palette:` / `// Typography:`
