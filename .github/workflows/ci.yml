@@ -85,12 +85,20 @@ jobs:
       # Plan 05's path-lint.test.js commits with `git -c user.email=... -c user.name=...`
       # flags per-test (PC-12 option (a), hermetic) — no global `git config --global`
       # prelude required in this workflow.
-      - name: Gate 5b — Install bats-core + libxml2-utils (xmllint)
+      - name: Gate 5b — Install bats-core + libxml2-utils + LibreOffice + Poppler + fontconfig
+        # LibreOffice (soffice) and Poppler (pdftoppm) gate the integration tests
+        # that exercise annotate/create/review pipelines end-to-end. Without them,
+        # ~12 tests skip on Linux that pass locally on Mac, dropping coverage of
+        # skills/annotate/scripts/index.js (line 243-281, 316-350) below 100% and
+        # tripping the `c8 --100` gate. fontconfig is required for the soft
+        # IBM-Plex-Sans probe in /doctor (warns rather than fails when absent).
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats libxml2-utils
+          sudo apt-get install -y bats libxml2-utils libreoffice poppler-utils fontconfig
           bats --version
           xmllint --version 2>&1 | head -1
+          soffice --version
+          pdftoppm -v 2>&1 | head -1
 
       - name: Gate 5c — Bash script test suite (bats)
         run: |
