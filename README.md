@@ -92,6 +92,9 @@ npm run test:bats
 
 # E2E suite (local-only; requires soffice + pdftoppm; skipped silently otherwise):
 npm run test:e2e
+
+# Release automation (Phase 10):
+npm run release:dry-run
 ```
 
 For human end-to-end gating before release, see [tests/FRESH-INSTALL.md](tests/FRESH-INSTALL.md).

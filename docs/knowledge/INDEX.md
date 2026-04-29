@@ -2,16 +2,32 @@
 
 Quick-reference pointer to current project docs. Updated when docs are added/removed.
 
+## Core docs (`docs/`)
+
 | Doc | Path | Purpose |
 |-----|------|---------|
-| Architecture | `docs/ARCHITECTURE.md` | Components, layers, design principles |
-| Testing | `docs/TESTING.md` | Test pyramid, coverage goals |
-| CI/CD | `docs/CICD.md` | Pipeline stages (if CI exists) |
-| Task Log | `docs/CHANGELOG.md` | Rolling task log (50 entries max) |
-| Session Logs | `docs/sessions/` | Per-session work logs (30 max) |
-| Design Specs | `docs/specs/` | Point-in-time design specs |
-| Active Workflow | `docs/workflows/full-dev-cycle.md` | Dev cycle steps |
-| Git Repo | https://github.com/alo-exp/instadecks | — |
+| Architecture | [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) | Components, layers, design principles, release pipeline |
+| Testing | [`docs/TESTING.md`](../TESTING.md) | Test pyramid, coverage goals, CI gates |
+| CI/CD | [`docs/CICD.md`](../CICD.md) | Pipeline stages, gate sequence, local commands |
+| Task Log | [`docs/CHANGELOG.md`](../CHANGELOG.md) | Rolling task log (50 entries max) |
+| Doc scheme | [`docs/doc-scheme.md`](../doc-scheme.md) | Documentation architecture reference |
+| PRD overview | [`docs/PRD-Overview.md`](../PRD-Overview.md) | Product overview document |
+| Security | [`docs/SECURITY.md`](../SECURITY.md) | Threat model, CVE policy, reporting |
+| Contributing | [`docs/CONTRIBUTING.md`](../CONTRIBUTING.md) | Dev setup, test discipline, locked invariants |
+
+## Knowledge & lessons
+
+| Doc | Path | Purpose |
+|-----|------|---------|
+| Knowledge — 2026-04 | [`docs/knowledge/2026-04.md`](./2026-04.md) | Phase 1-10 architecture patterns, decisions, gotchas |
+| Lessons — 2026-04 | [`docs/lessons/2026-04.md`](../lessons/2026-04.md) | Portable lessons (stack, practice, devops, design) |
+
+## External
+
+| Resource | Link |
+|----------|------|
+| Git repo | https://github.com/alo-exp/instadecks |
+| Marketplace | https://github.com/alo-exp |
 
 Latest knowledge: `docs/knowledge/` (current month's file)
 Latest lessons: `docs/lessons/` (current month's file)

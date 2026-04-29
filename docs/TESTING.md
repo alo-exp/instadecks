@@ -44,3 +44,26 @@ Three test layers reinforce the contract:
 - License-checker (zero GPL transitive deps)
 - annotate.js integrity SHA
 - Visual regression baselines (Phase 2 onwards)
+- Doc size caps + INDEX.md orphan check (`tools/lint-doc-size.js [--orphans]`, Phase 10 Gate 7)
+- c8 100% coverage gate (`npm test`, Phase 8 Gate 6)
+
+## Local commands
+
+```bash
+npm test                 # c8 --100 --check-coverage gate (matches CI Gate 6)
+npm run test:smoke       # <30s smoke suite
+npm run test:bats        # bash-script suite (bats)
+npm run test:e2e         # E2E (local-only; auto-skipped when CI=true)
+```
+
+## Phase-10 release-automation gates
+
+Forward-references for Plans 10-03 .. 10-06 (script names land with each plan):
+
+```bash
+npm run gate:activation-panel    # Plan 10-03 — skill activation panel >= 8/10 each
+npm run gate:permission-mode     # Plan 10-04 — permission-mode audit
+npm run gate:fresh-install       # Plan 10-05 — fresh-machine install gate
+npm run release:dry-run          # Plan 10-06 — release dry-run
+npm run release                  # Plan 10-06 — tagged release
+```
