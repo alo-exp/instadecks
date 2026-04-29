@@ -212,21 +212,84 @@ function validateRenderSource(src) {
 // design-ideas.json. Returns the first palette whose tone_tags intersect with
 // any keyword in toneKeywords; if none match, returns the seeded fallback.
 // Pure function — no I/O. designIdeas.palettes shape: [{name, ..., tone_tags}].
-function pickPaletteByTone(designIdeas, toneKeywords, seed = 0) {
+//
+// Live E2E Iter4-3: optional `opts.excludeNames` (Set/Array of palette names
+// already used by recent runs — the diversity audit). When the diversity
+// audit excludes ALL tone-matching palettes, we RELAX the diversity audit
+// (allow reuse, set `relaxed:'diversity'`) BEFORE relaxing tone-fit. The
+// deck looking right matters more than novelty (tone-fit > diversity-audit).
+//
+// Backwards-compatible call signature: pickPaletteByTone(ideas, tags, seed).
+// New: pickPaletteByTone(ideas, tags, seed, { excludeNames }) and an
+// alternate object form pickPaletteByTone(ideas, tags, { seed, excludeNames,
+// returnMeta }). When `returnMeta:true` the function returns
+// { palette, relaxed } instead of just the palette object — used by callers
+// that want to surface the diversity-relaxation warning.
+function pickPaletteByTone(designIdeas, toneKeywords, seedOrOpts = 0, opts) {
+  // Normalize args: support 3-arg legacy (seed) and 4-arg with opts object.
+  let seed = 0;
+  let excludeNames = null;
+  let returnMeta = false;
+  if (typeof seedOrOpts === 'number') {
+    seed = seedOrOpts;
+    if (opts && typeof opts === 'object') {
+      excludeNames = opts.excludeNames || null;
+      returnMeta = !!opts.returnMeta;
+    }
+  } else if (seedOrOpts && typeof seedOrOpts === 'object') {
+    seed = Number.isFinite(seedOrOpts.seed) ? seedOrOpts.seed : 0;
+    excludeNames = seedOrOpts.excludeNames || null;
+    returnMeta = !!seedOrOpts.returnMeta;
+  }
+
   const palettes = (designIdeas && Array.isArray(designIdeas.palettes))
     ? designIdeas.palettes : [];
-  if (palettes.length === 0) return null;
+  if (palettes.length === 0) return returnMeta ? { palette: null, relaxed: null } : null;
+
   const wanted = new Set((toneKeywords || []).map(s => String(s).toLowerCase()));
+  const excluded = new Set(
+    (Array.isArray(excludeNames) ? excludeNames
+     : excludeNames instanceof Set ? Array.from(excludeNames)
+     : []).map(s => String(s)));
+
+  const matches = (p) => {
+    if (wanted.size === 0) return false;
+    const tags = Array.isArray(p && p.tone_tags) ? p.tone_tags : [];
+    return tags.some(t => wanted.has(String(t).toLowerCase()));
+  };
+
+  // Pass 1: tone-fit AND not excluded by diversity audit.
   if (wanted.size > 0) {
     for (let i = 0; i < palettes.length; i++) {
       const idx = (seed + i) % palettes.length;
       const p = palettes[idx];
-      const tags = Array.isArray(p && p.tone_tags) ? p.tone_tags : [];
-      if (tags.some(t => wanted.has(String(t).toLowerCase()))) return p;
+      if (matches(p) && !excluded.has(p.name)) {
+        return returnMeta ? { palette: p, relaxed: null } : p;
+      }
+    }
+    // Pass 2: tone-fit wins over diversity. Relax diversity exclusion;
+    // accept a tone-matching palette even if it was recently used.
+    for (let i = 0; i < palettes.length; i++) {
+      const idx = (seed + i) % palettes.length;
+      const p = palettes[idx];
+      if (matches(p)) {
+        return returnMeta ? { palette: p, relaxed: 'diversity' } : p;
+      }
     }
   }
-  // No match — return seeded fallback (deterministic).
-  return palettes[seed % palettes.length];
+
+  // Pass 3: no tone keywords or no tone-match anywhere — seeded fallback,
+  // honoring excludeNames if any non-excluded palette is available.
+  for (let i = 0; i < palettes.length; i++) {
+    const idx = (seed + i) % palettes.length;
+    const p = palettes[idx];
+    if (!excluded.has(p.name)) {
+      return returnMeta ? { palette: p, relaxed: null } : p;
+    }
+  }
+  // All excluded — return seeded fallback with relaxed flag.
+  const p = palettes[seed % palettes.length];
+  return returnMeta ? { palette: p, relaxed: 'diversity' } : p;
 }
 
 module.exports = {
