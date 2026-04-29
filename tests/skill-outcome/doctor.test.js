@@ -62,7 +62,32 @@ test('exit-code policy: status is integer and matches MISSING-row presence', () 
 });
 
 // Minimal PATH that has bash/sed/grep/command but not soffice/pdftoppm/fc-list/node.
+// On Mac, /usr/bin:/bin happens not to ship fc-list. On Linux CI, fontconfig is in
+// /usr/bin/fc-list, which would defeat the missing-fc-list branch we want to test.
+// `buildCoreutilsSandbox()` constructs a minimal $TMP/cu/ that symlinks only the
+// utilities check.sh actually invokes — explicitly excluding fc-list, soffice,
+// pdftoppm, node — so the missing-tool branches are exercised on every host.
 const SANDBOX_PATH = '/usr/bin:/bin';
+
+function buildCoreutilsSandbox() {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'doctor-cu-'));
+  // Whitelist: utilities check.sh actually invokes. Deliberately excludes
+  // fc-list, soffice, pdftoppm, node so the missing-tool branches fire.
+  const utils = ['sed', 'grep', 'head', 'basename', 'dirname', 'tr', 'cat',
+                 'ls', 'cut', 'awk', 'bash', 'sh', 'env', 'wc', 'command'];
+  for (const u of utils) {
+    for (const root of ['/usr/bin', '/bin', '/usr/local/bin', '/opt/homebrew/bin']) {
+      const src = path.join(root, u);
+      try {
+        if (fs.existsSync(src)) {
+          fs.symlinkSync(src, path.join(dir, u));
+          break;
+        }
+      } catch { /* already linked */ }
+    }
+  }
+  return dir;
+}
 
 test('missing soffice → install instruction surfaced in stdout', () => {
   const r = runDoctor({ pathOverride: SANDBOX_PATH, pluginData: freshTmp('drctr-pd') });
@@ -77,7 +102,10 @@ test('missing pdftoppm → poppler install instruction surfaced', () => {
 });
 
 test('IBM Plex Sans probe is soft (WARN, not MISSING) when fc-list absent', () => {
-  const r = runDoctor({ pathOverride: SANDBOX_PATH, pluginData: freshTmp('drctr-pd-3') });
+  // Build a minimal coreutils sandbox that deliberately excludes fc-list — Linux CI
+  // ships /usr/bin/fc-list which would defeat the missing-fc-list branch otherwise.
+  const sandbox = buildCoreutilsSandbox();
+  const r = runDoctor({ pathOverride: sandbox, pluginData: freshTmp('drctr-pd-3') });
   // fc-list missing path emits a WARN row mentioning IBM Plex Sans OR fc-list itself.
   assert.match(r.stdout, /\[WARN\] (fc-list|IBM Plex Sans)/);
 });
