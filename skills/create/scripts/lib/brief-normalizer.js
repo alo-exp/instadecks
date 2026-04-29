@@ -71,6 +71,23 @@ function canonicalizeJson(input) {
     out.narrative_arc = out.key_messages;
     delete out.key_messages;
   }
+  // Iter6-2: narrative_arc may arrive as an array of beat objects
+  // ({slide, purpose, key_messages}) — coerce each to a string so it
+  // satisfies validateBrief. Priority: purpose → key_messages.join(' — ')
+  // → claim → String(beat).
+  if (Array.isArray(out.narrative_arc)) {
+    out.narrative_arc = out.narrative_arc.map((beat) => {
+      if (typeof beat === 'string') return beat;
+      if (beat && typeof beat === 'object') {
+        if (typeof beat.purpose === 'string' && beat.purpose.length > 0) return beat.purpose;
+        if (Array.isArray(beat.key_messages) && beat.key_messages.length > 0) {
+          return beat.key_messages.join(' — ');
+        }
+        if (typeof beat.claim === 'string' && beat.claim.length > 0) return beat.claim;
+      }
+      return String(beat);
+    });
+  }
   // Iter5-1 / Iter6-1: data_points → key_claims when key_claims absent.
   // Strings get auto-assigned 1-indexed slide_idx (Iter6-1 fix — null fails
   // validateBrief integer check). Object entries preserve their slide_idx if
