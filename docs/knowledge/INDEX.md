@@ -14,6 +14,7 @@ Quick-reference pointer to current project docs. Updated when docs are added/rem
 | PRD overview | [`docs/PRD-Overview.md`](../PRD-Overview.md) | Product overview document |
 | Security | [`docs/SECURITY.md`](../SECURITY.md) | Threat model, CVE policy, reporting |
 | Contributing | [`docs/CONTRIBUTING.md`](../CONTRIBUTING.md) | Dev setup, test discipline, locked invariants |
+| Pre-release gate | [`docs/pre-release-quality-gate.md`](../pre-release-quality-gate.md) | 4-stage release quality gate checklist |
 
 ## Knowledge & lessons
 
