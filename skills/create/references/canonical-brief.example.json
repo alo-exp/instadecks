@@ -1,0 +1,28 @@
+{
+  "topic": "Q3 2026 Strategy Review",
+  "audience": "Board of directors and senior leadership team",
+  "tone": "executive, authoritative, finance, corporate",
+  "narrative_arc": [
+    "Title — Q3 strategy headline",
+    "Context — market conditions and pressure points",
+    "Key insight — single hero stat that anchors the narrative",
+    "Evidence — three supporting data points",
+    "Implications — what this means for next quarter",
+    "Recommendation — concrete next-step ask",
+    "Risks — top 2 risks and mitigations",
+    "Closing — call to action and decision needed"
+  ],
+  "key_claims": [
+    { "slide_idx": 2, "claim": "Net new ARR grew 38% YoY", "evidence": "Q3 2026 financial review", "source": "internal finance, 2026-10" },
+    { "slide_idx": 3, "claim": "EU expansion driving 60% of growth", "evidence": "Regional revenue breakdown", "source": "internal CRM, 2026-10" },
+    { "slide_idx": 5, "claim": "Recommend approving EU hiring plan by 2026-11-15", "evidence": "Capacity model assumptions", "source": "people-ops capacity model" }
+  ],
+  "asset_hints": {
+    "images": [],
+    "logos": []
+  },
+  "source_files": [
+    "Q3-financial-review.pdf",
+    "regional-breakdown.xlsx"
+  ]
+}
