@@ -61,6 +61,48 @@ function renderReviewerNotes(reviewerNotes) {
   return ['## Reviewer Notes', body].join('\n');
 }
 
+// Live E2E Iteration 1 — Fix #2: emit shorthand `**Palette:** <name>` etc.
+// lines at the top so SKILL.md-documented regex extraction (and the
+// visual-diversity test that parses these to verify DNA distinctness across
+// runs) finds the rolled DNA without parsing markdown sections.
+function renderShorthand(designChoices) {
+  const dc = designChoices || {};
+  const palette = (dc.palette && dc.palette.name) || '(unnamed)';
+  let typography;
+  if (dc.typography && typeof dc.typography === 'object') {
+    if (dc.typography.pairing) {
+      typography = dc.typography.pairing;
+    } else if (dc.typography.heading || dc.typography.body) {
+      const h = dc.typography.heading || '';
+      const b = dc.typography.body || '';
+      typography = h && b ? `${h}+${b}` : (h || b);
+    } else {
+      typography = '(unnamed)';
+    }
+  } else {
+    typography = '(unnamed)';
+  }
+  let motif;
+  if (typeof dc.motif === 'string') {
+    if (dc.motif.length === 0) {
+      motif = '(unnamed)';
+    } else {
+      // First sentence/phrase — split on period, semicolon, or em-dash.
+      const m = dc.motif.split(/[.;—]/)[0].trim();
+      motif = m.length > 0 ? m : dc.motif;
+    }
+  } else if (dc.motif && typeof dc.motif === 'object' && dc.motif.name) {
+    motif = dc.motif.name;
+  } else {
+    motif = '(unnamed)';
+  }
+  return [
+    `**Palette:** ${palette}`,
+    `**Typography:** ${typography}`,
+    `**Motif:** ${motif}`,
+  ].join('\n');
+}
+
 function render({ brief, designChoices, reviewerNotes } = {}) {
   if (!brief || typeof brief !== 'object') {
     throw new Error('render: brief must be an object');
@@ -68,6 +110,7 @@ function render({ brief, designChoices, reviewerNotes } = {}) {
   const header = `# Design Rationale — ${brief.topic || ''}`;
   return [
     header,
+    renderShorthand(designChoices),
     renderPalette(designChoices),
     renderTypography(designChoices),
     renderMotif(designChoices),
@@ -82,6 +125,7 @@ module.exports = {
   _internal: {
     renderPalette, renderTypography, renderMotif,
     renderNarrativeArc, renderKeyTradeoffs, renderReviewerNotes,
+    renderShorthand,
     REVIEWER_NOTES_PLACEHOLDER,
   },
 };
