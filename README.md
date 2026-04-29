@@ -4,14 +4,14 @@ Generate, review, and annotate polished presentation decks from any input.
 
 [![CI](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml/badge.svg)](https://github.com/alo-exp/instadecks/actions/workflows/ci.yml)
 [![Coverage](https://img.shields.io/badge/coverage-100%25-brightgreen)](./tests/coverage-baseline.txt)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![License](https://img.shields.io/badge/license-Apache--2.0-green)
 
 ## Overview
 
 Instadecks is a [Claude Code](https://docs.claude.com/en/docs/claude-code) marketplace plugin that ships four user-invocable slash skills for end-to-end deck work: authoring, design review, content/argument review, and findings annotation. It productizes the v8 BluePrestige deck-building workflow (calibrated palette, typography, eight slide types, and an auto-refine convergence loop) into a reusable plugin under [Alo Labs](https://github.com/alo-exp).
 
-The pipeline composes naturally — `/instadecks:create` produces a deck; `/instadecks:review` and `/instadecks:content-review` emit findings JSON in a locked schema; `/instadecks:annotate` overlays those findings on the deck as a PPTX + PDF.
+The pipeline composes naturally — `/instadecks-create` produces a deck; `/instadecks-review` and `/instadecks-content-review` emit findings JSON in a locked schema; `/instadecks-annotate` overlays those findings on the deck as a PPTX + PDF.
 
 ## Install
 
@@ -30,28 +30,29 @@ cd instadecks
 npm ci
 ```
 
-After install, run [`/instadecks:doctor`](#instadecksdoctor-self-check) to self-check that all system prerequisites (LibreOffice, Poppler, Node ≥ 18, pinned `pptxgenjs@4.0.1`, IBM Plex Sans) are present. The SessionStart hook (`hooks/check-deps.sh`) handles the npm install and font-unpack steps automatically on first run; the doctor surfaces any host-installed binaries that still need attention.
+After install, run [`/instadecks-doctor`](#instadecksdoctor-self-check) to self-check that all system prerequisites (LibreOffice, Poppler, Node ≥ 18, pinned `pptxgenjs@4.0.1`, IBM Plex Sans) are present. The SessionStart hook (`hooks/check-deps.sh`) handles the npm install and font-unpack steps automatically on first run; the doctor surfaces any host-installed binaries that still need attention.
 
 ## Quick Start
 
 ```
-/instadecks:create — "Build me a pitch deck from this brief: ..."
-/instadecks:review — "Review my deck for design defects: deck.pptx"
-/instadecks:content-review — "Is my deck persuasive? deck.pptx"
-/instadecks:annotate — "Overlay these findings on my deck: deck.pptx findings.json"
+/instadecks-create — "Build me a pitch deck from this brief: ..."
+/instadecks-review — "Review my deck for design defects: deck.pptx"
+/instadecks-content-review — "Is my deck persuasive? deck.pptx"
+/instadecks-annotate — "Overlay these findings on my deck: deck.pptx findings.json"
 ```
 
 ## Skills
 
 | Slash command                  | Description                                                                                                                          |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `/instadecks:create`           | Generate a polished deck from any input (markdown, PDF, transcript, brief, URL); auto-refined to convergence.                        |
-| `/instadecks:review`           | Design critique using the DECK-VDA 4-pass methodology with finding-grammar output and AI-tell detection.                             |
-| `/instadecks:content-review`   | Argument-structure and narrative critique (Pyramid Principle / MECE / standalone-readability), distinct from visual review.          |
-| `/instadecks:annotate`         | Overlay design-review findings on a deck as PPTX + PDF, given a deck file and findings JSON in the locked schema.                    |
-| `/instadecks:doctor`           | Self-check Instadecks system prerequisites (soffice, pdftoppm, node, pptxgenjs, IBM Plex Sans) and report green/red with install hints. |
+| `/instadecks-create`           | Generate a polished deck from any input (markdown, PDF, transcript, brief, URL); auto-refined to convergence.                        |
+| `/instadecks-review`           | Design critique using the DECK-VDA 4-pass methodology with finding-grammar output and AI-tell detection.                             |
+| `/instadecks-content-review`   | Argument-structure and narrative critique (Pyramid Principle / MECE / standalone-readability), distinct from visual review.          |
+| `/instadecks-annotate`         | Overlay design-review findings on a deck as PPTX + PDF, given a deck file and findings JSON in the locked schema.                    |
+| `/instadecks-doctor`           | Self-check Instadecks system prerequisites (soffice, pdftoppm, node, pptxgenjs, IBM Plex Sans) and report green/red with install hints. |
+| `/instadecks-update`           | Update the local Instadecks installation to the latest GitHub release — compares versions, shows changelog, clones and verifies the new release. |
 
-## /instadecks:doctor Self-Check
+## /instadecks-doctor Self-Check
 
 The doctor skill probes every system prerequisite in one pass and reports a per-row OK / MISSING table with copy-pasteable install commands per OS. Run it after first install, after a host OS upgrade, or whenever any other skill fails with a missing-binary error.
 
@@ -65,7 +66,7 @@ The pinned `pptxgenjs@4.0.1` install and the bundled IBM Plex Sans font are hand
 
 ## Architecture
 
-Instadecks is a Claude Code marketplace plugin shipping 5 namespaced slash skills under `skills/`. The `/instadecks:annotate` skill bundles `annotate.js` verbatim from v8 BluePrestige (SHA-pinned binary asset) and consumes findings JSON in the locked Instadecks schema (1.0 / 1.1). `/instadecks:review` and `/instadecks:content-review` produce findings in that schema; `/instadecks:create` composes a per-run `render-deck.cjs` from a curated pptxgenjs cookbook and wraps the output in an auto-refine convergence loop. `/instadecks:doctor` self-checks system prerequisites. Single repo, single npm tree, pinned `pptxgenjs@4.0.1`.
+Instadecks is a Claude Code marketplace plugin shipping 6 user-invocable slash commands under `commands/`. The `/instadecks-annotate` command bundles `annotate.js` verbatim from v8 BluePrestige (SHA-pinned binary asset) and consumes findings JSON in the locked Instadecks schema (1.0 / 1.1). `/instadecks-review` and `/instadecks-content-review` produce findings in that schema; `/instadecks-create` composes a per-run `render-deck.cjs` from a curated pptxgenjs cookbook and wraps the output in an auto-refine convergence loop. `/instadecks-doctor` self-checks system prerequisites. `/instadecks-update` self-updates the plugin from GitHub releases. Single repo, single npm tree, pinned `pptxgenjs@4.0.1`.
 
 ## Requirements
 

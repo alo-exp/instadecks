@@ -7,24 +7,24 @@ The full architecture spec is in `.planning/research/ARCHITECTURE.md`. This file
 
 ## System Overview
 
-Multi-skill, single-plugin layout (topgun pattern). One plugin shipping four user-invocable slash skills plus shared scripts:
+Multi-skill, single-plugin layout (topgun pattern). One plugin shipping six user-invocable slash commands plus shared scripts:
 
 ```
-/instadecks:create  ──┐
-                      ├──→ /instadecks:review  ──→ /instadecks:annotate  ──→ annotated PPTX + PDF
-                      └──→ /instadecks:content-review  ──→ /instadecks:annotate
+/instadecks-create  ──┐
+                      ├──→ /instadecks-review  ──→ /instadecks-annotate  ──→ annotated PPTX + PDF
+                      └──→ /instadecks-content-review  ──→ /instadecks-annotate
 ```
 
-`/instadecks:create` runs the auto-refine loop (calling `/review` internally each cycle). All four user skills can also be invoked standalone.
+`/instadecks-create` runs the auto-refine loop (calling `/review` internally each cycle). All four user skills can also be invoked standalone.
 
 ## Core Components
 
 | Component | Responsibility |
 |-----------|----------------|
-| `/instadecks:create` skill | Input ingestion, agent-generated `render-deck.cjs`, auto-refine loop control, default pipelining |
-| `/instadecks:review` skill | DECK-VDA 4-pass design review, JSON output in locked schema, R18 AI-tell detection |
-| `/instadecks:content-review` skill | Pyramid Principle / MECE / narrative-arc / claim-evidence; same finding grammar as `/review` |
-| `/instadecks:annotate` skill | Reads findings JSON, severity normalization, slide-image symlinking, invokes `annotate.js` verbatim |
+| `/instadecks-create` skill | Input ingestion, agent-generated `render-deck.cjs`, auto-refine loop control, default pipelining |
+| `/instadecks-review` skill | DECK-VDA 4-pass design review, JSON output in locked schema, R18 AI-tell detection |
+| `/instadecks-content-review` skill | Pyramid Principle / MECE / narrative-arc / claim-evidence; same finding grammar as `/review` |
+| `/instadecks-annotate` skill | Reads findings JSON, severity normalization, slide-image symlinking, invokes `annotate.js` verbatim |
 | `scripts/render-deck.cjs` (per-run) | One-shot pptxgenjs PPTX rendering using cookbook patterns + design-ideas guidance |
 | `scripts/pptx-to-images.sh` | soffice → PDF → pdftoppm → JPGs at 150 DPI; isolated `-env:UserInstallation` per call |
 | `skills/annotate/scripts/annotate.js` | VERBATIM v8 BluePrestige; SHA-pinned; lint-excluded; only one-line require-path patch |
@@ -38,7 +38,7 @@ Multi-skill, single-plugin layout (topgun pattern). One plugin shipping four use
 - **Contract-first.** The `/review → /annotate` JSON schema is locked in Phase 1 and every later component triangulates on it.
 - **Consumer-before-producer.** `/annotate` (smallest, most-locked component) ships first; validates the contract before any producer is built.
 - **Verbatim where calibrated.** `annotate.js` is treated as a SHA-pinned binary asset; only a documented one-line require-path patch is permitted.
-- **Thin skills, thick scripts.** SKILL.md files are agent playbooks (Bash invocations + decision logic); heavy Node logic lives in `scripts/`.
+- **Thin commands, thick scripts.** Command files (`commands/instadecks-*.md`) are agent playbooks (Bash invocations + decision logic); heavy Node logic lives in `skills/<name>/scripts/`.
 - **Filesystem-state handoff between skills.** Inter-skill communication is via JSON files in `.planning/instadecks/<run-id>/` — debuggable, crash-survivable.
 - **Agent runs the loop.** The auto-refine loop owner is `/create` itself (the agent); each "is this finding genuine?" decision is a judgment call.
 

@@ -1,7 +1,7 @@
 # Findings (Triaged) Schema
 
 **Schema variant:** triaged (additive superset of `findings-schema.md` v1.0)
-**Status:** consumed exclusively by the `/instadecks:create` auto-refine loop.
+**Status:** consumed exclusively by the `/instadecks-create` auto-refine loop.
 
 This file documents the agent-augmented variant of the findings document. The base schema in `findings-schema.md` is **UNCHANGED** — this is a strict additive superset for use inside the Phase 5 auto-refine loop.
 
@@ -9,7 +9,7 @@ This file documents the agent-augmented variant of the findings document. The ba
 
 ## 1. Purpose (D-08)
 
-`/instadecks:review` (the producer) emits findings with severity but does NOT set `genuine` based on the user's design rationale or brief — that is judgment-laden context the reviewer does not own. In the auto-refine loop, the agent reads each finding alongside the rendered slide image and the brief, then decides genuine vs non-genuine and writes the augmented document back to disk. Only `genuine && severity_reviewer ∈ {Critical, Major}` findings drive fixes; non-genuine entries are recorded in the ledger's `skipped_finding_ids[]` so the same finding is never relitigated on a later cycle.
+`/instadecks-review` (the producer) emits findings with severity but does NOT set `genuine` based on the user's design rationale or brief — that is judgment-laden context the reviewer does not own. In the auto-refine loop, the agent reads each finding alongside the rendered slide image and the brief, then decides genuine vs non-genuine and writes the augmented document back to disk. Only `genuine && severity_reviewer ∈ {Critical, Major}` findings drive fixes; non-genuine entries are recorded in the ledger's `skipped_finding_ids[]` so the same finding is never relitigated on a later cycle.
 
 ---
 
@@ -100,7 +100,7 @@ The ledger never re-records the full finding text — `id` is the cross-referenc
 
 ## 7. Out of scope
 
-- **Base schema is UNCHANGED.** Standalone `/instadecks:review` consumers read `findings-schema.md` exclusively; they never see this triaged variant.
+- **Base schema is UNCHANGED.** Standalone `/instadecks-review` consumers read `findings-schema.md` exclusively; they never see this triaged variant.
 - **No JSON-Schema file ships in v0.1.0.** Validation is hand-rolled in the auto-refine loop primitives, mirroring the project's "Don't Hand-Roll" exception for findings (research SUMMARY).
 - **No migration path** between the base and triaged variants is needed: the triaged document is produced by adding three fields to a copy of the raw findings, never by mutating the raw file in place. The two-files-per-cycle layout (D-08 / Q-4) makes this explicit.
 

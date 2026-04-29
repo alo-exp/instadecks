@@ -117,3 +117,24 @@ test('run() globs skills/* and returns aggregate', () => {
   assert.equal(r.ok, false);
   assert.equal(r.results.length, 2);
 });
+
+test('run() scans commands/*.md for allowed-tools violations', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'audit-cmd-'));
+  fs.mkdirSync(path.join(root, 'commands'));
+  fs.writeFileSync(path.join(root, 'commands', 'my-cmd.md'), GREEN);
+  fs.writeFileSync(path.join(root, 'commands', 'bad-cmd.md'), RED_WILDCARD);
+  // A commands doc with no frontmatter at all (null return) — should be silently skipped
+  fs.writeFileSync(path.join(root, 'commands', 'no-fm.md'), '# Just a doc\n\nNo frontmatter here.');
+  // A commands doc with missing-allowed-tools — should also be silently skipped
+  fs.writeFileSync(path.join(root, 'commands', 'no-tools.md'), RED_MISSING);
+  const r = run(root);
+  assert.equal(r.ok, false);
+  assert.equal(r.results.length, 2); // my-cmd + bad-cmd; no-fm and no-tools skipped
+});
+
+test('run() returns error when no skills or commands directories exist', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'audit-empty-'));
+  const r = run(root);
+  assert.equal(r.ok, false);
+  assert.ok(r.error && r.error.includes('no command or skill files found'));
+});

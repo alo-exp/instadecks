@@ -6,7 +6,7 @@ source managed by GSD. Update during the FINALIZATION step of each phase.
 
 ## Product Vision
 
-Instadecks is a Claude Code marketplace plugin that productizes a refined deck-building workflow into four namespaced slash skills (`/instadecks:create`, `/instadecks:review`, `/instadecks:content-review`, `/instadecks:annotate`). Any Claude Code user can hand the plugin arbitrary input material and receive a polished, design-reviewed, annotated PPTX + PDF without knowing about pptxgenjs, custom-geometry annotation arrows, or our internal review skill.
+Instadecks is a Claude Code marketplace plugin that productizes a refined deck-building workflow into four namespaced slash skills (`/instadecks-create`, `/instadecks-review`, `/instadecks-content-review`, `/instadecks-annotate`). Any Claude Code user can hand the plugin arbitrary input material and receive a polished, design-reviewed, annotated PPTX + PDF without knowing about pptxgenjs, custom-geometry annotation arrows, or our internal review skill.
 
 ## Core Value
 
@@ -17,10 +17,10 @@ A user can hand Claude Code arbitrary input material and end up with a polished,
 See `.planning/REQUIREMENTS.md` for the full list with REQ-IDs. High-level groupings:
 
 - **Plugin Foundation (FOUND)** — manifest, license, contracts, CI gates, fonts, visual-regression baselines
-- **`/instadecks:annotate` (ANNO)** — verbatim annotate.js, severity collapse, adapter, standalone + pipelined modes
-- **`/instadecks:review` (RVW)** — DECK-VDA design review, R18 AI-tell detection, soffice race fix
-- **`/instadecks:create` (CRT)** — multi-format input, render-deck cookbook, 8 slide types, auto-refine loop
-- **`/instadecks:content-review` (CRV)** — Pyramid Principle / MECE / narrative-arc / claim-evidence
+- **`/instadecks-annotate` (ANNO)** — verbatim annotate.js, severity collapse, adapter, standalone + pipelined modes
+- **`/instadecks-review` (RVW)** — DECK-VDA design review, R18 AI-tell detection, soffice race fix
+- **`/instadecks-create` (CRT)** — multi-format input, render-deck cookbook, 8 slide types, auto-refine loop
+- **`/instadecks-content-review` (CRV)** — Pyramid Principle / MECE / narrative-arc / claim-evidence
 - **Marketplace Distribution (DIST)** — skill activation, license compliance, alo-labs PR, v0.1.0
 
 ## Out of Scope

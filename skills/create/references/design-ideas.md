@@ -51,7 +51,7 @@ IBM Plex Sans (bundled, SIL OFL) is the body anchor.
 
 ## 10 Anti-Patterns
 
-1. **Layout repetition.** Re-using the same recipe across more than 3 consecutive slides creates the AI-authored signature `/instadecks:review` flags as R18. Vary recipe across narrative-arc beats.
+1. **Layout repetition.** Re-using the same recipe across more than 3 consecutive slides creates the AI-authored signature `/instadecks-review` flags as R18. Vary recipe across narrative-arc beats.
 
 2. **Body-text centering.** Center-aligning body bullets reduces scanability. Left-align body content; reserve center alignment for hero stats and titles on title/closing slides.
 
@@ -69,4 +69,4 @@ IBM Plex Sans (bundled, SIL OFL) is the body anchor.
 
 9. **Low-contrast palettes.** WCAG AA requires ≥ 4.5:1 for body text. Avoid muted-on-accent or accent-on-secondary combinations for body content.
 
-10. **Accent lines under titles (R18 AI-tell).** A horizontal divider directly below the slide title is the LLM-authored signature `/instadecks:review` flags. If a divider is needed, place it at section-rail position (e.g., under the section number, see `cookbook/section.md`) — never under a title.
+10. **Accent lines under titles (R18 AI-tell).** A horizontal divider directly below the slide title is the LLM-authored signature `/instadecks-review` flags. If a divider is needed, place it at section-rail position (e.g., under the section number, see `cookbook/section.md`) — never under a title.

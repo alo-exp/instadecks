@@ -61,21 +61,41 @@ function auditSkill(skillMdPath) {
 }
 
 function run(rootDir) {
-  const skillsDir = path.join(rootDir, 'skills');
-  if (!fs.existsSync(skillsDir)) {
-    return { ok: false, results: [], error: 'skills dir missing: ' + skillsDir };
-  }
-  const subdirs = fs.readdirSync(skillsDir, { withFileTypes: true })
-    .filter(function (d) { return d.isDirectory(); })
-    .map(function (d) { return d.name; });
   const results = [];
-  for (const sub of subdirs) {
-    const md = path.join(skillsDir, sub, 'SKILL.md');
-    /* c8 ignore next */ // Defensive: every skills/<sub>/ contains SKILL.md by convention; guard skips unexpected non-skill dirs.
-    if (!fs.existsSync(md)) continue;
-    const r = auditSkill(md);
-    results.push(Object.assign({ file: md }, r));
+
+  // Scan skills/<name>/SKILL.md (legacy layout)
+  const skillsDir = path.join(rootDir, 'skills');
+  if (fs.existsSync(skillsDir)) {
+    const subdirs = fs.readdirSync(skillsDir, { withFileTypes: true })
+      .filter(function (d) { return d.isDirectory(); })
+      .map(function (d) { return d.name; });
+    for (const sub of subdirs) {
+      const md = path.join(skillsDir, sub, 'SKILL.md');
+      /* c8 ignore next */ // Defensive: guard skips skill dirs without SKILL.md (e.g. scripts-only dirs).
+      if (!fs.existsSync(md)) continue;
+      const r = auditSkill(md);
+      results.push(Object.assign({ file: md }, r));
+    }
   }
+
+  // Scan commands/*.md (current layout — skills moved here for clean slash-menu names)
+  const commandsDir = path.join(rootDir, 'commands');
+  if (fs.existsSync(commandsDir)) {
+    const files = fs.readdirSync(commandsDir)
+      .filter(function (f) { return f.endsWith('.md'); });
+    for (const f of files) {
+      const md = path.join(commandsDir, f);
+      const r = auditSkill(md);
+      // Commands without allowed-tools frontmatter are non-skill docs — skip silently
+      if (r === null || (r.violations && r.violations.some(function (v) { return v.reason === 'missing-allowed-tools'; }))) continue;
+      results.push(Object.assign({ file: md }, r));
+    }
+  }
+
+  if (results.length === 0) {
+    return { ok: false, results: [], error: 'no command or skill files found to audit' };
+  }
+
   const ok = results.every(function (r) { return r.ok; });
   if (!ok) {
     process.stderr.write('audit-allowed-tools: violations found\n');
@@ -86,7 +106,7 @@ function run(rootDir) {
       }
     }
   } else {
-    process.stdout.write('audit-allowed-tools: OK (' + results.length + ' SKILL.md files passed)\n');
+    process.stdout.write('audit-allowed-tools: OK (' + results.length + ' command/skill files passed)\n');
   }
   return { ok: ok, results: results };
 }

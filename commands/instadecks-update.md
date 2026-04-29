@@ -8,7 +8,14 @@ description: >
   commit SHA, and installs the update using the same mechanism as the official
   Claude plugin system.
 argument-hint: [--check]
-allowed-tools: [Read, Write, Bash]
+allowed-tools:
+  - Read
+  - Write
+  - Bash(jq:*)
+  - Bash(git:*)
+  - Bash(curl:*)
+  - Bash(node:*)
+  - Bash(bash:*)
 user-invocable: true
 version: 0.1.0
 ---
