@@ -1,15 +1,15 @@
 {
   "palettes": [
-    { "name": "Indigo Dawn",     "primary": "1E2761", "secondary": "CADCFC", "accent": "FFFFFF", "ink": "0B1020", "muted": "6B7280" },
-    { "name": "Slate Forest",    "primary": "2F3E2E", "secondary": "B7C9A8", "accent": "F4F1E8", "ink": "1A1F18", "muted": "5E6B58" },
-    { "name": "Crimson Atelier", "primary": "8B1E3F", "secondary": "F2CBC4", "accent": "FBF5EC", "ink": "2A0E15", "muted": "8A6F77" },
-    { "name": "Plex Mono Noir",  "primary": "0B0B0F", "secondary": "D4D4D8", "accent": "FAFAFA", "ink": "09090B", "muted": "52525B" },
-    { "name": "Verdant Steel",   "primary": "1F4D40", "secondary": "B5D8C9", "accent": "F5F8F6", "ink": "0F1F1A", "muted": "5A6F69" },
-    { "name": "Saffron Brief",   "primary": "B8651A", "secondary": "F4D9B5", "accent": "FFFAF0", "ink": "2C1810", "muted": "8B7355" },
-    { "name": "Glacier Ridge",   "primary": "1E5A7A", "secondary": "B8DCE8", "accent": "F4FAFC", "ink": "0F1E2A", "muted": "5C7689" },
-    { "name": "Copper Field",    "primary": "9C4221", "secondary": "EBC8B8", "accent": "FFF8F1", "ink": "2D1410", "muted": "8B6A5C" },
-    { "name": "Cobalt Plex",     "primary": "2546B0", "secondary": "BFD0F0", "accent": "F5F8FF", "ink": "0B1837", "muted": "5A6B8C" },
-    { "name": "Cerulean Plex",   "primary": "0E7490", "secondary": "B5E2EB", "accent": "F0FAFB", "ink": "082F38", "muted": "4A6C73" }
+    { "name": "Indigo Dawn",     "primary": "1E2761", "secondary": "CADCFC", "accent": "FFFFFF", "ink": "0B1020", "muted": "6B7280", "tone_tags": ["executive", "corporate", "finance", "b2b-enterprise", "authoritative"] },
+    { "name": "Slate Forest",    "primary": "2F3E2E", "secondary": "B7C9A8", "accent": "F4F1E8", "ink": "1A1F18", "muted": "5E6B58", "tone_tags": ["sustainability", "impact", "esg", "earth-tone", "conservation"] },
+    { "name": "Crimson Atelier", "primary": "8B1E3F", "secondary": "F2CBC4", "accent": "FBF5EC", "ink": "2A0E15", "muted": "8A6F77", "tone_tags": ["editorial", "premium", "brand", "lifestyle", "fashion"] },
+    { "name": "Plex Mono Noir",  "primary": "0B0B0F", "secondary": "D4D4D8", "accent": "FAFAFA", "ink": "09090B", "muted": "52525B", "tone_tags": ["dev-tools", "infrastructure", "technical", "developer", "monochrome"] },
+    { "name": "Verdant Steel",   "primary": "1F4D40", "secondary": "B5D8C9", "accent": "F5F8F6", "ink": "0F1F1A", "muted": "5A6F69", "tone_tags": ["sustainability", "impact", "heritage", "earth-tone", "foundation"] },
+    { "name": "Saffron Brief",   "primary": "B8651A", "secondary": "F4D9B5", "accent": "FFFAF0", "ink": "2C1810", "muted": "8B7355", "tone_tags": ["hospitality", "artisanal", "warm", "lifestyle", "travel"] },
+    { "name": "Glacier Ridge",   "primary": "1E5A7A", "secondary": "B8DCE8", "accent": "F4FAFC", "ink": "0F1E2A", "muted": "5C7689", "tone_tags": ["executive", "finance", "consulting", "b2b-enterprise", "authoritative"] },
+    { "name": "Copper Field",    "primary": "9C4221", "secondary": "EBC8B8", "accent": "FFF8F1", "ink": "2D1410", "muted": "8B6A5C", "tone_tags": ["artisanal", "hospitality", "premium", "earth-tone", "modern-craft"] },
+    { "name": "Cobalt Plex",     "primary": "2546B0", "secondary": "BFD0F0", "accent": "F5F8FF", "ink": "0B1837", "muted": "5A6B8C", "tone_tags": ["executive", "finance", "consulting", "b2b-enterprise", "corporate"] },
+    { "name": "Cerulean Plex",   "primary": "0E7490", "secondary": "B5E2EB", "accent": "F0FAFB", "ink": "082F38", "muted": "4A6C73", "tone_tags": ["saas", "startup", "modern-tech", "b2b-saas", "growth"] }
   ],
   "typography_pairs": [
     { "heading": "Inter",            "body": "IBM Plex Sans" },
