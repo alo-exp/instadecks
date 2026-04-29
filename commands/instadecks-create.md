@@ -18,7 +18,7 @@ version: 0.1.0
 
 ## What this skill does
 
-Generate a polished presentation deck (PPTX + PDF + design-rationale doc) from arbitrary input. The agent normalizes input into a structured `DeckBrief`, picks a palette and typography pairing from bundled author-original design guidance, composes a per-run `render-deck.cjs` from a curated pptxgenjs cookbook (one recipe per slide type), executes it via `runCreate`, and writes a fixed-template `design-rationale.md`. Outputs cover the 8 canonical slide types at 16:9 widescreen with action titles, page numbers, source lines, and speaker notes by default. Single-cycle in v0.1.0; the auto-refine convergence loop ships in Phase 5.
+Generate a polished presentation deck (PPTX + PDF + design-rationale doc) from arbitrary input. The agent normalizes input into a structured `DeckBrief`, picks a palette and typography pairing from bundled author-original design guidance, composes a per-run `render-deck.cjs` from a curated pptxgenjs cookbook (one recipe per slide type), executes it via `runCreate`, and writes a fixed-template `design-rationale.md`. Outputs cover the 8 canonical slide types at 16:9 widescreen with action titles, page numbers, source lines, and speaker notes. After cycle 1 the agent immediately enters the auto-refine convergence loop — no separate user invocation required — iterating review → triage → fix until `findings_genuine == 0 AND cycle >= 2` (D-07), subject to oscillation detection and the cycle-5 soft cap.
 
 ## When to use this skill
 
@@ -200,12 +200,24 @@ If you passed `designChoices`, runCreate already wrote a baseline. Open `${runDi
 
 ### Step 6 — Surface warnings + outputs to the user
 
-If `result.warnings.length > 0`, surface them (e.g., "xmllint missing — OOXML sanity skipped"). Print:
+If `result.warnings.length > 0`, surface them (e.g., "xmllint missing — OOXML sanity skipped").
 
-- Deck path: `${result.deckPath}`
-- PDF: `${result.pdfPath}` (or "skipped — soffice missing")
-- Design rationale: `${result.rationalePath}`
-- Slides: `${result.slidesCount}`
+**Mirror artifacts to an accessible location** (do this before printing links):
+
+1. Derive a `project_slug` from `brief.topic` — lowercase, spaces→hyphens, strip special chars — and today's date: e.g. `jobready-status-2026-04-30`.
+2. Mirror `deck.pptx` and `deck.pdf` (and `deck.annotated.pptx`/`.pdf` if present) to `/tmp/<project_slug>/`. Create the dir if needed. This path contains no spaces so it is terminal-clickable on macOS.
+3. If the user supplied a declared working folder (e.g. in their brief or `CLAUDE_PLUGIN_DATA/working-folder`), also copy there.
+
+**Print clickable links using the space-free `/tmp/` path:**
+
+```
+📄 PDF:   file:///tmp/<project_slug>/deck.pdf
+📊 PPTX:  file:///tmp/<project_slug>/deck.pptx
+📝 Rationale: ${result.rationalePath}
+🔢 Slides: ${result.slidesCount}
+```
+
+If soffice was missing and no PDF was produced, omit the PDF line and note "PDF skipped — soffice not found".
 
 ## Output contract
 
@@ -295,7 +307,19 @@ b. Render `design-rationale.md` via `lib/render-rationale.js` with the populated
 c. Convert `deck.pptx` → `deck.pdf` via soffice (per Phase 4 `runCreate`; soft on missing tool).
 d. If the final cycle's `findings.json` has any **genuine** findings (`genuine === true` count > 0), invoke `runAnnotate({deckPath: deck.pptx, findings, outDir: runDir, runId})` → `deck.annotated.pptx` + `deck.annotated.pdf`. (Live E2E Iteration 1 Fix #11: aligned to adapter behavior — non-genuine findings are filtered by the adapter, so passing only-non-genuine findings would produce an empty annotated deck. runAnnotate now short-circuits in that case and returns `{annotatedSlideCount:0, message, ...}` with no .pptx/.pdf written; consumers should treat that as "clean convergence".)
 e. If the final findings union is empty (clean convergence), SKIP the annotated artifacts and surface to the user: "Clean convergence — no annotation overlay generated." (Pitfall 7).
-f. Surface the 8-artifact bundle (deck.pptx, deck.pdf, design-rationale.md, findings.json, deck.annotated.pptx, deck.annotated.pdf, refine-ledger.jsonl, render-deck.cjs) to the user.
+f. **Mirror artifacts** — derive `project_slug` from `brief.topic` (lowercase, spaces→hyphens, no special chars) + today's date. Copy `deck.pptx`, `deck.pdf`, and annotated variants (if any) to `/tmp/<project_slug>/`. Also copy to the user's declared working folder if one was supplied in the brief.
+g. Surface the 8-artifact bundle to the user with **clickable `file://` links** using the space-free `/tmp/` mirror path:
+
+```
+📄 PDF:   file:///tmp/<project_slug>/deck.pdf
+📊 PPTX:  file:///tmp/<project_slug>/deck.pptx
+📋 Annotated PDF:  file:///tmp/<project_slug>/deck.annotated.pdf   (if produced)
+📊 Annotated PPTX: file:///tmp/<project_slug>/deck.annotated.pptx  (if produced)
+📝 Rationale: <runDir>/design-rationale.md
+📊 Ledger:    <runDir>/refine-ledger.jsonl
+```
+
+macOS cannot open `file://` links that contain spaces (e.g. Google Drive CloudStorage paths); the `/tmp/` mirror eliminates that friction.
 
 ### Anti-patterns to avoid
 

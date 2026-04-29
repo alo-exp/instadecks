@@ -14,7 +14,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SKILL_MD = path.join(
-  __dirname, '..', 'skills', 'create', 'SKILL.md');
+  __dirname, '..', 'commands', 'instadecks-create.md');
 const COOKBOOK_MD = path.join(
   __dirname, '..', 'skills', 'create', 'references', 'cookbook.md');
 
