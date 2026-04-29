@@ -52,7 +52,7 @@ This file is THE canonical JSON contract for design/content findings produced by
 | Field                | Type    | Required | Purpose                                                                                      |
 | -------------------- | ------- | -------- | -------------------------------------------------------------------------------------------- |
 | `severity_reviewer`  | string  | yes      | One of `"Critical"`, `"Major"`, `"Minor"`, `"Nitpick"` (full 4-tier producer vocabulary).    |
-| `category`           | string  | yes      | One of `"defect"`, `"improvement"`, `"style"`, `"content"`. (`"content"` added in v1.1.)     |
+| `category`           | string  | yes      | One of `"defect"`, `"improvement"`, `"style"`, `"content"`. (`"content"` added in v1.1.) Reviewers MAY emit synonym variants `"polish"` / `"nit"` / `"cosmetic"` for Nitpick-tier cosmetic preferences; the `/annotate` adapter normalizes these to canonical `"style"` (Live E2E Iteration 1 Fix #4). Synonyms are an adapter-only convenience; downstream consumers see canonical values only. |
 | `check_id`           | string  | conditional | Required iff `category === "content"`. One of `"action-title"`, `"redundancy"`, `"jargon"`, `"length"`, `"pyramid-mece"`, `"narrative-arc"`, `"claim-evidence"`, `"standalone-readability"`. (Added in v1.1.) |
 | `genuine`            | boolean | yes      | Auto-refine filter — only `true` findings flow into `/annotate` SAMPLES.                     |
 | `nx`                 | number  | yes      | Normalized x in `[0, 1]`; mapped directly to `annotate.js` `nx`.                             |

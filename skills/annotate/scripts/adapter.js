@@ -13,6 +13,19 @@ const path = require('node:path');
 
 const SEV_MAP = { Critical: 'major', Major: 'major', Minor: 'minor', Nitpick: 'polish' };
 const VALID_CATEGORY = new Set(['defect', 'improvement', 'style', 'content']);
+// Live E2E Iteration 1 — Fix #4: category synonym map.
+// Reviewers (/review, /content-review) sometimes emit `polish` (Nitpick-tier
+// cosmetic preference) or other near-synonyms for the canonical 4-category
+// vocabulary. Mirroring the SEV_MAP 4→3 collapse, the adapter normalizes
+// these to canonical categories. Reviewers MAY emit either form; canonical
+// vocabulary is enforced only at the adapter boundary (per findings-schema.md).
+const CATEGORY_SYNONYMS = { polish: 'style', nit: 'style', cosmetic: 'style' };
+function normalizeCategory(c) {
+  if (typeof c !== 'string') return c;
+  const key = c.toLowerCase();
+  return Object.prototype.hasOwnProperty.call(CATEGORY_SYNONYMS, key)
+    ? CATEGORY_SYNONYMS[key] : c;
+}
 const REQUIRED_FINDING_FIELDS = [
   'severity_reviewer', 'category', 'genuine',
   'nx', 'ny', 'text', 'rationale', 'location', 'standard', 'fix',
@@ -130,7 +143,15 @@ function adaptFindings(doc, deckMeta) {
       if (!(f.severity_reviewer in SEV_MAP)) {
         throw new Error(`${where}.severity_reviewer: ${f.severity_reviewer} not in {Critical,Major,Minor,Nitpick}`);
       }
-      if (typeof f.category !== 'string' || !VALID_CATEGORY.has(f.category)) {
+      if (typeof f.category !== 'string') {
+        throw new Error(`${where}.category: ${f.category} not in {defect,improvement,style,content}`);
+      }
+      // Fix #4: synonym map — normalize before validating. Reviewer-emitted
+      // `polish`/`nit`/`cosmetic` collapse to `style`. Mutates `f.category` so
+      // downstream consumers (and re-serialized findings) see the canonical
+      // form.
+      f.category = normalizeCategory(f.category);
+      if (!VALID_CATEGORY.has(f.category)) {
         throw new Error(`${where}.category: ${f.category} not in {defect,improvement,style,content}`);
       }
       if (typeof f.genuine !== 'boolean') {
@@ -173,4 +194,4 @@ function adaptFindings(doc, deckMeta) {
   return samples;
 }
 
-module.exports = { adaptFindings, readDeckMeta, decodeXmlEntities, SEV_MAP };
+module.exports = { adaptFindings, readDeckMeta, decodeXmlEntities, SEV_MAP, normalizeCategory, CATEGORY_SYNONYMS };
