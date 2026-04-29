@@ -41,7 +41,10 @@ esac
   stub_bin shasum 0 'echo "deadbeef  -"'
   # No npm ci needed if sentinel matches; pre-seed sentinel.
   echo "deadbeef" > "$CLAUDE_PLUGIN_DATA/.npm-installed-sentinel"
-  stub_bin fc-list 0 'echo "IBM Plex Sans:style=Regular"'
+  # check-deps.sh probes all three Plex families (Sans/Serif/Mono) — stub all
+  # three so the font-install branch is not triggered (it would fail under the
+  # bats sandbox because only IBM_Plex_Sans/ is seeded by the test setup).
+  stub_bin fc-list 0 'echo "IBM Plex Sans:style=Regular"; echo "IBM Plex Serif:style=Regular"; echo "IBM Plex Mono:style=Regular"'
   run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"deps OK"* ]]
