@@ -16,10 +16,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       # NOTE: No `--omit=dev` here — license-checker, pixelmatch, and pngjs are
@@ -85,11 +85,12 @@ jobs:
       # Plan 05's path-lint.test.js commits with `git -c user.email=... -c user.name=...`
       # flags per-test (PC-12 option (a), hermetic) — no global `git config --global`
       # prelude required in this workflow.
-      - name: Gate 5b — Install bats-core
+      - name: Gate 5b — Install bats-core + libxml2-utils (xmllint)
         run: |
           sudo apt-get update
-          sudo apt-get install -y bats
+          sudo apt-get install -y bats libxml2-utils
           bats --version
+          xmllint --version 2>&1 | head -1
 
       - name: Gate 5c — Bash script test suite (bats)
         run: |
