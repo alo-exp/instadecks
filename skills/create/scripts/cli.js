@@ -66,6 +66,7 @@ function parseArgs(argv) {
   const args = {
     brief: null, briefText: null, briefMd: null, briefFiles: null,
     runId: null, outDir: null, mode: 'standalone', softCap: null, designChoices: null,
+    scaffold: null, diversityHistory: null,
   };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -77,6 +78,8 @@ function parseArgs(argv) {
     else if (a === '--out-dir') { args.outDir = argv[++i]; }
     else if (a === '--mode') { args.mode = argv[++i]; }
     else if (a === '--design-choices') { args.designChoices = argv[++i]; }
+    else if (a === '--scaffold') { args.scaffold = argv[++i]; }
+    else if (a === '--diversity-history') { args.diversityHistory = argv[++i]; }
     else if (typeof a === 'string' && a.startsWith('--soft-cap=')) {
       args.softCap = parseSoftCapFlag([a]);
     }
@@ -84,6 +87,69 @@ function parseArgs(argv) {
     else { throw new Error(`cli.js: unrecognized argument "${a}"`); }
   }
   return args;
+}
+
+// Live E2E Iteration 2 Fix #10: --scaffold writes a working starter triplet
+// (canonical brief, render-deck template, design-choices envelope) so a
+// standalone-mode user has a runnable baseline without authoring from
+// cookbook recipes.
+function writeScaffold(outDir) {
+  const fsm = require('node:fs');
+  const pathm = require('node:path');
+  const dir = pathm.resolve(outDir);
+  fsm.mkdirSync(dir, { recursive: true });
+  const briefSrc = pathm.join(__dirname, '..', 'references', 'canonical-brief.example.json');
+  fsm.copyFileSync(briefSrc, pathm.join(dir, 'canonical-brief.example.json'));
+  const designChoices = {
+    palette: {
+      name: 'Cobalt Edge',
+      primary: '0B2A6B', secondary: '2E4A8C', accent: 'F59E0B', ink: '0B2A6B', muted: '8FA1C7',
+      rationale: 'Authoritative finance/board register; cobalt + amber avoid default Office blue.'
+    },
+    typography: {
+      heading: 'IBM Plex Sans', body: 'IBM Plex Sans',
+      pairing: 'IBM Plex Sans Bold + IBM Plex Sans Regular',
+      rationale: 'Single-family discipline; weight contrast carries hierarchy.'
+    },
+    motif: 'Quiet diagonals as section bookends; numerals foregrounded; no decorative imagery on data slides.',
+    tradeoffs: [
+      'Avoided default Office blue to dodge AI-tell',
+      'Single typography family for discipline'
+    ]
+  };
+  fsm.writeFileSync(pathm.join(dir, 'design-choices.example.json'),
+    JSON.stringify(designChoices, null, 2) + '\n');
+  const cjs = `'use strict';
+// render-deck.template.cjs — Live E2E Iteration 2 Fix #10 scaffold.
+// Replace TITLE/CONTENT placeholders with values from canonical-brief.example.json.
+// See skills/create/references/cookbook/*.md for variant recipes.
+// Motif: Quiet diagonals as section bookends; numerals foregrounded.
+
+const pptxgen = require('pptxgenjs');
+const pres = new pptxgen();
+pres.layout = 'LAYOUT_16x9';
+
+const PALETTE = { primary: '0B2A6B', secondary: '2E4A8C', accent: 'F59E0B', ink: '0B2A6B', muted: '8FA1C7' };
+const TYPE = { heading: 'IBM Plex Sans', body: 'IBM Plex Sans' };
+const W = 10, H = 5.625, MARGIN_X = 0.5;
+
+async function main() {
+  const slide = pres.addSlide();
+  slide.background = { color: 'FFFFFF' };
+  slide.addText('Replace with brief.topic', {
+    x: MARGIN_X, y: 2.4, w: W - 1.0, h: 1.0,
+    fontFace: TYPE.heading, fontSize: 36, bold: true, color: PALETTE.primary, margin: 0,
+  });
+  await pres.writeFile({ fileName: 'deck.pptx' });
+}
+main().catch(e => { console.error(e); process.exit(1); });
+`;
+  fsm.writeFileSync(pathm.join(dir, 'render-deck.template.cjs'), cjs);
+  return {
+    brief: pathm.join(dir, 'canonical-brief.example.json'),
+    designChoices: pathm.join(dir, 'design-choices.example.json'),
+    template: pathm.join(dir, 'render-deck.template.cjs'),
+  };
 }
 
 function countBriefFlags(args) {
@@ -102,6 +168,13 @@ async function main() {
   } catch (e) {
     console.error(e.message);
     process.exit(1);
+  }
+
+  // Live E2E Iteration 2 Fix #10: --scaffold short-circuits before brief checks.
+  if (args.scaffold) {
+    const written = writeScaffold(args.scaffold);
+    process.stdout.write(JSON.stringify(written, null, 2) + '\n');
+    return;
   }
 
   // Plan 9-04: mutual exclusion across the 4 brief flags.
@@ -166,6 +239,7 @@ async function main() {
     outDir: args.outDir ? path.resolve(args.outDir) : undefined,
     mode: args.mode,
     designChoices,
+    diversityHistory: args.diversityHistory || undefined,
   });
 }
 
@@ -174,4 +248,4 @@ if (require.main === module) {
   main().catch(e => { console.error(e.stack || e.message); process.exit(3); });
 }
 
-module.exports = { isInteractive, parseSoftCapFlag, resolveSoftCap, parseArgs, inferTypeFromExt, countBriefFlags };
+module.exports = { isInteractive, parseSoftCapFlag, resolveSoftCap, parseArgs, inferTypeFromExt, countBriefFlags, writeScaffold };
