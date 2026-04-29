@@ -18,16 +18,21 @@ setup() {
 }
 
 # A soffice stub that writes a syntactically valid PDF (>=1024 bytes, %PDF magic).
+# Portability: macOS bash 3.2 populates BASH_ARGV[0] at script top level, but Linux
+# bash 4+/5.x leaves it empty unless `shopt -s extdebug` is on. Walk argv with shift
+# to find the trailing input arg (last positional) instead.
 stub_soffice_ok() {
   stub_bin soffice 0 '
 OUTDIR=""
+INPUT=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --outdir) OUTDIR="$2"; shift 2 ;;
-    *) shift ;;
+    -env:*|--headless|--convert-to) shift ;;
+    pdf) shift ;;
+    *) INPUT="$1"; shift ;;
   esac
 done
-INPUT="${BASH_ARGV[0]:-}"
 BASENAME="$(basename "${INPUT%.*}")"
 PDF="$OUTDIR/$BASENAME.pdf"
 { printf "%%PDF-1.4\n"; head -c 2048 /dev/zero | tr "\0" "x"; } > "$PDF"
@@ -88,10 +93,15 @@ JPG="${PREFIX}-1.jpg"
 @test "soffice produces zero-byte PDF: size check fires (exit 3)" {
   stub_bin soffice 0 '
 OUTDIR=""
+INPUT=""
 while [ $# -gt 0 ]; do
-  case "$1" in --outdir) OUTDIR="$2"; shift 2 ;; *) shift ;; esac
+  case "$1" in
+    --outdir) OUTDIR="$2"; shift 2 ;;
+    -env:*|--headless|--convert-to) shift ;;
+    pdf) shift ;;
+    *) INPUT="$1"; shift ;;
+  esac
 done
-INPUT="${BASH_ARGV[0]:-}"
 : > "$OUTDIR/$(basename "${INPUT%.*}").pdf"
 '
   run bash "$SCRIPT" "$IN" "$OUT"
@@ -102,10 +112,15 @@ INPUT="${BASH_ARGV[0]:-}"
 @test "soffice output lacks %PDF magic: exit 3" {
   stub_bin soffice 0 '
 OUTDIR=""
+INPUT=""
 while [ $# -gt 0 ]; do
-  case "$1" in --outdir) OUTDIR="$2"; shift 2 ;; *) shift ;; esac
+  case "$1" in
+    --outdir) OUTDIR="$2"; shift 2 ;;
+    -env:*|--headless|--convert-to) shift ;;
+    pdf) shift ;;
+    *) INPUT="$1"; shift ;;
+  esac
 done
-INPUT="${BASH_ARGV[0]:-}"
 PDF="$OUTDIR/$(basename "${INPUT%.*}").pdf"
 head -c 2048 /dev/zero | tr "\0" "x" > "$PDF"
 '

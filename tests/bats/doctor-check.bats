@@ -120,8 +120,19 @@ exit 0
   stub_node 20
   stub_bin soffice 0 ''
   stub_bin pdftoppm 0 ''
-  # No fc-list stub.
-  run env PATH="$BATS_TEST_TMPDIR/bin:/usr/bin:/bin" bash "$SCRIPT"
+  # No fc-list stub. Linux CI runners ship fontconfig in /usr/bin/fc-list, which
+  # would defeat `command -v fc-list` and skip the missing-fc-list branch. Build
+  # a minimal coreutils sandbox under $BATS_TEST_TMPDIR/cu/ that contains only
+  # the utilities check.sh actually invokes (sed, grep, head, basename, dirname,
+  # cd is a builtin), then run with PATH limited to stubdir + sandbox.
+  CU="$BATS_TEST_TMPDIR/cu"
+  mkdir -p "$CU"
+  for u in sed grep head basename dirname tr cat ls cut awk bash sh env wc; do
+    if command -v "$u" >/dev/null 2>&1; then
+      ln -sf "$(command -v "$u")" "$CU/$u"
+    fi
+  done
+  run env PATH="$BATS_TEST_TMPDIR/bin:$CU" bash "$SCRIPT"
   [ "$status" -eq 0 ]
   [[ "$output" == *"[WARN] fc-list not installed"* ]]
 }
