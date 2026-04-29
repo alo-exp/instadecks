@@ -34,10 +34,13 @@ function recipeFnName(slug) {
   return map[slug];
 }
 
-function extractJsCodeFence(md) {
-  const m = md.match(/```javascript\n([\s\S]*?)\n```/);
-  if (!m) throw new Error('no JS code-fence');
-  return m[1];
+function extractAllJsCodeFences(md) {
+  const re = /```javascript\n([\s\S]*?)\n```/g;
+  const out = [];
+  let m;
+  while ((m = re.exec(md)) !== null) out.push(m[1]);
+  if (out.length === 0) throw new Error('no JS code-fence');
+  return out;
 }
 
 const COOKBOOK_DIR = path.join(__dirname, '..', 'skills', 'create', 'references', 'cookbook');
@@ -45,23 +48,34 @@ const COOKBOOK_DIR = path.join(__dirname, '..', 'skills', 'create', 'references'
 for (const recipe of RECIPES) {
   test(`recipe ${recipe}: code-fence parses + uses ENUM constants`, () => {
     const md = fs.readFileSync(path.join(COOKBOOK_DIR, `${recipe}.md`), 'utf8');
-    const code = extractJsCodeFence(md);
-    // Layer 2 enum-lint pass:
-    lintCjs(code, { filename: `${recipe}.md` });
-    // Sandboxed callable check: wrap in factory + call with mock pres.
-    const fnName = `render${recipeFnName(recipe)}`;
-    const factory = new Function(
-      'pres', 'PALETTE', 'TYPE', 'W', 'H', 'MARGIN_X', 'MARGIN_Y', 'TITLE_Y', 'TITLE_H', 'FOOTER_Y', 'addFooter',
-      `${code}\n; return ${fnName};`
-    );
-    const mockPres = {
-      shapes: new Proxy({}, { get: () => 'ENUM_STUB' }),
-      charts: new Proxy({}, { get: () => 'CHART_STUB' }),
-    };
-    const PALETTE = { primary: '111111', secondary: '222222', accent: 'FFFFFF', ink: '000000', muted: '888888' };
-    const TYPE = { heading: 'IBM Plex Sans', body: 'IBM Plex Sans', mono: 'IBM Plex Mono' };
-    const fn = factory(mockPres, PALETTE, TYPE, 10, 5.625, 0.5, 0.4, 0.3, 0.7, 5.325, () => {});
-    assert.equal(typeof fn, 'function', `${fnName} must be a function`);
+    const codes = extractAllJsCodeFences(md);
+    // Plan 9-02 introduced ≥3 variants per recipe (renderTitleA, renderTitleB, …);
+    // verify EACH variant code-fence lints clean and instantiates as a callable.
+    const baseFn = `render${recipeFnName(recipe)}`;
+    const fnRe = new RegExp(`function\\s+(${baseFn}[A-E])\\s*\\(`);
+    let variantsChecked = 0;
+    for (const code of codes) {
+      const fnMatch = code.match(fnRe);
+      if (!fnMatch) continue; // skip non-variant code-fences (none expected, but be tolerant)
+      const fnName = fnMatch[1];
+      // Layer 2 enum-lint pass per variant:
+      lintCjs(code, { filename: `${recipe}.md (${fnName})` });
+      // Sandboxed callable check: wrap in factory + call with mock pres.
+      const factory = new Function(
+        'pres', 'PALETTE', 'TYPE', 'W', 'H', 'MARGIN_X', 'MARGIN_Y', 'TITLE_Y', 'TITLE_H', 'FOOTER_Y', 'addFooter',
+        `${code}\n; return ${fnName};`
+      );
+      const mockPres = {
+        shapes: new Proxy({}, { get: () => 'ENUM_STUB' }),
+        charts: new Proxy({}, { get: () => 'CHART_STUB' }),
+      };
+      const PALETTE = { primary: '111111', secondary: '222222', accent: 'FFFFFF', ink: '000000', muted: '888888' };
+      const TYPE = { heading: 'IBM Plex Sans', body: 'IBM Plex Sans', mono: 'IBM Plex Mono' };
+      const fn = factory(mockPres, PALETTE, TYPE, 10, 5.625, 0.5, 0.4, 0.3, 0.7, 5.325, () => {});
+      assert.equal(typeof fn, 'function', `${fnName} must be a function`);
+      variantsChecked += 1;
+    }
+    assert.ok(variantsChecked >= 3, `${recipe}: expected ≥3 variant code-fences, got ${variantsChecked}`);
   });
 }
 
