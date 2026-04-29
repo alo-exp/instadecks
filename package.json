@@ -7,10 +7,10 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "CI=true c8 --100 --check-coverage --reporter text node --test 'tests/**/*.test.js'",
-    "coverage": "c8 --reporter html --reporter text node --test 'tests/**/*.test.js'",
-    "test:smoke": "node --test 'tests/smoke/**/*.test.js'",
-    "test:e2e": "node --test 'tests/e2e/**/*.test.js'",
+    "test": "CI=true c8 --100 --check-coverage --reporter text bash -c \"find tests -name '*.test.js' -print0 | xargs -0 node --test\"",
+    "coverage": "c8 --reporter html --reporter text bash -c \"find tests -name '*.test.js' -print0 | xargs -0 node --test\"",
+    "test:smoke": "bash -c \"find tests/smoke -name '*.test.js' -print0 | xargs -0 node --test\"",
+    "test:e2e": "bash -c \"find tests/e2e -name '*.test.js' -print0 | xargs -0 node --test\"",
     "test:bats": "bats tests/bats/",
     "test:bats:if-installed": "command -v bats >/dev/null 2>&1 && bats tests/bats/ || echo 'bats not installed; skipping'",
     "lint:paths": "bash tools/lint-paths.sh",
