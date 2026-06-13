@@ -1,4 +1,4 @@
-# Instadecks
+# InstaDecks
 
 Generate, review, and annotate polished presentation decks from any input.
 
