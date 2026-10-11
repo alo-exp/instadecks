@@ -1,6 +1,6 @@
 {
   "name": "instadecks",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Generate, review, content-review, and annotate polished presentation decks from any input. This plugin provides four namespaced slash skills for design critique, argument-structure review, annotation overlays, and full deck authoring with auto-refine convergence.",
   "author": {
     "name": "Alo Labs",
